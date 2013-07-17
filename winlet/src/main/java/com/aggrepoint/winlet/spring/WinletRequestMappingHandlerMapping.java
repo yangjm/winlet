@@ -10,8 +10,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.aggrepoint.winlet.LogInfo;
-import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.LogInfoImpl;
+import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.ViewInstance;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.spring.annotation.Window;
@@ -37,8 +37,8 @@ public class WinletRequestMappingHandlerMapping extends
 	@Override
 	protected HandlerMethod lookupHandlerMethod(String lookupPath,
 			HttpServletRequest request) throws Exception {
-		ReqInfo req = new ReqInfo(request, lookupPath);
-		LogInfo.getLogInfo(request, null).setReqInfo(req);
+		ReqInfoImpl req = new ReqInfoImpl(request, lookupPath);
+		LogInfoImpl.getLogInfo(request, null).setReqInfo(req);
 
 		HandlerMethod hm = super.lookupHandlerMethod(lookupPath, request);
 		if (hm == null)

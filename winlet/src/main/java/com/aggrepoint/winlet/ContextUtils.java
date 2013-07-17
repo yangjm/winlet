@@ -7,7 +7,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
- * @see ReqInfo
+ * @see ReqInfoImpl
  * @author Jim
  */
 public class ContextUtils {
@@ -19,11 +19,11 @@ public class ContextUtils {
 			.getName() + ".REQUEST_PSN_RULE_ENGINE";
 	private static String REQUEST_CONFIG_PROVIDER = ContextUtils.class
 			.getName() + ".REQUEST_CONFIG_PROVIDER";
-	private static String REQUEST_LOGINFO_KEY = LogInfo.class.getName()
+	private static String REQUEST_LOGINFO_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_LOGINFO_KEY";
 
-	public static ReqInfo getReqInfo() {
-		return (ReqInfo) RequestContextHolder.currentRequestAttributes()
+	public static ReqInfoImpl getReqInfo() {
+		return (ReqInfoImpl) RequestContextHolder.currentRequestAttributes()
 				.getAttribute(WinletConst.REQUEST_ATTR_REQUEST,
 						RequestAttributes.SCOPE_REQUEST);
 	}
@@ -60,8 +60,8 @@ public class ContextUtils {
 		getSession().removeAttribute(name);
 	}
 
-	public static LogInfo getLogInfo(HttpServletRequest request) {
-		return (LogInfo) request.getAttribute(REQUEST_LOGINFO_KEY);
+	public static LogInfoImpl getLogInfo(HttpServletRequest request) {
+		return (LogInfoImpl) request.getAttribute(REQUEST_LOGINFO_KEY);
 	}
 
 	public static void setLogInfo(HttpServletRequest request, LogInfo li) {
@@ -70,6 +70,10 @@ public class ContextUtils {
 
 	public static UserEngine getUserEngine(HttpServletRequest request) {
 		return (UserEngine) request.getAttribute(REQUEST_USER_ENGINE);
+	}
+
+	public static UserProfile getUser(HttpServletRequest request) {
+		return ((UserEngine) request.getAttribute(REQUEST_USER_ENGINE)).getUser(request);
 	}
 
 	public static void setUserEngine(HttpServletRequest request,

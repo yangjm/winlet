@@ -41,7 +41,7 @@ public class ReturnDefList {
 	public ArrayList<ReturnDef> getReturnDef(String code) {
 		ArrayList<ReturnDef> list = htRetDefs.get(code);
 		if (list == null || list.size() == 0)
-			return htRetDefs.get("");
+			return htRetDefs.get(Return.NOT_SPECIFIED);
 
 		return list;
 	}

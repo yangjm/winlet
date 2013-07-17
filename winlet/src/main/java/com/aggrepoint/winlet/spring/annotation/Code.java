@@ -8,9 +8,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Code {
-	static final String VIEW_NOT_SPECIFIED = "VIEW_NOT_SPECIFIED";
-
-	String value();
+	String value() default Return.NOT_SPECIFIED;
 
 	String rule() default "";
 
@@ -26,5 +24,5 @@ public @interface Code {
 
 	String title() default "";
 
-	String view() default VIEW_NOT_SPECIFIED;
+	String view() default Return.NOT_SPECIFIED;
 }

@@ -11,8 +11,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.LogInfo;
+import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.RespConst;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.form.FormImpl;
@@ -38,7 +39,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
-		LogInfo.getLogInfo(request, response).setHandler(handler);
+		LogInfoImpl.getLogInfo(request, response).setHandler(handler);
 
 		// 表单处理
 		if (handler instanceof HandlerMethod) {
@@ -56,7 +57,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			if (action == null)
 				return true;
 
-			ReqInfo ri = ContextUtils.getReqInfo();
+			ReqInfoImpl ri = ContextUtils.getReqInfo();
 			FormImpl form = WinletManager.getForm(ri);
 			if (form == null)
 				return true;
@@ -90,7 +91,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		LogInfo li = LogInfo.getLogInfo(request, response).setHandler(handler)
+		LogInfoImpl li = LogInfoImpl.getLogInfo(request, response).setHandler(handler)
 				.setModelAndView(modelAndView);
 
 		if (handler instanceof HandlerMethod) {
@@ -139,7 +140,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			if (rd != null) {
 				li.setReturnDef(rd);
 
-				ReqInfo reqInfo = ContextUtils.getReqInfo();
+				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
 				reqInfo.setReturnDef(rd);
 
 				if (action != null && reqInfo.isValidateField()) {
@@ -193,6 +194,6 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		LogInfo.getLogInfo(request, response).setException(ex).complete();
+		LogInfoImpl.getLogInfo(request, response).setException(ex).complete();
 	}
 }

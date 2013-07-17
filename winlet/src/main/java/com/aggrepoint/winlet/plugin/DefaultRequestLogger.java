@@ -58,9 +58,7 @@ public class DefaultRequestLogger implements RequestLogger {
 
 			// reqinfo
 			ReqInfo ri = log.getReqInfo();
-			addUser(sb,
-					ContextUtils.getUserEngine(ri.getRequest()).getUser(
-							ri.getRequest()));
+			addUser(sb, ContextUtils.getUser(ri.getRequest()));
 
 			if (ri != null) {
 				sb.append(" | ");

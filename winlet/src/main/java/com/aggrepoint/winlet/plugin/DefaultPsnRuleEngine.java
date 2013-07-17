@@ -41,7 +41,7 @@ public class DefaultPsnRuleEngine implements PsnRuleEngine {
 		}
 
 		HttpServletRequest req = ContextUtils.getRequest();
-		UserProfile user = ContextUtils.getUserEngine(req).getUser(req);
+		UserProfile user = ContextUtils.getUser(req);
 
 		EvaluationContext ctx = new StandardEvaluationContext();
 		ctx.setVariable("user", user);

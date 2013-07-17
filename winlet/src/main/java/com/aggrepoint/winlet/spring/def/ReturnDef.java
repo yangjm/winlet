@@ -25,7 +25,7 @@ public class ReturnDef {
 			log = null;
 		if (title != null && "".equals(title))
 			title = null;
-		if (Code.VIEW_NOT_SPECIFIED.equals(viewName))
+		if (Return.NOT_SPECIFIED.equals(viewName))
 			viewName = null;
 	}
 
@@ -53,8 +53,8 @@ public class ReturnDef {
 	}
 
 	public ReturnDef(Return ret) {
-		this.code = "";
-		rule = ret.rule();
+		this.code = Return.NOT_SPECIFIED;
+		rule = null;
 		update = ret.update();
 		isDialog = ret.dialog();
 		log = ret.log();

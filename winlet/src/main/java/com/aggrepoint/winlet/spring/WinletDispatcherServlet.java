@@ -15,7 +15,7 @@ import org.springframework.web.servlet.View;
 import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.LogInfo;
+import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
@@ -71,7 +71,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 	protected View resolveViewName(String viewName, Map<String, Object> model,
 			Locale locale, HttpServletRequest request) throws Exception {
 		View view = super.resolveViewName(viewName, model, locale, request);
-		LogInfo.getLogInfo(request, null).setView(view);
+		LogInfoImpl.getLogInfo(request, null).setView(view);
 		return view;
 	}
 
@@ -82,7 +82,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		ContextUtils.setPsnRuleEngine(req, psnRuleEngine);
 		ContextUtils.setConfigProvider(req, configProvider);
 
-		LogInfo li = LogInfo.getLogInfo(req, resp);
+		LogInfoImpl li = LogInfoImpl.getLogInfo(req, resp);
 
 		try {
 			super.service(req, resp);

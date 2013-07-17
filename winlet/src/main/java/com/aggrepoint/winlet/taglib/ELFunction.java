@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-import com.aggrepoint.winlet.Resolver;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LangTextProcessor;
 import com.aggrepoint.winlet.ReqInfo;
-import com.icebean.core.adb.ADB;
+import com.aggrepoint.winlet.Resolver;
 import com.icebean.core.beanutil.BeanProperty;
 import com.icebean.core.common.StringUtils;
 import com.icebean.core.locale.LocaleManager;
@@ -27,6 +29,8 @@ public class ELFunction {
 	static Hashtable<String, SimpleDateFormat> m_htSDFs = new Hashtable<String, SimpleDateFormat>();
 	static Hashtable<String, DecimalFormat> m_htDFs = new Hashtable<String, DecimalFormat>();
 	static Hashtable<String, BeanProperty> m_htProperties = new Hashtable<String, BeanProperty>();
+
+	static final Log logger = LogFactory.getLog(ELFunction.class);
 
 	static String strBOM;
 	static {
@@ -286,11 +290,7 @@ public class ELFunction {
 		return null;
 	}
 
-	public static Object adbData(ADB adb, String key) {
-		return adb.getCommonData(key);
-	}
-
-	public static Object m(String property) throws Exception {
+	public static Object w(String property) throws Exception {
 		Object winlet = null;
 
 		try {
@@ -302,6 +302,42 @@ public class ELFunction {
 			return Resolver.getObjectValue(winlet, property);
 
 		return null;
+	}
+
+	public static Boolean access(String rule) throws Exception {
+		try {
+			return ContextUtils.getAccessRuleEngine(ContextUtils.getRequest())
+					.eval(rule);
+		} catch (Exception e) {
+			logger.error("Error evaluating access rule defined in JSP: \""
+					+ rule + "\"", e);
+		}
+
+		return false;
+	}
+
+	public static Boolean psn(String rule) throws Exception {
+		try {
+			return ContextUtils.getPsnRuleEngine(ContextUtils.getRequest())
+					.eval(rule);
+		} catch (Exception e) {
+			logger.error(
+					"Error evaluating personalization rule defined in JSP: \""
+							+ rule + "\"", e);
+		}
+
+		return false;
+	}
+
+	public static String cfg(String name) {
+		return ContextUtils.getConfigProvider(ContextUtils.getRequest())
+				.getConfig(name);
+	}
+
+	public static String cfgdef(String name, String def) {
+		String cfg = ContextUtils.getConfigProvider(ContextUtils.getRequest())
+				.getConfig(name);
+		return cfg == null ? def : cfg;
 	}
 
 	// ///////////////////////////////////////////////////////

@@ -70,12 +70,10 @@ public class Resolver extends javax.el.ELResolver implements
 				val = ContextUtils.getReqInfo().getViewInstance().getWinlet();
 			} else if (property.equals("ws")) {
 				val = ContextUtils.getReqInfo().getWinletStorage();
-			} else if (property.equals("retcode")) {
+			} else if (property.equals("return")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
 			} else if (property.equals("u")) {
-				// IModuleRequest req = (IModuleRequest) ThreadContext
-				// .getAttribute(THREAD_ATTR_REQUEST);
-				// val = req.getUserProfile();
+				return ContextUtils.getUser(ContextUtils.getRequest());
 			} else if (property.equals("f")) {
 				// val = ThreadContext.getAttribute(THREAD_ATTR_REQUEST);
 			} else if (property.equals("e")) {

@@ -38,7 +38,7 @@ public class DefaultAccessRuleEngine implements AccessRuleEngine {
 		}
 
 		HttpServletRequest req = ContextUtils.getRequest();
-		UserProfile user = ContextUtils.getUserEngine(req).getUser(req);
+		UserProfile user = ContextUtils.getUser(req);
 		synchronized (exp) {
 			return exp.getValue(user, Boolean.class);
 		}

@@ -16,7 +16,7 @@ import com.aggrepoint.winlet.spring.def.ReturnDef;
  * 
  */
 public class PsnReturnDefFinder {
-	static final Log logger = LogFactory.getLog(AccessRuleChecker.class);
+	static final Log logger = LogFactory.getLog(PsnReturnDefFinder.class);
 
 	public static ReturnDef getReturnDef(ArrayList<ReturnDef> defs) {
 		if (defs == null || defs.size() == 0)

@@ -12,7 +12,7 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.ReqInfoImpl;
 
 /**
  * 用于生成可支持Ajax页面替换的Javascript函数名称 函数名称必须由"document."开头
@@ -70,7 +70,7 @@ public class FunctionTag extends BodyTagSupport {
 	 * @param body
 	 * @return
 	 */
-	void genScript(FormTag form, String name, ReqInfo reqInfo, String winiid,
+	void genScript(FormTag form, String name, ReqInfoImpl reqInfo, String winiid,
 			String formName, String body) {
 		StringBuffer sb = new StringBuffer();
 
@@ -144,7 +144,7 @@ public class FunctionTag extends BodyTagSupport {
 			if (m_strName == null && m_strRef == null)
 				throw new JspException("必须指定name或者ref属性。");
 
-			ReqInfo reqInfo = ContextUtils.getReqInfo();
+			ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
 			if (reqInfo == null)
 				return (SKIP_BODY);
 
@@ -197,7 +197,7 @@ public class FunctionTag extends BodyTagSupport {
 
 	public int doAfterBody() {
 		try {
-			ReqInfo reqInfo = ContextUtils.getReqInfo();
+			ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
 			if (reqInfo == null)
 				return SKIP_BODY;
 

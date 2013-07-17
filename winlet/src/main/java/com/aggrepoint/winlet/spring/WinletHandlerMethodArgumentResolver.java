@@ -11,7 +11,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
-import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.WinletStorage;
 import com.aggrepoint.winlet.form.Validation;
@@ -25,7 +25,7 @@ public class WinletHandlerMethodArgumentResolver implements
 		Class<?> clz = parameter.getParameterType();
 
 		return clz.isAssignableFrom(Validation.class)
-				|| clz.isAssignableFrom(ReqInfo.class)
+				|| clz.isAssignableFrom(ReqInfoImpl.class)
 				|| clz.isAssignableFrom(WinletStorage.class)
 				|| clz.isAssignableFrom(UserProfile.class)
 				|| clz.isAssignableFrom(ConfigProvider.class)
@@ -42,7 +42,7 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(Validation.class))
 			return new ValidationImpl(ContextUtils.getReqInfo());
 
-		if (clz.isAssignableFrom(ReqInfo.class))
+		if (clz.isAssignableFrom(ReqInfoImpl.class))
 			return ContextUtils.getReqInfo();
 
 		if (clz.isAssignableFrom(WinletStorage.class))
