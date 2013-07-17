@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<taglib xsi:schemaLocation="http://java.sun.com/xml/ns/javaee webjsptaglibrary_2_1.xsd"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.1">
+	<tlibversion>2.0</tlibversion>
+	<jspversion>2.1</jspversion>
+	<uri>http://www.aggrepoint.com/winlet</uri>
+
+	<function>
+		<name>bom</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String bom()
+		</function-signature>
+	</function>
+
+	<function>
+		<name>reqattr</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcReqAttr(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>frontattr</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcFrontAttr(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>htmlencode</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String htmlEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>textareaencode</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String textAreaEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>wmlencode</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String wmlEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>urlencode</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String urlEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>jsonencode</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String jsonEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>markup</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcMarkup()
+		</function-signature>
+	</function>
+
+	<function>
+		<name>encodens</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcEncodeNameSpace(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>if</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcIf(java.lang.Boolean, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>ifelse</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcIfElse(java.lang.Boolean, java.lang.String, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>text</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcText(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>fmt</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcDateFormat(java.lang.String, java.util.Date)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>decfmt</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String
+			funcDecimalFormat(java.lang.String, java.lang.Double)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>pct</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcPercent(java.lang.Double, java.lang.Double)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>changepct</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String
+			funcChangePercent(java.lang.Double, java.lang.Double)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>get</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcGet(java.lang.Object, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>set</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcSet(java.lang.Object, java.lang.String, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>listGet</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcListGet(java.util.List, java.lang.Integer)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec(java.lang.Object, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec1</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec1(java.lang.Object, java.lang.String, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec2</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec2(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec3</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec3(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec4</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec4(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>exec5</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object funcExec5(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>resurl</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcResurl(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>actionurl</name>
+		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String actionurl(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>resproxy</name>
+		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String resproxy(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uitmpl</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			com.aggrepoint.winlet.taglib.ContTmpl.uitmpl(com.icebean.core.adb.ADB, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>tmplexec</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String tmplexec(com.icebean.core.adb.ADB, java.lang.String[], java.util.Vector, java.util.Vector)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uiprops</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.util.Collection uiprops(com.icebean.core.adb.ADB, com.icebean.core.adb.ADB, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>propsbind</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.util.Collection propsbind(java.util.Collection, com.icebean.core.adb.ADB)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>propsclearcached</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.util.Collection propsclearcached(java.util.Collection)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uiprop</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			com.aggrepoint.winlet.ui.PropertyInstance uiprop(java.util.Collection, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uiattr</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String uiattr(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uiattach</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String uiattach(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.Object)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>uiget</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object uiget(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>cfgval</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String cfgval(com.icebean.core.xml.MatchElement, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>adbData</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String adbData(com.icebean.core.adb.ADB, java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>m</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Object m(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>func</name>
+		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String func(java.lang.String)
+		</function-signature>
+	</function>
+
+	<tag>
+		<name>form</name>
+		<tagclass>com.aggrepoint.winlet.taglib.FormTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>action</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>method</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>onsubmit</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>enctype</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>focus</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>validate</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>resetref</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>hideloading</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>update</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>getinput</name>
+		<tagclass>com.aggrepoint.winlet.taglib.GetInputTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.taglib.GetInputTei</teiclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>var</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>type</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>object</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>property</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>validate</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>error</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>disabled</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>inputattr</name>
+		<tagclass>com.aggrepoint.winlet.taglib.InputAttrTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>validator</name>
+		<tagclass>com.aggrepoint.winlet.taglib.InputValidatorTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>method</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>passskip</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>failskip</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>error</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>arg</name>
+		<tagclass>com.aggrepoint.winlet.taglib.InputValidatorArgTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+	</tag>
+
+	<tag>
+		<name>element</name>
+		<tagclass>com.aggrepoint.winlet.taglib.Element
+		</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<dynamic-attributes>true</dynamic-attributes>
+		<attribute>
+			<name>elm</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>attr</name>
+		<tagclass>com.aggrepoint.winlet.taglib.ElementAttribute
+		</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>test</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>

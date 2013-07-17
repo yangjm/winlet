@@ -1,0 +1,198 @@
+package com.aggrepoint.winlet.spring;
+
+import java.net.URLEncoder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.aggrepoint.winlet.ContextUtils;
+import com.aggrepoint.winlet.LogInfo;
+import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.RespConst;
+import com.aggrepoint.winlet.WinletManager;
+import com.aggrepoint.winlet.form.FormImpl;
+import com.aggrepoint.winlet.form.InputImpl;
+import com.aggrepoint.winlet.spring.annotation.Action;
+import com.aggrepoint.winlet.spring.annotation.Window;
+import com.aggrepoint.winlet.spring.def.ControllerMethodDef;
+import com.aggrepoint.winlet.spring.def.ReturnDef;
+import com.aggrepoint.winlet.spring.def.WidgetDef;
+import com.icebean.core.common.StringUtils;
+
+/**
+ * <pre>
+ * Winlet的View和Action方法的返回处理
+ * 
+ * 1. 如果返回值为空，则不处理
+ * 
+ * </pre>
+ * 
+ * @author Jim
+ */
+public class WinletHandlerInterceptor implements HandlerInterceptor {
+	@Override
+	public boolean preHandle(HttpServletRequest request,
+			HttpServletResponse response, Object handler) throws Exception {
+		LogInfo.getLogInfo(request, response).setHandler(handler);
+
+		// 表单处理
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod hm = (HandlerMethod) handler;
+
+			if (!AccessRuleChecker.evalRule(hm.getBeanType())
+					|| !AccessRuleChecker.evalRule(hm.getMethod()))
+				return false;
+
+			WidgetDef def = WidgetDef.getDef(hm.getBeanType());
+			if (def == null) // 不是Winlet
+				return true;
+			Action action = AnnotationUtils.findAnnotation(hm.getMethod(),
+					Action.class); // 不是Action
+			if (action == null)
+				return true;
+
+			ReqInfo ri = ContextUtils.getReqInfo();
+			FormImpl form = WinletManager.getForm(ri);
+			if (form == null)
+				return true;
+			ri.setForm(form);
+
+			form.bindAction(hm.getMethod());
+
+			if (ri.isValidateField()) { // 单个字段校验
+				form.setValidateField(null);
+				form.startRecordChanges();
+
+				InputImpl input = ri.getValidateField();
+
+				if (input == null)
+					return true;
+
+				form.setValidateField(input);
+				input.populate(ri.getRequest(), ri.getValidateFieldValue());
+			} else {
+				form.clearError();
+
+				for (InputImpl input : form.getInputs())
+					input.populate(ri.getRequest());
+			}
+		}
+
+		return true;
+	}
+
+	@Override
+	public void postHandle(HttpServletRequest request,
+			HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		LogInfo li = LogInfo.getLogInfo(request, response).setHandler(handler)
+				.setModelAndView(modelAndView);
+
+		if (handler instanceof HandlerMethod) {
+			HandlerMethod hm = (HandlerMethod) handler;
+
+			if (modelAndView.getViewName() == null) // 直接指定了View对象而不是ViewName，不是Winlet的开发方式，不加处理
+				return;
+
+			ReturnDef rd = null;
+
+			WidgetDef def = WidgetDef.getDef(hm.getBeanType());
+			if (def == null) { // 不是Winlet
+				// 处理普通Spring MVC Controller方法上定义的@Return
+				ControllerMethodDef mdef = ControllerMethodDef.getDef(hm
+						.getMethod());
+				rd = PsnReturnDefFinder.getReturnDef(mdef
+						.getReturnDef(modelAndView.getViewName()));
+				if (rd != null) {
+					li.setReturnDef(rd);
+					
+					if (rd.getViewName() != null)
+						modelAndView.setViewName(rd.getViewName());
+				}
+				return;
+			}
+
+			Window view = null;
+			Action action = null;
+
+			view = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
+			if (view != null)
+				rd = PsnReturnDefFinder.getReturnDef(def.getView(view.value())
+						.getReturnDef(modelAndView.getViewName()));
+			else {
+				action = AnnotationUtils.findAnnotation(hm.getMethod(),
+						Action.class);
+				if (action != null)
+					rd = PsnReturnDefFinder.getReturnDef(def.getAction(
+							action.value()).getReturnDef(
+							modelAndView.getViewName()));
+			}
+
+			if (view == null && action == null)
+				return;
+
+			if (rd != null) {
+				li.setReturnDef(rd);
+
+				ReqInfo reqInfo = ContextUtils.getReqInfo();
+				reqInfo.setReturnDef(rd);
+
+				if (action != null && reqInfo.isValidateField()) {
+					response.setHeader("Content-Type",
+							"application/json; charset=UTF-8");
+					response.getOutputStream().write(
+							StringUtils.fixJson(
+									reqInfo.getForm().getJsonChanges())
+									.getBytes("UTF-8"));
+
+					modelAndView.clear();
+					return;
+				}
+
+				if (rd.getViewName() != null)
+					modelAndView.setViewName(rd.getViewName());
+
+				if (rd.getTitle() != null)
+					response.setHeader(RespConst.HEADER_TITLE,
+							URLEncoder.encode(rd.getTitle(), "UTF-8"));
+
+				if (action != null) {
+					if (rd.getUpdate() != null) {
+						ReqInfo ri = ContextUtils.getReqInfo();
+						response.setHeader(
+								RespConst.HEADER_UPDATE,
+								ri.getViewInstance().translateUpdateViews(ri,
+										rd.getUpdate()));
+					}
+
+					if (rd.isDialog())
+						response.setHeader(RespConst.HEADER_DIALOG, "yes");
+					else
+						modelAndView.clear();
+				} else {
+					if ("".equals(modelAndView.getViewName()))
+						modelAndView.clear();
+				}
+			} else {
+				if (action != null || "".equals(modelAndView.getViewName()))
+					modelAndView.clear();
+			}
+
+			if (modelAndView.getViewName() != null)
+				modelAndView.setViewName(def.getName() + "/"
+						+ modelAndView.getViewName());
+		}
+	}
+
+	@Override
+	public void afterCompletion(HttpServletRequest request,
+			HttpServletResponse response, Object handler, Exception ex)
+			throws Exception {
+		LogInfo.getLogInfo(request, response).setException(ex).complete();
+	}
+}
