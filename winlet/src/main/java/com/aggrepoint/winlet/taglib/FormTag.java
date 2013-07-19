@@ -30,8 +30,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 
 	protected String m_strMethod;
 
-	protected String m_strOnSubmit;
-
 	protected String m_strEncType;
 
 	protected String m_strFocus;
@@ -64,10 +62,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 
 	public void setMethod(String str) {
 		m_strMethod = str;
-	}
-
-	public void setOnsubmit(String str) {
-		m_strOnSubmit = str;
 	}
 
 	public void setEnctype(String str) {

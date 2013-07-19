@@ -347,8 +347,26 @@ public class ELFunction {
 	// ///////////////////////////////////////////////////////
 
 	/**
-	 * 生成函数调用名称<br>
-	 * 不支持函数定义，函数定义必须使用TagLib
+	 * 生成函数定义<br>
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static String funcdef(String name) {
+		ReqInfo reqInfo = ContextUtils.getReqInfo();
+
+		StringBuffer sb = new StringBuffer();
+		sb.append("document.");
+		sb.append(name);
+		sb.append(reqInfo.getWinId());
+		sb.append(reqInfo.getViewId());
+		sb.append(" = function");
+
+		return sb.toString();
+	}
+
+	/**
+	 * 生成函数调用<br>
 	 * 
 	 * @param name
 	 * @return
@@ -357,8 +375,7 @@ public class ELFunction {
 		ReqInfo reqInfo = ContextUtils.getReqInfo();
 
 		StringBuffer sb = new StringBuffer();
-		// if (reqInfo.m_bUseAjax)
-		// sb.append("document.");
+		sb.append("document.");
 		sb.append(name);
 		sb.append(reqInfo.getWinId());
 		sb.append(reqInfo.getViewId());

@@ -33,7 +33,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String validateFieldValue;
 	private ViewInstance vi;
 	private FormImpl form;
-	private WinletStorage ws;
+	private PageStorage ws;
 	private ReturnDef rd;
 
 	// 待移植
@@ -271,9 +271,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	 * @see com.aggrepoint.winlet.ReqInfo#getWinletStorage()
 	 */
 	@Override
-	public WinletStorage getWinletStorage() {
+	public PageStorage getPageStorage() {
 		if (ws == null)
-			ws = new WinletStorageImpl(this);
+			ws = new PageStorageImpl(this);
 		return ws;
 	}
 

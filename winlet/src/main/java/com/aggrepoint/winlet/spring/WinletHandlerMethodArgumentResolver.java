@@ -8,15 +8,17 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.UserProfile;
-import com.aggrepoint.winlet.WinletStorage;
+import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
+import com.aggrepoint.winlet.spring.annotation.Storage;
 
 public class WinletHandlerMethodArgumentResolver implements
 		HandlerMethodArgumentResolver {
@@ -26,11 +28,13 @@ public class WinletHandlerMethodArgumentResolver implements
 
 		return clz.isAssignableFrom(Validation.class)
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
-				|| clz.isAssignableFrom(WinletStorage.class)
+				|| clz.isAssignableFrom(PageStorage.class)
 				|| clz.isAssignableFrom(UserProfile.class)
 				|| clz.isAssignableFrom(ConfigProvider.class)
 				|| clz.isAssignableFrom(PsnRuleEngine.class)
-				|| parameter.getParameterAnnotation(Cfg.class) != null;
+				|| clz.isAssignableFrom(CodeMapProvider.class)
+				|| parameter.getParameterAnnotation(Cfg.class) != null
+				|| parameter.getParameterAnnotation(Storage.class) != null;
 	}
 
 	@Override
@@ -45,8 +49,8 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(ReqInfoImpl.class))
 			return ContextUtils.getReqInfo();
 
-		if (clz.isAssignableFrom(WinletStorage.class))
-			return ContextUtils.getReqInfo().getWinletStorage();
+		if (clz.isAssignableFrom(PageStorage.class))
+			return ContextUtils.getReqInfo().getPageStorage();
 
 		HttpServletRequest req = ContextUtils.getRequest();
 
@@ -59,6 +63,9 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(PsnRuleEngine.class))
 			return ContextUtils.getPsnRuleEngine(req);
 
+		if (clz.isAssignableFrom(CodeMapProvider.class))
+			return ContextUtils.getCodeTableProvider(req);
+
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
 		if (cfg != null) {
 			String value = ContextUtils.getConfigProvider(req).getConfig(
@@ -67,6 +74,12 @@ public class WinletHandlerMethodArgumentResolver implements
 				value = cfg.def();
 			return value;
 		}
+
+		Storage s = parameter.getParameterAnnotation(Storage.class);
+		if (s != null)
+			return ContextUtils.getReqInfo().getPageStorage()
+					.getAttribute(s.value());
+
 		return null;
 	}
 }

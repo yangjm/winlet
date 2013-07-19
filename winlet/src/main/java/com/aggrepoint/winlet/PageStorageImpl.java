@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpSession;
 
-public class WinletStorageImpl implements WinletStorage {
+public class PageStorageImpl implements PageStorage {
 	HashMap<Object, Object> winletSession = null;
 
 	public static final String WINLET_SESSION_KEY_PREFIX = "com.aggrepoint.winlet.prefix";
 
-	protected WinletStorageImpl(ReqInfo reqInfo) {
+	protected PageStorageImpl(ReqInfo reqInfo) {
 		HttpSession session = reqInfo.getSession();
 		synchronized (session) {
 			String key = WINLET_SESSION_KEY_PREFIX

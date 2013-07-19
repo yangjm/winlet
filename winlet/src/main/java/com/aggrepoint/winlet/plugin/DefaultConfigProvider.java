@@ -11,7 +11,6 @@ import com.aggrepoint.winlet.ConfigProvider;
 public class DefaultConfigProvider implements ConfigProvider {
 	@Override
 	public String getConfig(String name) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

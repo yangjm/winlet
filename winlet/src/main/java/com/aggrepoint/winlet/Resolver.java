@@ -68,12 +68,15 @@ public class Resolver extends javax.el.ELResolver implements
 		if (base == null) {
 			if (property.equals("w")) {
 				val = ContextUtils.getReqInfo().getViewInstance().getWinlet();
-			} else if (property.equals("ws")) {
-				val = ContextUtils.getReqInfo().getWinletStorage();
+			} else if (property.equals("ps")) {
+				val = ContextUtils.getReqInfo().getPageStorage();
 			} else if (property.equals("return")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
 			} else if (property.equals("u")) {
-				return ContextUtils.getUser(ContextUtils.getRequest());
+				val = ContextUtils.getUser(ContextUtils.getRequest());
+			} else if (property.equals("c")) {
+				val = ContextUtils.getCodeTableProvider(ContextUtils
+						.getRequest());
 			} else if (property.equals("f")) {
 				// val = ThreadContext.getAttribute(THREAD_ATTR_REQUEST);
 			} else if (property.equals("e")) {
@@ -87,8 +90,11 @@ public class Resolver extends javax.el.ELResolver implements
 			if (val != null)
 				context.setPropertyResolved(true);
 		} else {
-			if (base instanceof WinletStorage) {
-				val = ((WinletStorage) base).getAttribute(property);
+			if (base instanceof PageStorage) {
+				val = ((PageStorage) base).getAttribute(property);
+				context.setPropertyResolved(true);
+			} else if (base instanceof CodeMapProvider) {
+				val = ((CodeMapProvider) base).getMap(property.toString());
 				context.setPropertyResolved(true);
 			} else if (base instanceof WinletEl) {
 				WinletEl winEl = (WinletEl) base;

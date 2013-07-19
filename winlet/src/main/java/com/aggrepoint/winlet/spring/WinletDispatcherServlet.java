@@ -13,6 +13,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
@@ -20,6 +21,7 @@ import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
+import com.aggrepoint.winlet.plugin.DefaultCodeMapProvider;
 import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultUserEngine;
@@ -31,6 +33,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 	AccessRuleEngine accessRuleEngine;
 	PsnRuleEngine psnRuleEngine;
 	ConfigProvider configProvider;
+	CodeMapProvider codeTableProvider;
 
 	public WinletDispatcherServlet() {
 		this.setContextClass(WinletXmlApplicationContext.class);
@@ -66,6 +69,13 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		}
 		if (configProvider == null)
 			configProvider = new DefaultConfigProvider();
+
+		try {
+			codeTableProvider = context.getBean(CodeMapProvider.class);
+		} catch (Exception e) {
+		}
+		if (codeTableProvider == null)
+			codeTableProvider = new DefaultCodeMapProvider();
 	}
 
 	protected View resolveViewName(String viewName, Map<String, Object> model,
@@ -81,6 +91,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		ContextUtils.setAccessRuleEngine(req, accessRuleEngine);
 		ContextUtils.setPsnRuleEngine(req, psnRuleEngine);
 		ContextUtils.setConfigProvider(req, configProvider);
+		ContextUtils.setCodeTableProvider(req, codeTableProvider);
 
 		LogInfoImpl li = LogInfoImpl.getLogInfo(req, resp);
 

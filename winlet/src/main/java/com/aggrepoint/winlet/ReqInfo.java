@@ -44,7 +44,7 @@ public interface ReqInfo {
 
 	public abstract InputImpl getValidateField();
 
-	public abstract WinletStorage getWinletStorage();
+	public abstract PageStorage getPageStorage();
 
 	public abstract ReturnDef getReturnDef();
 

@@ -1,6 +1,6 @@
 package com.aggrepoint.winlet;
 
-public interface WinletStorage {
+public interface PageStorage {
 	public <T> T getAttribute(Object obj);
 
 	public void setAttribute(Object key, Object value);

@@ -439,6 +439,15 @@
 	</function>
 
 	<function>
+		<name>funcdef</name>
+		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String funcdef(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
 		<name>func</name>
 		<function-class>com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
@@ -499,11 +508,6 @@
 		</attribute>
 		<attribute>
 			<name>method</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>onsubmit</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
