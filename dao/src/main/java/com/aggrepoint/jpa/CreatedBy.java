@@ -1,14 +1,12 @@
-package com.aggrepoint.winlet.spring.annotation;
+package com.aggrepoint.jpa;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AccessRule {
+public @interface CreatedBy {
 	String value() default "";
-
-	Class<? extends Exception> exception() default Unspecified.class;
 }

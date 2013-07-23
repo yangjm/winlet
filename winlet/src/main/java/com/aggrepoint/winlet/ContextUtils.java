@@ -19,7 +19,7 @@ public class ContextUtils {
 			.getName() + ".REQUEST_PSN_RULE_ENGINE";
 	private static String REQUEST_CONFIG_PROVIDER = ContextUtils.class
 			.getName() + ".REQUEST_CONFIG_PROVIDER";
-	private static String REQUEST_CODE_TABLE_PROVIDER = ContextUtils.class
+	private static String REQUEST_CODE_MAP_PROVIDER = ContextUtils.class
 			.getName() + ".REQUEST_CODE_TABLE_PROVIDER";
 	private static String REQUEST_LOGINFO_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_LOGINFO_KEY";
@@ -112,14 +112,14 @@ public class ContextUtils {
 		request.setAttribute(REQUEST_CONFIG_PROVIDER, provider);
 	}
 
-	public static CodeMapProvider getCodeTableProvider(
+	public static CodeMapProvider getCodeMapProvider(
 			HttpServletRequest request) {
 		return (CodeMapProvider) request
-				.getAttribute(REQUEST_CODE_TABLE_PROVIDER);
+				.getAttribute(REQUEST_CODE_MAP_PROVIDER);
 	}
 
-	public static void setCodeTableProvider(HttpServletRequest request,
+	public static void setCodeMapProvider(HttpServletRequest request,
 			CodeMapProvider provider) {
-		request.setAttribute(REQUEST_CODE_TABLE_PROVIDER, provider);
+		request.setAttribute(REQUEST_CODE_MAP_PROVIDER, provider);
 	}
 }

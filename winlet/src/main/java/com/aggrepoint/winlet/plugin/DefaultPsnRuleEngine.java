@@ -26,7 +26,8 @@ public class DefaultPsnRuleEngine implements PsnRuleEngine {
 	Hashtable<String, Expression> htExpressionCache = new Hashtable<String, Expression>();
 
 	@Override
-	public boolean eval(String rule) throws Exception {
+	public boolean eval(String rule, Hashtable<String, Object> variables)
+			throws Exception {
 		if (rule == null)
 			return true;
 
@@ -46,8 +47,18 @@ public class DefaultPsnRuleEngine implements PsnRuleEngine {
 		EvaluationContext ctx = new StandardEvaluationContext();
 		ctx.setVariable("user", user);
 		ctx.setVariable("req", req);
+
+		if (variables != null)
+			for (String key : variables.keySet())
+				ctx.setVariable(key, variables.get(key));
+
 		synchronized (exp) {
 			return exp.getValue(ctx, Boolean.class);
 		}
+	}
+
+	@Override
+	public boolean eval(String rule) throws Exception {
+		return eval(rule, null);
 	}
 }

@@ -75,7 +75,7 @@ public class Resolver extends javax.el.ELResolver implements
 			} else if (property.equals("u")) {
 				val = ContextUtils.getUser(ContextUtils.getRequest());
 			} else if (property.equals("c")) {
-				val = ContextUtils.getCodeTableProvider(ContextUtils
+				val = ContextUtils.getCodeMapProvider(ContextUtils
 						.getRequest());
 			} else if (property.equals("f")) {
 				// val = ThreadContext.getAttribute(THREAD_ATTR_REQUEST);

@@ -134,6 +134,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.mmec</groupId>
+			<artifactId>dao</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.icebean</groupId>
 			<artifactId>icebean</artifactId>
 			<version>1.0</version>

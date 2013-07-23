@@ -18,7 +18,9 @@ import com.aggrepoint.winlet.RespConst;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.form.InputImpl;
+import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Action;
+import com.aggrepoint.winlet.spring.annotation.Unspecified;
 import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.def.ControllerMethodDef;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
@@ -45,9 +47,14 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			if (!AccessRuleChecker.evalRule(hm.getBeanType())
-					|| !AccessRuleChecker.evalRule(hm.getMethod()))
-				return false;
+			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType());
+			if (rule == null)
+				rule = AccessRuleChecker.evalRule(hm.getMethod());
+			if (rule != null) {
+				if (rule.exception() == Unspecified.class)
+					return false;
+				throw rule.exception().newInstance();
+			}
 
 			WidgetDef def = WidgetDef.getDef(hm.getBeanType());
 			if (def == null) // 不是Winlet
@@ -91,13 +98,19 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		LogInfoImpl li = LogInfoImpl.getLogInfo(request, response).setHandler(handler)
-				.setModelAndView(modelAndView);
+		LogInfoImpl li = LogInfoImpl.getLogInfo(request, response)
+				.setHandler(handler).setModelAndView(modelAndView);
 
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			if (modelAndView.getViewName() == null) // 直接指定了View对象而不是ViewName，不是Winlet的开发方式，不加处理
+			String viewName = null;
+			if (modelAndView == null)
+				viewName = "";
+			else
+				viewName = modelAndView.getViewName();
+
+			if (viewName == null) // 直接指定了View对象而不是ViewName，不是Winlet的开发方式，不加处理
 				return;
 
 			ReturnDef rd = null;
@@ -108,11 +121,11 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				ControllerMethodDef mdef = ControllerMethodDef.getDef(hm
 						.getMethod());
 				rd = PsnReturnDefFinder.getReturnDef(mdef
-						.getReturnDef(modelAndView.getViewName()));
+						.getReturnDef(viewName));
 				if (rd != null) {
 					li.setReturnDef(rd);
-					
-					if (rd.getViewName() != null)
+
+					if (rd.getViewName() != null && modelAndView != null)
 						modelAndView.setViewName(rd.getViewName());
 				}
 				return;
@@ -124,14 +137,13 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			view = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
 			if (view != null)
 				rd = PsnReturnDefFinder.getReturnDef(def.getView(view.value())
-						.getReturnDef(modelAndView.getViewName()));
+						.getReturnDef(viewName));
 			else {
 				action = AnnotationUtils.findAnnotation(hm.getMethod(),
 						Action.class);
 				if (action != null)
 					rd = PsnReturnDefFinder.getReturnDef(def.getAction(
-							action.value()).getReturnDef(
-							modelAndView.getViewName()));
+							action.value()).getReturnDef(viewName));
 			}
 
 			if (view == null && action == null)
@@ -151,12 +163,14 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 									reqInfo.getForm().getJsonChanges())
 									.getBytes("UTF-8"));
 
-					modelAndView.clear();
+					if (modelAndView != null)
+						modelAndView.clear();
 					return;
 				}
 
 				if (rd.getViewName() != null)
-					modelAndView.setViewName(rd.getViewName());
+					if (modelAndView != null)
+						modelAndView.setViewName(rd.getViewName());
 
 				if (rd.getTitle() != null)
 					response.setHeader(RespConst.HEADER_TITLE,
@@ -173,20 +187,34 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 					if (rd.isDialog())
 						response.setHeader(RespConst.HEADER_DIALOG, "yes");
-					else
-						modelAndView.clear();
+					else {
+						if (modelAndView != null)
+							modelAndView.clear();
+					}
 				} else {
-					if ("".equals(modelAndView.getViewName()))
-						modelAndView.clear();
+					if ("".equals(viewName)) {
+						if (modelAndView != null)
+							modelAndView.clear();
+					}
 				}
 			} else {
-				if (action != null || "".equals(modelAndView.getViewName()))
-					modelAndView.clear();
+				if (action != null || "".equals(viewName)) {
+					if (modelAndView != null)
+						modelAndView.clear();
+				}
 			}
 
-			if (modelAndView.getViewName() != null)
+			if (modelAndView != null && modelAndView.getViewName() != null) {
+				if (modelAndView.getViewName().startsWith("redirect:")) {
+					response.setHeader(RespConst.HEADER_REDIRECT, modelAndView
+							.getViewName().substring(9));
+					modelAndView.clear();
+					return;
+				}
+
 				modelAndView.setViewName(def.getName() + "/"
 						+ modelAndView.getViewName());
+			}
 		}
 	}
 

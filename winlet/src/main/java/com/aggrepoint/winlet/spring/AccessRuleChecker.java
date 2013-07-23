@@ -52,34 +52,35 @@ public class AccessRuleChecker {
 		return ruleEngine;
 	}
 
-	public static boolean evalRule(Class<?> c) {
+	public static AccessRule evalRule(Class<?> c) {
+		AccessRule rule = getRule(c);
 		try {
-			AccessRule rule = getRule(c);
 			if (rule == null || rule.value() == null || "".equals(rule.value()))
-				return true;
+				return null;
 
-			return getRuleEngine().eval(rule.value());
+			return getRuleEngine().eval(rule.value()) ? null : rule;
 		} catch (Exception e) {
-			logger.error("Error evaluating access rule \"" + getRule(c)
+			logger.error("Error evaluating access rule \"" + rule.value()
 					+ "\" defined on class " + c.getName() + "\"", e);
-			return false;
+			return rule;
 		}
 	}
 
-	public static boolean evalRule(Method m) {
-		try {
-			AccessRule rule = getRule(m);
-			if (rule == null || rule.value() == null || "".equals(rule.value()))
-				return true;
+	public static AccessRule evalRule(Method m) {
+		AccessRule rule = getRule(m);
 
-			return getRuleEngine().eval(rule.value());
+		try {
+			if (rule == null || rule.value() == null || "".equals(rule.value()))
+				return null;
+
+			return getRuleEngine().eval(rule.value()) ? null : rule;
 		} catch (Exception e) {
 			logger.error(
-					"Error evaluating access rule \"" + getRule(m)
+					"Error evaluating access rule \"" + rule.value()
 							+ "\" defined on method \"" + m.getName()
 							+ "\" of class \""
 							+ m.getDeclaringClass().getName() + "\"", e);
-			return false;
+			return rule;
 		}
 	}
 }

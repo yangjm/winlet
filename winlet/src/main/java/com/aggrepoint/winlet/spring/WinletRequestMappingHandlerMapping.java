@@ -20,7 +20,7 @@ import com.aggrepoint.winlet.spring.def.ActionDef;
 import com.aggrepoint.winlet.spring.def.WidgetDef;
 
 /**
- * 对Spring按缺省实现找到的HandlerMethod根据Winlet的要求进行处理，返回要需要框架执行的HandlerMethod
+ * 根据Winlet的要求处理Spring按缺省实现找到的HandlerMethod，返回要需要框架执行的HandlerMethod
  * 
  * @author Jim
  */

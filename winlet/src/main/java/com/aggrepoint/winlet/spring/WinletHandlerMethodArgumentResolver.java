@@ -64,7 +64,7 @@ public class WinletHandlerMethodArgumentResolver implements
 			return ContextUtils.getPsnRuleEngine(req);
 
 		if (clz.isAssignableFrom(CodeMapProvider.class))
-			return ContextUtils.getCodeTableProvider(req);
+			return ContextUtils.getCodeMapProvider(req);
 
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
 		if (cfg != null) {

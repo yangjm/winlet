@@ -91,6 +91,12 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${org.hibernate-version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.icebean</groupId>
+			<artifactId>icebean</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>

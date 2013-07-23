@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
 
+import com.aggrepoint.dao.UserContext;
 import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
@@ -91,7 +92,8 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		ContextUtils.setAccessRuleEngine(req, accessRuleEngine);
 		ContextUtils.setPsnRuleEngine(req, psnRuleEngine);
 		ContextUtils.setConfigProvider(req, configProvider);
-		ContextUtils.setCodeTableProvider(req, codeTableProvider);
+		ContextUtils.setCodeMapProvider(req, codeTableProvider);
+		UserContext.setUser(userEngine.getUser(req).getLoginId());
 
 		LogInfoImpl li = LogInfoImpl.getLogInfo(req, resp);
 
