@@ -13,7 +13,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.dao.DataAccessException;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 	Class<T> clz;
@@ -101,7 +100,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 			throws DataAccessException {
 		Query queryObject = factory.getCurrentSession()
 				.createQuery(queryString);
-		SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
+		// SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
 				queryObject.setParameter(i, values[i]);
@@ -116,8 +115,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 			throws DataAccessException {
 		Criteria executableCriteria = criteria.getExecutableCriteria(factory
 				.getCurrentSession());
-		SessionFactoryUtils
-				.applyTransactionTimeout(executableCriteria, factory);
+		//SessionFactoryUtils.applyTransactionTimeout(executableCriteria, factory);
 		if (firstResult >= 0) {
 			executableCriteria.setFirstResult(firstResult);
 		}
@@ -144,7 +142,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 			throws DataAccessException {
 		Query queryObject = factory.getCurrentSession()
 				.createQuery(queryString);
-		SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
+		//SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++)
 				applyNamedParameterToQuery(queryObject, paramNames[i],
@@ -158,7 +156,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 			final Object... values) throws DataAccessException {
 		Query queryObject = factory.getCurrentSession()
 				.getNamedQuery(queryName);
-		SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
+		//SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
 				queryObject.setParameter(i, values[i]);
@@ -173,7 +171,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 			throws DataAccessException {
 		Query queryObject = factory.getCurrentSession()
 				.getNamedQuery(queryName);
-		SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
+		//SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
 				applyNamedParameterToQuery(queryObject, paramNames[i],
@@ -241,7 +239,7 @@ public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 		case 21:
 			Criteria criteria = factory.getCurrentSession().createCriteria(clz);
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			SessionFactoryUtils.applyTransactionTimeout(criteria, factory);
+			//SessionFactoryUtils.applyTransactionTimeout(criteria, factory);
 			return criteria.list();
 		case 22:
 			return factory.getCurrentSession().merge(args[0]);

@@ -22,7 +22,7 @@ public class ExceptionMapping {
 
 	public void setView(String str) {
 		view = str;
-		if (view.startsWith("redirect:")) {
+		if (view.startsWith(Const.REDIRECT)) {
 			redirect = true;
 			view = str.substring(9);
 		}

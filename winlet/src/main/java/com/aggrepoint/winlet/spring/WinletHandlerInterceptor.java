@@ -188,7 +188,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					if (rd.isDialog())
 						response.setHeader(RespConst.HEADER_DIALOG, "yes");
 					else {
-						if (modelAndView != null)
+						if (modelAndView != null
+								&& !viewName.startsWith(Const.REDIRECT))
 							modelAndView.clear();
 					}
 				} else {
@@ -205,7 +206,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			}
 
 			if (modelAndView != null && modelAndView.getViewName() != null) {
-				if (modelAndView.getViewName().startsWith("redirect:")) {
+				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
 					response.setHeader(RespConst.HEADER_REDIRECT, modelAndView
 							.getViewName().substring(9));
 					modelAndView.clear();
