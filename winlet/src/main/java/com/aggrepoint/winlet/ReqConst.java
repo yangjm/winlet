@@ -1,7 +1,7 @@
 package com.aggrepoint.winlet;
 
 /**
- * @see RespConst
+ * @see RespHeaderConst
  * 
  * @author Jim
  */
@@ -27,4 +27,6 @@ public interface ReqConst {
 	public final String PARAM_PAGE_PATH = "_pg";
 	/** 完整的页面URL */
 	public final String PARAM_PAGE_URL = "_purl";
+	/** 是否为全页面刷新而显示 */
+	public final String PARAM_PAGE_REFRESH = "_pr";
 }

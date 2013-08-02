@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
-import com.aggrepoint.winlet.RespConst;
+import com.aggrepoint.winlet.RespHeaderConst;
 
 public class WinletExceptionResolver implements HandlerExceptionResolver {
 	static final Log logger = LogFactory.getLog(WinletExceptionResolver.class);
@@ -39,7 +39,7 @@ public class WinletExceptionResolver implements HandlerExceptionResolver {
 				}
 
 				if (map.isRedirect()) {
-					response.setHeader(RespConst.HEADER_REDIRECT, map.getView());
+					response.setHeader(RespHeaderConst.HEADER_REDIRECT, map.getView());
 					ModelAndView mv = new ModelAndView();
 					mv.clear();
 					return mv;

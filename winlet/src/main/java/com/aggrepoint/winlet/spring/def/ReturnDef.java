@@ -11,6 +11,7 @@ public class ReturnDef {
 	private String rule;
 	private String update;
 	private boolean isDialog = false;
+	private boolean cache = false;
 	private String log;
 	private HashSet<String> logExclude;
 	private String title;
@@ -45,6 +46,7 @@ public class ReturnDef {
 		rule = code.rule();
 		update = code.update();
 		isDialog = code.dialog();
+		cache = code.cache();
 		log = code.log();
 		title = code.title();
 		viewName = code.view();
@@ -57,6 +59,7 @@ public class ReturnDef {
 		rule = null;
 		update = ret.update();
 		isDialog = ret.dialog();
+		cache = ret.cache();
 		log = ret.log();
 		title = ret.title();
 		viewName = ret.view();
@@ -83,6 +86,10 @@ public class ReturnDef {
 
 	public boolean isDialog() {
 		return isDialog;
+	}
+
+	public boolean cache() {
+		return cache;
 	}
 
 	public String getLog() {

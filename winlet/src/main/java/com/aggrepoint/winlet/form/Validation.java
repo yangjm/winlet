@@ -11,5 +11,7 @@ public interface Validation {
 
 	public void addError(String name, String msg);
 
+	public void removeError(String name);
+
 	public boolean validate(String name);
 }

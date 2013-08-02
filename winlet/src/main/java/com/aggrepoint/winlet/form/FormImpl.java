@@ -44,6 +44,12 @@ public class FormImpl implements Form {
 			change.addTo(vecChanges);
 	}
 
+	public void removeChange(Change change) {
+		if (vecChanges != null)
+			vecChanges.removeAll(Change.find(vecChanges, change.type,
+					change.input));
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -71,6 +77,8 @@ public class FormImpl implements Form {
 
 	public void clearError() {
 		bHasError = false;
+		for (InputImpl inp : vecInputs)
+			inp.clearErrors();
 	}
 
 	@Override
@@ -84,6 +92,16 @@ public class FormImpl implements Form {
 
 	public Vector<InputImpl> getInputs() {
 		return vecInputs;
+	}
+
+	public void updateErrorFlag() {
+		bHasError = false;
+
+		for (InputImpl input : vecInputs)
+			if (input.isHasError()) {
+				bHasError = true;
+				return;
+			}
 	}
 
 	public InputImpl getInput(String type, String name) {

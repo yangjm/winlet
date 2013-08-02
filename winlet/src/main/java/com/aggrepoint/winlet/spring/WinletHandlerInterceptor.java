@@ -14,7 +14,7 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
-import com.aggrepoint.winlet.RespConst;
+import com.aggrepoint.winlet.RespHeaderConst;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.form.InputImpl;
@@ -173,20 +173,23 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 						modelAndView.setViewName(rd.getViewName());
 
 				if (rd.getTitle() != null)
-					response.setHeader(RespConst.HEADER_TITLE,
+					response.setHeader(RespHeaderConst.HEADER_TITLE,
 							URLEncoder.encode(rd.getTitle(), "UTF-8"));
 
 				if (action != null) {
 					if (rd.getUpdate() != null) {
 						ReqInfo ri = ContextUtils.getReqInfo();
 						response.setHeader(
-								RespConst.HEADER_UPDATE,
+								RespHeaderConst.HEADER_UPDATE,
 								ri.getViewInstance().translateUpdateViews(ri,
 										rd.getUpdate()));
 					}
 
+					if (rd.cache())
+						response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
+
 					if (rd.isDialog())
-						response.setHeader(RespConst.HEADER_DIALOG, "yes");
+						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
 						if (modelAndView != null
 								&& !viewName.startsWith(Const.REDIRECT))
@@ -207,7 +210,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 			if (modelAndView != null && modelAndView.getViewName() != null) {
 				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
-					response.setHeader(RespConst.HEADER_REDIRECT, modelAndView
+					response.setHeader(RespHeaderConst.HEADER_REDIRECT, modelAndView
 							.getViewName().substring(9));
 					modelAndView.clear();
 					return;

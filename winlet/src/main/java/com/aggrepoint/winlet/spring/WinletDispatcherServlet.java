@@ -16,6 +16,7 @@ import com.aggrepoint.dao.UserContext;
 import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
+import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.PsnRuleEngine;
@@ -42,6 +43,9 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 
 	protected void initStrategies(ApplicationContext context) {
 		super.initStrategies(context);
+
+		Context.set(context);
+
 		loggers = context.getBeansOfType(RequestLogger.class);
 		try {
 			userEngine = context.getBean(UserEngine.class);

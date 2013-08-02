@@ -44,6 +44,18 @@ public class ValidationImpl implements Validation {
 		input.addError(msg);
 	}
 
+	public void removeError(String name) {
+		FormImpl form = reqInfo.getForm();
+		if (form == null)
+			return;
+
+		InputImpl input = form.getInputByName(name);
+		if (input == null)
+			return;
+
+		input.removeError();
+	}
+
 	public boolean validate(String name) {
 		if (name == null)
 			return false;

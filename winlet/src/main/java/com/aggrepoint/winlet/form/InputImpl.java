@@ -162,6 +162,14 @@ public abstract class InputImpl implements Input {
 		form.recordChange(new ChangeUpdateValidateResult(strName, getError()));
 	}
 
+	public void removeError() {
+		vecErrors = null;
+		bHasError = false;
+
+		form.updateErrorFlag();
+		form.removeChange(new ChangeUpdateValidateResult(strName, ""));
+	}
+
 	@Override
 	public String getError() {
 		if (vecErrors == null)

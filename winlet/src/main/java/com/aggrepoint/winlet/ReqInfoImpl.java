@@ -31,6 +31,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String winRes;
 	private String validateFieldName;
 	private String validateFieldValue;
+	private boolean pageRefresh;
 	private ViewInstance vi;
 	private FormImpl form;
 	private PageStorage ws;
@@ -63,6 +64,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		viewId = getParameter(request, PARAM_WIN_VIEW, "");
 		if ("".equals(viewId))
 			viewId = winId;
+
 		actionId = getParameter(request, PARAM_WIN_ACTION, null);
 		if (actionId != null) {
 			Matcher m;
@@ -81,6 +83,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 				if (m.groupCount() > 3)
 					formId = m.group(4);
 			}
+		} else {
+			pageRefresh = "yes".equalsIgnoreCase(getParameter(request,
+					PARAM_PAGE_REFRESH, ""));
 		}
 
 		if (formId != null && !formId.trim().equals("")) {
@@ -112,8 +117,11 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 				RequestAttributes.SCOPE_REQUEST);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aggrepoint.winlet.ReqInfo#getParameter(javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.aggrepoint.winlet.ReqInfo#getParameter(javax.servlet.http.
+	 * HttpServletRequest, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public String getParameter(HttpServletRequest request, String name,
@@ -138,7 +146,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		this.rd = rd;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getRequest()
 	 */
 	@Override
@@ -146,7 +156,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return request;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getSession()
 	 */
 	@Override
@@ -155,11 +167,13 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	}
 
 	@Override
-	public  UserProfile getUser() {
+	public UserProfile getUser() {
 		return ContextUtils.getUser(request);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getPath()
 	 */
 	@Override
@@ -167,7 +181,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return path;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getRequestId()
 	 */
 	@Override
@@ -175,7 +191,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return requestId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getWinId()
 	 */
 	@Override
@@ -183,7 +201,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return winId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getPageId()
 	 */
 	@Override
@@ -191,7 +211,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return pageId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getViewId()
 	 */
 	@Override
@@ -199,7 +221,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return viewId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getActionId()
 	 */
 	@Override
@@ -207,7 +231,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return actionId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getFormId()
 	 */
 	@Override
@@ -215,7 +241,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return formId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#isValidateField()
 	 */
 	@Override
@@ -223,7 +251,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return validateFieldName != null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getValidateFieldName()
 	 */
 	@Override
@@ -231,7 +261,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return validateFieldName;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getValidateFieldValue()
 	 */
 	@Override
@@ -239,7 +271,19 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return validateFieldValue;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.aggrepoint.winlet.ReqInfo#isPageRefresh()
+	 */
+	@Override
+	public boolean isPageRefresh() {
+		return pageRefresh;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getViewInstance()
 	 */
 	@Override
@@ -247,7 +291,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return vi;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getForm()
 	 */
 	@Override
@@ -255,7 +301,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return form;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getValidateField()
 	 */
 	@Override
@@ -267,7 +315,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return form.getInputByName(name);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getWinletStorage()
 	 */
 	@Override
@@ -277,7 +327,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return ws;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aggrepoint.winlet.ReqInfo#getReturnDef()
 	 */
 	@Override

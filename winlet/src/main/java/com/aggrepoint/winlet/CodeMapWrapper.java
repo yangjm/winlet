@@ -41,7 +41,7 @@ public class CodeMapWrapper implements Map<String, String> {
 
 	@Override
 	public String get(Object key) {
-		return map.get(key);
+		return map.get(key == null ? key : key.toString());
 	}
 
 	@Override

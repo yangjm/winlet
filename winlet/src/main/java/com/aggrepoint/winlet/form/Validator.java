@@ -33,26 +33,26 @@ public class Validator implements PropertyTypeCode {
 	Object methodObject;
 
 	public Validator(InputImpl input, String id, String method,
-			String passskip, String failskip, String error, Vector<String> args) {
+			String ps, String fs, String error, Vector<String> args) {
 		this.input = input;
 		strId = id;
 		if (strId != null)
 			strId = strId.trim();
 		strMethod = method;
-		if ("property".equalsIgnoreCase(passskip)
+		if ("property".equalsIgnoreCase(ps)
 				|| ValidateResultType.PASS_SKIP_PROPERTY.name()
-						.equals(passSkip))
+						.equals(ps))
 			passSkip = ValidateResultType.PASS_SKIP_PROPERTY;
-		else if ("all".equalsIgnoreCase(passskip)
-				|| ValidateResultType.PASS_SKIP_ALL.name().equals(passSkip))
+		else if ("all".equalsIgnoreCase(ps)
+				|| ValidateResultType.PASS_SKIP_ALL.name().equals(ps))
 			passSkip = ValidateResultType.PASS_SKIP_ALL;
 		else
 			passSkip = ValidateResultType.PASS_CONTINUE;
-		if ("continue".equalsIgnoreCase(failskip)
-				|| ValidateResultType.FAILED_CONTINUE.name().equals(failSkip))
+		if ("continue".equalsIgnoreCase(fs)
+				|| ValidateResultType.FAILED_CONTINUE.name().equals(fs))
 			failSkip = ValidateResultType.FAILED_CONTINUE;
-		else if ("all".equalsIgnoreCase(failskip)
-				|| ValidateResultType.FAILED_SKIP_ALL.name().equals(failSkip))
+		else if ("all".equalsIgnoreCase(fs)
+				|| ValidateResultType.FAILED_SKIP_ALL.name().equals(fs))
 			failSkip = ValidateResultType.FAILED_SKIP_ALL;
 		else
 			failSkip = ValidateResultType.FAILED_SKIP_PROPERTY;

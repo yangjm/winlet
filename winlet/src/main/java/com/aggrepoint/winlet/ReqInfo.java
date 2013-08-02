@@ -38,6 +38,8 @@ public interface ReqInfo {
 
 	public abstract String getValidateFieldValue();
 
+	public abstract boolean isPageRefresh();
+
 	public abstract ViewInstance getViewInstance();
 
 	public abstract FormImpl getForm();
