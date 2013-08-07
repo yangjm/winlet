@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -381,6 +383,15 @@ public class ELFunction {
 		sb.append(reqInfo.getViewId());
 
 		return sb.toString();
+	}
+
+	public static String funcResurl(String param) {
+		HttpServletRequest req = ContextUtils.getRequest();
+
+		if (param.startsWith("/"))
+			return req.getContextPath() + param;
+		else
+			return req.getContextPath() + "/" + param;
 	}
 
 	// public static String resurl(String param, boolean isStatic) {

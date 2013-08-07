@@ -55,8 +55,8 @@ public class WinletManager implements WinletConst {
 	 */
 	static Hashtable<String, Vector<WinletInstance>> WIN_INSTANCES = new Hashtable<String, Vector<WinletInstance>>();
 
-	static Hashtable<String, Vector<WinletInstance>> getWinInstances(Scope scope,
-			HttpServletRequest req) {
+	static Hashtable<String, Vector<WinletInstance>> getWinInstances(
+			Scope scope, HttpServletRequest req) {
 		if (scope == Scope.PROTOTYPE)
 			return WIN_INSTANCES;
 
@@ -107,7 +107,7 @@ public class WinletManager implements WinletConst {
 	}
 
 	static Hashtable<String, FormImpl> getForms(HttpSession session,
-			Object winlet, String viewPath, String formName) {
+			Object winlet, String viewId) {
 		Hashtable<Object, Hashtable<String, Hashtable<String, FormImpl>>> ht = getFormsByWinlet(session);
 
 		Hashtable<String, Hashtable<String, FormImpl>> ht2 = null;
@@ -120,16 +120,33 @@ public class WinletManager implements WinletConst {
 		}
 
 		Hashtable<String, FormImpl> ht3 = null;
-		String key = viewPath + "!" + formName;
 		synchronized (ht2) {
-			ht3 = ht2.get(key);
+			ht3 = ht2.get(viewId);
 			if (ht3 == null) {
 				ht3 = new Hashtable<String, FormImpl>();
-				ht2.put(key, ht3);
+				ht2.put(viewId, ht3);
 			}
 		}
 
 		return ht3;
+	}
+
+	public static void markFormRequestId(ReqInfo req) {
+		if (req.getActionId() != null)
+			return;
+		
+		Hashtable<String, Hashtable<String, FormImpl>> ht = getFormsByWinlet(
+				req.getSession()).get(req.getViewInstance().getWinlet());
+
+		if (ht == null)
+			return;
+
+		Hashtable<String, FormImpl> ht2 = ht.get(req.getViewId());
+		if (ht2 == null)
+			return;
+
+		for (FormImpl f : ht2.values())
+			f.setInvalidateRequestId(req.getRequestId());
 	}
 
 	/**
@@ -145,13 +162,13 @@ public class WinletManager implements WinletConst {
 		Object winlet = req.getViewInstance().getWinlet();
 
 		Hashtable<String, FormImpl> ht = getForms(req.getSession(), winlet,
-				req.getViewId(), formName);
+				req.getViewId());
 
-		FormImpl f = ht.get(req.getPageId());
+		FormImpl f = ht.get(formName);
 		if (f == null) {
 			String id = Long.toString(++FORM_ID);
 			f = new FormImpl(id, winlet);
-			ht.put(req.getPageId(), f);
+			ht.put(formName, f);
 
 			getFormsById(req.getSession()).put(id, f);
 		}
@@ -173,10 +190,10 @@ public class WinletManager implements WinletConst {
 	}
 
 	public static void resetForms(HttpSession session, Object winlet,
-			String viewPath, String formName) {
-		Hashtable<String, FormImpl> ht = getForms(session, winlet, viewPath,
-				formName);
-		for (FormImpl f : ht.values())
+			String viewId, String formName) {
+		Hashtable<String, FormImpl> ht = getForms(session, winlet, viewId);
+		FormImpl f = ht.get(formName);
+		if (f != null)
 			f.reset();
 	}
 

@@ -29,10 +29,31 @@ public class FormImpl implements Form {
 	/** 在一次校验请求处理过程中表单的变化 */
 	Vector<Change> vecChanges;
 	Method actionMethod;
+	/**
+	 * 尝试将当前表单失效的请求的id。
+	 * 用于在表单没有制定resetref的情况下，实现自动清空表单
+	 * 
+	 * window方法执行时，会将本视图所属表单中，invalidateRequestId为0的，全都设置为当前请求id。
+	 * 
+	 * JSP页面显示表单时，如果发现invalidateRequestId与当前请求id一致，表示表单在本次请求被使用了，不需要进行表单重置，
+	 * 并且将invalidateRequestId改回为0. JSP页面显示表单时，如果发现invalidateRequestId与当前请求id不一致，
+	 * 说明对应的window方法曾经执行过并且表单没有被使用，将表单重置。
+	 * 
+	 */
+	long invalidateRequestId;
 
 	public FormImpl(String id, Object winlet) {
 		this.id = id;
 		this.winlet = winlet;
+	}
+
+	public void setInvalidateRequestId(long l) {
+		if (l == 0 || invalidateRequestId == 0)
+			invalidateRequestId = l;
+	}
+
+	public long getInvalidateRequestId() {
+		return invalidateRequestId;
 	}
 
 	public void startRecordChanges() {

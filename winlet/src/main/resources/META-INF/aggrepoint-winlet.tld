@@ -287,7 +287,7 @@
 	</function>
 
 	<function>
-		<name>resurl</name>
+		<name>res</name>
 		<function-class>
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>

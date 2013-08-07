@@ -119,8 +119,11 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 		m_form = WinletManager.getForm(ri, m_strName);
 		m_form.setAction(m_strAction);
 		if (m_objResetRef == null) {
-			if (ri.isPageRefresh())
+			if (m_form.getInvalidateRequestId() != ri.getRequestId()
+					|| ri.isPageRefresh())
 				m_form.reset();
+
+			m_form.setInvalidateRequestId(0l);
 		} else if (!(m_objResetRef == m_form.getResetRef())) {
 			m_form.reset();
 			m_form.setResetRef(m_objResetRef);
@@ -186,9 +189,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 	public int doAfterBody() {
 		try {
 			ReqInfo ri = ContextUtils.getReqInfo();
-
-			if (m_objResetRef == null)
-				m_form.clearError();
 
 			String name = m_strName + ri.getWinId() + ri.getViewId();
 

@@ -134,6 +134,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.4</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.mmec</groupId>
 			<artifactId>dao</artifactId>
 			<version>0.0.1-SNAPSHOT</version>

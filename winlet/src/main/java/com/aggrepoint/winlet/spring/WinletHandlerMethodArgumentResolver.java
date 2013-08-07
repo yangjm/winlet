@@ -8,13 +8,15 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
+import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqInfoImpl;
+import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.UserProfile;
-import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
@@ -30,8 +32,10 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
 				|| clz.isAssignableFrom(PageStorage.class)
 				|| clz.isAssignableFrom(UserProfile.class)
+				|| clz.isAssignableFrom(UserEngine.class)
 				|| clz.isAssignableFrom(ConfigProvider.class)
 				|| clz.isAssignableFrom(PsnRuleEngine.class)
+				|| clz.isAssignableFrom(AccessRuleEngine.class)
 				|| clz.isAssignableFrom(CodeMapProvider.class)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
 				|| parameter.getParameterAnnotation(Storage.class) != null;
@@ -57,8 +61,14 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(UserProfile.class))
 			return ContextUtils.getUserEngine(req).getUser(req);
 
+		if (clz.isAssignableFrom(UserEngine.class))
+			return ContextUtils.getUserEngine(req);
+
 		if (clz.isAssignableFrom(ConfigProvider.class))
 			return ContextUtils.getConfigProvider(req);
+
+		if (clz.isAssignableFrom(AccessRuleEngine.class))
+			return ContextUtils.getAccessRuleEngine(req);
 
 		if (clz.isAssignableFrom(PsnRuleEngine.class))
 			return ContextUtils.getPsnRuleEngine(req);

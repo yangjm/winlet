@@ -65,6 +65,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				return true;
 
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
+
 			FormImpl form = WinletManager.getForm(ri);
 			if (form == null)
 				return true;
@@ -155,6 +156,9 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
 				reqInfo.setReturnDef(rd);
 
+				if (view != null)
+					WinletManager.markFormRequestId(reqInfo);
+
 				if (action != null && reqInfo.isValidateField()) {
 					response.setHeader("Content-Type",
 							"application/json; charset=UTF-8");
@@ -210,8 +214,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 			if (modelAndView != null && modelAndView.getViewName() != null) {
 				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
-					response.setHeader(RespHeaderConst.HEADER_REDIRECT, modelAndView
-							.getViewName().substring(9));
+					response.setHeader(RespHeaderConst.HEADER_REDIRECT,
+							modelAndView.getViewName().substring(9));
 					modelAndView.clear();
 					return;
 				}
