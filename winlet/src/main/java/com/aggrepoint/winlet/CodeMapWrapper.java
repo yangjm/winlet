@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * 将HashMap做封装，防止CodeTable的内容被应用修改
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  * 
  * @param <K>
  * @param <V>

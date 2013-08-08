@@ -11,6 +11,10 @@ import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Element extends BodyTagSupport implements DynamicAttributes {
 	private static final long serialVersionUID = 1L;
 

@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet.form;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public enum ValidateResultType {
 	FAILED_CONTINUE, // Validate failed. Continue to do next validation. 
 	FAILED_SKIP_PROPERTY, // Validation failed. Skip following validations within same property. 

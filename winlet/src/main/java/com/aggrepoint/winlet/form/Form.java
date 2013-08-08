@@ -4,7 +4,7 @@ package com.aggrepoint.winlet.form;
 /**
  * 表单
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface Form {
 	/**

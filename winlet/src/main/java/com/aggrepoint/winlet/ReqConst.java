@@ -3,7 +3,7 @@ package com.aggrepoint.winlet;
 /**
  * @see RespHeaderConst
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface ReqConst {
 	public final String PARAM_WIN_ID = "_w";

@@ -8,6 +8,10 @@ import org.springframework.web.servlet.View;
 
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface LogInfo {
 
 	public abstract ReqInfo getReqInfo();

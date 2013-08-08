@@ -3,7 +3,7 @@ package com.aggrepoint.winlet;
 /**
  * @see ReqConst
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface RespHeaderConst {
 	String HEADER_UPDATE = "X-Winlet-Update";

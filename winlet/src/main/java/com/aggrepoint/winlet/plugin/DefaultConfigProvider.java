@@ -5,8 +5,7 @@ import com.aggrepoint.winlet.ConfigProvider;
 /**
  * 缺省的配置提供
  * 
- * @author Jim
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class DefaultConfigProvider implements ConfigProvider {
 	@Override

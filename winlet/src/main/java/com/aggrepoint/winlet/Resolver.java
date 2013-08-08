@@ -20,9 +20,9 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
 import com.icebean.core.beanutil.BeanProperty;
 
 /**
- * 支持在EL中通过w.访问Winlet对象，通过ws.访问Winlet Storage，通过ret.访问响应码对象，通过win访问taglib功能等
+ * 支持在EL中通过w.访问Winlet对象，通过ps.访问Page Storage，通过ret.访问响应码对象，通过win访问taglib功能等
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class Resolver extends javax.el.ELResolver implements
 		ServletContextListener {
@@ -105,6 +105,9 @@ public class Resolver extends javax.el.ELResolver implements
 					val = winEl.execute(property.toString());
 					context.setPropertyResolved(true);
 				}
+			} else if (base instanceof CodeMapWrapper) {
+				val = ((CodeMapWrapper)base).get(property.toString());
+				context.setPropertyResolved(true);
 			} else {
 				Winlet winlet = AnnotationUtils.findAnnotation(base.getClass(),
 						Winlet.class);

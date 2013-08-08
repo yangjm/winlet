@@ -6,6 +6,10 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputValidatorArgTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
 

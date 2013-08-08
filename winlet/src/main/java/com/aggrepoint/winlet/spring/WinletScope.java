@@ -3,6 +3,10 @@ package com.aggrepoint.winlet.spring;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.web.context.request.AbstractRequestAttributesScope;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletScope extends AbstractRequestAttributesScope {
 	@Override
 	public Object get(String name,

@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import java.util.Vector;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public abstract class Change {
 	String input;
 	String type;

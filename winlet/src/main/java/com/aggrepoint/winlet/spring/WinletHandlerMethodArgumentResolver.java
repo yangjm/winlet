@@ -22,6 +22,10 @@ import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
 import com.aggrepoint.winlet.spring.annotation.Storage;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletHandlerMethodArgumentResolver implements
 		HandlerMethodArgumentResolver {
 	@Override

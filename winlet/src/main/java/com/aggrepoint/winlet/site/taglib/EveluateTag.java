@@ -11,10 +11,10 @@ import com.aggrepoint.winlet.site.domain.Page;
 
 /**
  * 
- * @author YJM
- * 
  *         <ae:eval type="focus" page="page0" name="bbbb"/> <% if
  *         (bbbb.booleanValue()) { %>aaa<% } else { %>bbb<% } %>
+ *         
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class EveluateTag extends TagSupport {
 	static final long serialVersionUID = 0;

@@ -17,7 +17,7 @@ import com.aggrepoint.winlet.WinletConst;
 /**
  * 个性化
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PsnRuleTag extends BodyTagSupport implements WinletConst {
 	private static final long serialVersionUID = 1L;

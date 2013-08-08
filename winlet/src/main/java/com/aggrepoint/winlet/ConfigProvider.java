@@ -3,7 +3,7 @@ package com.aggrepoint.winlet;
 /**
  * 提供配置
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface ConfigProvider {
 	/** 获取配置参数值 */

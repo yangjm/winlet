@@ -15,7 +15,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  * 修改Winlet类定义：修改类注解。
  * 
  * @see WinletClassVisitor
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletClassLoader extends ClassLoader {
 	private ClassLoader innerLoader;

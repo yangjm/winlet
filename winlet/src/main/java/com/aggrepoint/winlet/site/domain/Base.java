@@ -3,6 +3,10 @@ package com.aggrepoint.winlet.site.domain;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Base implements Comparable<Base> {
 	static final Log logger = LogFactory.getLog(Page.class);
 

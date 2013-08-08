@@ -13,6 +13,10 @@ import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.form.InputImpl;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private static long REQUEST_ID = 0;
 
@@ -209,6 +213,16 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public String getPageId() {
 		return pageId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.aggrepoint.winlet.ReqInfo#getPageUrl()
+	 */
+	@Override
+	public String getPageUrl() {
+		return pageUrl;
 	}
 
 	/*

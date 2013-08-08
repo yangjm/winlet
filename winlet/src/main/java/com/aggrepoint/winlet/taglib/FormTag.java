@@ -19,7 +19,7 @@ import com.aggrepoint.winlet.form.InputImpl;
 /**
  * Form
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class FormTag extends BodyTagSupport implements WinletConst {
 	private static final long serialVersionUID = 1L;

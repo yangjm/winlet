@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet.form;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ChangeUpdateValidateResult extends Change {
 	String message;
 

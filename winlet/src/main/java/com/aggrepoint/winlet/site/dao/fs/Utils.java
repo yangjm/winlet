@@ -14,7 +14,7 @@ import com.aggrepoint.winlet.site.domain.Base;
 /**
  * 工具类
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class Utils {
 	static final Log logger = LogFactory.getLog(Utils.class);

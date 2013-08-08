@@ -10,7 +10,7 @@ import com.aggrepoint.winlet.site.SiteContext;
 import com.aggrepoint.winlet.site.domain.Page;
 
 /**
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class Utils {
 	/**

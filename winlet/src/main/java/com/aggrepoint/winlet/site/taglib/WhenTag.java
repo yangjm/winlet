@@ -14,7 +14,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * WHEN
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WhenTag extends BodyTagSupport {
 	static final long serialVersionUID = 0;

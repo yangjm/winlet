@@ -17,7 +17,7 @@ import com.aggrepoint.winlet.UserProfile;
  * 以当前用户身份为root对象执行SpEL规则表达式
  * </pre>
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class DefaultAccessRuleEngine implements AccessRuleEngine {
 	Hashtable<String, Expression> htExpressionCache = new Hashtable<String, Expression>();

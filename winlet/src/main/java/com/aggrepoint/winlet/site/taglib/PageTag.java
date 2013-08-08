@@ -6,7 +6,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 /**
  * 获取页面对象
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PageTag extends TagSupport {
 	static final long serialVersionUID = 0;

@@ -17,7 +17,7 @@ import com.aggrepoint.winlet.WinletConst;
 /**
  * 访问控制
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class AccessRuleTag extends BodyTagSupport implements WinletConst {
 	private static final long serialVersionUID = 1L;

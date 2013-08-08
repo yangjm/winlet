@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import java.util.Date;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputDateImpl extends InputTextImpl {
 	public String strFormat;
 

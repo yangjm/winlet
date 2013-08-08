@@ -6,6 +6,10 @@ import java.util.Map;
 import com.aggrepoint.winlet.CodeMapWrapper;
 import com.aggrepoint.winlet.CodeMapProvider;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class DefaultCodeMapProvider implements CodeMapProvider {
 	static CodeMapWrapper table = new CodeMapWrapper(
 			new Hashtable<String, String>());

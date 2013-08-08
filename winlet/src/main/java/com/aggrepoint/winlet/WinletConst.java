@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface WinletConst {
 	public static final int WINLET_SCOPE = 15;
 	public static final String REQUEST_ATTR_REQUEST = "com.aggrepoint.winlet.request";

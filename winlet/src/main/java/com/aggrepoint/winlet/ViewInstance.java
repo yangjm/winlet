@@ -6,6 +6,10 @@ import java.util.Vector;
 import com.aggrepoint.winlet.spring.def.ViewDef;
 import com.aggrepoint.winlet.spring.def.WidgetDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ViewInstance {
 	WinletInstance wis;
 	String viewId;

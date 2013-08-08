@@ -8,6 +8,10 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Controller;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

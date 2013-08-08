@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface PageStorage {
 	public <T> T getAttribute(Object obj);
 

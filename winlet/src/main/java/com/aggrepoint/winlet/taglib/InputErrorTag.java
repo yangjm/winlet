@@ -8,6 +8,10 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import com.aggrepoint.winlet.form.InputImpl;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputErrorTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
 

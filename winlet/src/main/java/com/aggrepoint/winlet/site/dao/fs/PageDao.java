@@ -9,6 +9,10 @@ import org.apache.commons.logging.LogFactory;
 import com.aggrepoint.winlet.site.domain.Area;
 import com.aggrepoint.winlet.site.domain.Page;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class PageDao {
 	static final Log logger = LogFactory.getLog(PageDao.class);
 

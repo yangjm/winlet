@@ -13,6 +13,10 @@ import com.icebean.core.beanutil.BeanProperty;
 import com.icebean.core.beanutil.PropertyTypeCode;
 import com.icebean.core.common.StringUtils;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Validator implements PropertyTypeCode {
 	/** 日志 */
 	static org.apache.log4j.Category m_log = com.icebean.core.common.Log4jIniter

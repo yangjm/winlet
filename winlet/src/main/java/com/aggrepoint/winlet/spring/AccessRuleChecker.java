@@ -14,7 +14,7 @@ import com.aggrepoint.winlet.spring.annotation.AccessRule;
 /**
  * 负责检查定义在类或方法上的AccessRule
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class AccessRuleChecker {
 	static AccessRuleEngine ruleEngine;

@@ -24,7 +24,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  * 6) 若Action注解没有指明value，则将其方法名替换为value
  * </pre>
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 	static String getClassDesc(Class<?> c) {

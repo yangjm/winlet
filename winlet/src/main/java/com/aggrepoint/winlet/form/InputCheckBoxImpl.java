@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import com.icebean.core.beanutil.BeanProperty;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputCheckBoxImpl extends InputImpl {
 	public boolean bHasValueParam = false;
 	public String strValue;

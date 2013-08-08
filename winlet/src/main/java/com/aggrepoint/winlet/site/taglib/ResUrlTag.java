@@ -9,7 +9,7 @@ import com.aggrepoint.winlet.site.SiteContext;
 /**
  * 构造模板资源的URL
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ResUrlTag extends TagSupport {
 	static final long serialVersionUID = 0;

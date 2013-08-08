@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet.site.domain;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Area extends Base {
 	private boolean cascade;
 	private String content;

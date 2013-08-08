@@ -4,6 +4,10 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface Input {
 	public String getType();
 

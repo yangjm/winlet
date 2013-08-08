@@ -21,7 +21,7 @@ import com.icebean.core.common.StringUtils;
 /**
  * 表单里的输入项
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public abstract class InputImpl implements Input {
 	static org.apache.log4j.Category m_log = com.icebean.core.common.Log4jIniter

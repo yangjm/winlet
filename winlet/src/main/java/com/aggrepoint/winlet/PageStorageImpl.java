@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class PageStorageImpl implements PageStorage {
 	HashMap<Object, Object> winletSession = null;
 

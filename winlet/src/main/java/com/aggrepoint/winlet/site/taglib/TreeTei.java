@@ -5,7 +5,7 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 /**
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class TreeTei extends TagExtraInfo {
 	public VariableInfo[] getVariableInfo(TagData data) {

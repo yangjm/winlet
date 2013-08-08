@@ -6,6 +6,10 @@ import java.util.List;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Branch extends Base {
 	private String template;
 	private List<Area> areas = new ArrayList<Area>();
@@ -16,6 +20,7 @@ public class Branch extends Base {
 		rootPage.setName("");
 		rootPage.setPath("/");
 		rootPage.setSkip(true);
+		rootPage.setBranch(this);
 	}
 
 	public void init() {

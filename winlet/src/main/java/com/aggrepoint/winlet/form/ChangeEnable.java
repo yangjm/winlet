@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import java.util.Vector;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ChangeEnable extends Change {
 	public ChangeEnable(String input) {
 		super(input, "e");

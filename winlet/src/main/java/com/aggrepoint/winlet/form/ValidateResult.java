@@ -2,6 +2,8 @@ package com.aggrepoint.winlet.form;
 
 /**
  * Validation method should return this
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ValidateResult {
 	public static ValidateResult PASS = new ValidateResult(

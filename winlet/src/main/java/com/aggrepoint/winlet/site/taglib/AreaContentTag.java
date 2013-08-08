@@ -12,7 +12,7 @@ import com.aggrepoint.winlet.site.domain.Area;
 /**
  * 栏位
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class AreaContentTag extends TagSupport {
 	static final long serialVersionUID = 0;

@@ -12,7 +12,7 @@ import org.springframework.core.io.Resource;
 /**
  * 封装经过Winlet注解处理的类资源
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletResource implements Resource {
 	Resource inner;

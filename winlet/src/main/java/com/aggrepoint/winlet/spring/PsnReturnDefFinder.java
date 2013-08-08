@@ -12,8 +12,7 @@ import com.aggrepoint.winlet.spring.def.ReturnDef;
 /**
  * 负责找到个性化规则
  * 
- * @author Jim
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PsnReturnDefFinder {
 	static final Log logger = LogFactory.getLog(PsnReturnDefFinder.class);

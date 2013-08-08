@@ -14,6 +14,10 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.RespHeaderConst;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletExceptionResolver implements HandlerExceptionResolver {
 	static final Log logger = LogFactory.getLog(WinletExceptionResolver.class);
 

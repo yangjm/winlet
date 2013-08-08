@@ -10,7 +10,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * IF
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class IfTag extends TagSupport {
 	static final long serialVersionUID = 0;

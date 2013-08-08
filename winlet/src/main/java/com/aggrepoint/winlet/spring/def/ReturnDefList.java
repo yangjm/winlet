@@ -9,6 +9,10 @@ import org.springframework.core.annotation.AnnotationUtils;
 import com.aggrepoint.winlet.spring.annotation.Code;
 import com.aggrepoint.winlet.spring.annotation.Return;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ReturnDefList {
 	private Hashtable<String, ArrayList<ReturnDef>> htRetDefs = new Hashtable<String, ArrayList<ReturnDef>>();
 

@@ -35,7 +35,7 @@ import com.icebean.core.common.StringUtils;
  * 
  * </pre>
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletHandlerInterceptor implements HandlerInterceptor {
 	@Override

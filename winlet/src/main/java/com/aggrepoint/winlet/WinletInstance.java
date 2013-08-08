@@ -2,6 +2,10 @@ package com.aggrepoint.winlet;
 
 import com.aggrepoint.winlet.spring.def.ViewDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletInstance {
 	String iid;
 	ViewInstance viewInstance;

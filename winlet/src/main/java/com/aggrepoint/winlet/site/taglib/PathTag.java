@@ -15,7 +15,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * 
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 
 /*

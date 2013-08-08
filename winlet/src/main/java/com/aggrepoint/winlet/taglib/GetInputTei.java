@@ -7,7 +7,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 import com.aggrepoint.winlet.form.InputImpl;
 
 /**
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class GetInputTei extends TagExtraInfo {
 	public VariableInfo[] getVariableInfo(TagData data) {

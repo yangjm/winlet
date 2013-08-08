@@ -20,7 +20,7 @@ import com.aggrepoint.winlet.UserProfile;
  * req		当前HttpServletRequest
  * </pre>
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class DefaultPsnRuleEngine implements PsnRuleEngine {
 	Hashtable<String, Expression> htExpressionCache = new Hashtable<String, Expression>();

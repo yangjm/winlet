@@ -28,6 +28,10 @@ import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultUserEngine;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletDispatcherServlet extends DispatcherServlet {
 	private static final long serialVersionUID = 1L;
 	Map<String, RequestLogger> loggers;

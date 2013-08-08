@@ -13,7 +13,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * 计算在指定栏目下包含多少个子栏目
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 /*
  * <ae:subcount level="0"/>

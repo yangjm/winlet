@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet.spring;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ExceptionMapping {
 	private Class<? extends Exception> clz;
 	private String rule;

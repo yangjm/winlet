@@ -12,6 +12,10 @@ import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.spring.def.ViewDef;
 import com.aggrepoint.winlet.spring.def.WidgetDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletManager implements WinletConst {
 	public static final String WINLET_SESSION_KEY = "com.aggrepoint.winlet";
 	public static final String WINLETINSTS_SESSION_KEY = "com.aggrepoint.winsts";

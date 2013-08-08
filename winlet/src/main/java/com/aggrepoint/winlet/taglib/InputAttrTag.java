@@ -5,7 +5,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class InputAttrTag extends TagSupport {
 	private static final long serialVersionUID = 1L;

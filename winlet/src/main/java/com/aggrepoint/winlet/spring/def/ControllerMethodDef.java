@@ -6,8 +6,7 @@ import java.util.HashMap;
 /**
  * 普通Spring MVC控制器方法的定义
  * 
- * @author Jim
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ControllerMethodDef extends ReturnDefList {
 	public ControllerMethodDef(Method method) {

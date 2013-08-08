@@ -6,6 +6,10 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WinletXmlApplicationContext extends XmlWebApplicationContext {
 	public final static String SCOPE_WINLET = "winlet";
 

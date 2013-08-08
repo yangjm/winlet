@@ -1,5 +1,8 @@
 package com.aggrepoint.winlet;
 
+/**
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class AnonymousUser implements UserProfile {
 	private static final long serialVersionUID = 1L;
 	static AnonymousUser instance = new AnonymousUser();

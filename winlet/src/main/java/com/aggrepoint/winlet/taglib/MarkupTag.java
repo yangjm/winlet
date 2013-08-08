@@ -15,7 +15,7 @@ import com.aggrepoint.winlet.EnumMarkup;
  * 。 页面可以使用本标记明确声明页面的语言类型。若页面没有使用本标记明确声明标记类型，则视为页面标记类型与请求类型一致。
  * 该标记在页面中必须先于其他Winlet标记出现
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class MarkupTag extends TagSupport {
 	static final long serialVersionUID = 0;

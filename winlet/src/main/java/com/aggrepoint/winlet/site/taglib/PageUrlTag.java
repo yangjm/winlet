@@ -10,7 +10,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * 构造页面的URL
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PageUrlTag extends TagSupport {
 	static final long serialVersionUID = 0;

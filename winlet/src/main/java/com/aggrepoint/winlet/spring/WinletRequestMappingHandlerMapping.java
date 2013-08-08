@@ -22,7 +22,7 @@ import com.aggrepoint.winlet.spring.def.WidgetDef;
 /**
  * 根据Winlet的要求处理Spring按缺省实现找到的HandlerMethod，返回要需要框架执行的HandlerMethod
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletRequestMappingHandlerMapping extends
 		RequestMappingHandlerMapping {

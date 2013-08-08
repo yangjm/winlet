@@ -1,5 +1,9 @@
 package com.aggrepoint.winlet.form;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface Validation {
 	public boolean isValidateField();
 

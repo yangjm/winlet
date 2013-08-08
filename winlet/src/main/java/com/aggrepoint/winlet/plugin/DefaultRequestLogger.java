@@ -19,6 +19,10 @@ import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class DefaultRequestLogger implements RequestLogger {
 	static final HashSet<String> SYSTEM_PARAMS;
 	static {

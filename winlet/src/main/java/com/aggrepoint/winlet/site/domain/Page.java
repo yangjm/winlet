@@ -10,9 +10,14 @@ import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Page extends Base {
 	static final Log logger = LogFactory.getLog(Page.class);
 
+	private Branch branch;
 	private String path;
 	private String template;
 	private String link;
@@ -26,6 +31,8 @@ public class Page extends Base {
 
 	public void init(Page p, List<Area> cascade, String tmpl) {
 		Collections.sort(pages);
+
+		branch = p.branch;
 
 		parent = p;
 		level = p.getLevel() + 1;
@@ -55,6 +62,14 @@ public class Page extends Base {
 
 		for (Page pg : pages)
 			pg.init(this, c2, template);
+	}
+
+	public Branch getBranch() {
+		return branch;
+	}
+
+	public void setBranch(Branch branch) {
+		this.branch = branch;
 	}
 
 	public String getPath() {

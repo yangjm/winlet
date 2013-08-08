@@ -9,7 +9,7 @@ import com.aggrepoint.winlet.site.domain.Branch;
 /**
  * 负责从文件系统加载站点配置
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class FileSystemCfgLoader {
 	/** 检查是否有变更的时间间隔 */

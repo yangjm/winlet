@@ -8,7 +8,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 /**
  * @see ReqInfoImpl
- * @author Jim
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ContextUtils {
 	private static String REQUEST_USER_ENGINE = ContextUtils.class.getName()

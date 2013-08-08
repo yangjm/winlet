@@ -3,6 +3,10 @@ package com.aggrepoint.winlet.form;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputNumberImpl extends InputTextImpl {
 	static Pattern NUMBER_PATTERN = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
 	public String strFormat = "0";

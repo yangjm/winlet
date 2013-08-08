@@ -7,6 +7,10 @@ import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.form.InputImpl;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface ReqInfo {
 
 	public abstract String getParameter(HttpServletRequest request,
@@ -25,6 +29,8 @@ public interface ReqInfo {
 	public abstract String getWinId();
 
 	public abstract String getPageId();
+
+	public abstract String getPageUrl();
 
 	public abstract String getViewId();
 

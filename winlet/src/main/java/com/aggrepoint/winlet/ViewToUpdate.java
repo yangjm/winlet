@@ -3,6 +3,10 @@ package com.aggrepoint.winlet;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ViewToUpdate {
 	public boolean ensureVisible;
 	public String winletName;

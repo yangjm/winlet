@@ -5,6 +5,10 @@ import java.util.Vector;
 
 import com.icebean.core.common.TypeCast;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputSelectImpl extends InputImpl implements InputSelect {
 	Vector<SelectOption> options;
 

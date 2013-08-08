@@ -9,6 +9,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.winlet.site.domain.Area;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class AreaDao {
 	static final Log logger = LogFactory.getLog(AreaDao.class);
 

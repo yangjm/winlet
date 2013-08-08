@@ -10,6 +10,10 @@ import com.aggrepoint.winlet.site.domain.Area;
 import com.aggrepoint.winlet.site.domain.Branch;
 import com.aggrepoint.winlet.site.domain.Page;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class BranchDao {
 	static final Log logger = LogFactory.getLog(BranchDao.class);
 

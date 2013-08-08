@@ -8,6 +8,10 @@ import org.springframework.web.servlet.View;
 
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class LogInfoImpl implements LogInfo {
 	private static String REQUEST_ID_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_ID_KEY";

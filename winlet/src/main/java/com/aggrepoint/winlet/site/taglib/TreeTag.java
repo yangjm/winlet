@@ -19,7 +19,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * 
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 /*
  * <site:tree level="0" name="page0"> <site:name page="page0"/> <site:url

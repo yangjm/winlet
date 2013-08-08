@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import java.util.Collection;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public interface SelectOption {
 	public static final int TYPE_OPTION = 0;
 	public static final int TYPE_SUB = 1;

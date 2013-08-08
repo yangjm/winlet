@@ -6,8 +6,7 @@ import java.util.Hashtable;
 /**
  * 实现可以在EL中通过win.访问的工具方法
  * 
- * @author Owner
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletEl {
 	static final Class<?>[] MODULE_METHOD_PARAM_TYPE = { String.class };

@@ -3,7 +3,7 @@ package com.aggrepoint.winlet.site.taglib;
 import javax.servlet.jsp.tagext.*;
 
 /**
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class SubCountTei extends TagExtraInfo {
 	public VariableInfo[] getVariableInfo(TagData data) {

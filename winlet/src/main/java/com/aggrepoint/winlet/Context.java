@@ -2,6 +2,10 @@ package com.aggrepoint.winlet;
 
 import org.springframework.context.ApplicationContext;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class Context {
 	private static ApplicationContext ctx;
 

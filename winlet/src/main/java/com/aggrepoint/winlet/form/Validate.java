@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 /**
  * 校验规则
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public @interface Validate {
 	/** 要校验的属性名称 */

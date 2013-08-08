@@ -5,6 +5,10 @@ import java.util.Vector;
 
 import com.icebean.core.common.StringUtils;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class BasicSelectOption implements SelectOption {
 	String id;
 	String logo;

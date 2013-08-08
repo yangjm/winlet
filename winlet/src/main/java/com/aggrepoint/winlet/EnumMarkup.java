@@ -1,6 +1,9 @@
 package com.aggrepoint.winlet;
 
-
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public enum EnumMarkup {
 	HTML(0, "html"), XHTML(2, "xhtml"), WML(1, "wml"), UNDEFINED(-1, "undef");
 

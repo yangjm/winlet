@@ -9,7 +9,7 @@ import com.aggrepoint.winlet.UserProfile;
 /**
  * 缺省UserEngine，当应用没有指定的UserEngine时使用
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class DefaultUserEngine implements UserEngine {
 	static final String SESSION_KEY = DefaultUserEngine.class.getName()

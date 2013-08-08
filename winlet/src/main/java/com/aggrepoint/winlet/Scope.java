@@ -2,6 +2,10 @@ package com.aggrepoint.winlet;
 
 import com.aggrepoint.winlet.spring.annotation.Winlet;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public enum Scope {
 	PROTOTYPE(Winlet.SCOPE_PROTOTYPE, 0),
 	SESSION(Winlet.SCOPE_SESSION, 1),

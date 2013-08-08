@@ -9,7 +9,7 @@ import net.sf.json.JSONSerializer;
 /**
  * 输入表单
  * 
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class FormImpl implements Form {
 	/** 表单的ID */

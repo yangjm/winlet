@@ -14,8 +14,7 @@ import com.icebean.core.msg.MessageBoundle;
  * [|site name|app name@CN:zhan dian (0) zhong ying yong (1) bao han de chuang
  * kou@EN:windows in app (1) of site (0)]
  * 
- * @author Owner
- * 
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class LangTextProcessor {
 	char[] m_chars;

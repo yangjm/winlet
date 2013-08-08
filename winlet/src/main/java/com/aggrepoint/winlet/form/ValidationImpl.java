@@ -2,6 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import com.aggrepoint.winlet.ReqInfo;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ValidationImpl implements Validation {
 	private ReqInfo reqInfo;
 

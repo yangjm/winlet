@@ -6,6 +6,10 @@ import java.util.StringTokenizer;
 import com.aggrepoint.winlet.spring.annotation.Code;
 import com.aggrepoint.winlet.spring.annotation.Return;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class ReturnDef {
 	private String code;
 	private String rule;

@@ -13,6 +13,10 @@ import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class WidgetDef {
 	private String name;
 	private Scope scope = Scope.PROTOTYPE;

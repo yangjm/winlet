@@ -2,7 +2,10 @@ package com.aggrepoint.winlet.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class InputFileImpl extends InputImpl {
 	public Object getValue() {
 		return "";

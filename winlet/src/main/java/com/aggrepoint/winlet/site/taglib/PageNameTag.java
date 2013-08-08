@@ -8,7 +8,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 /**
  * 输出页面名称
  * 
- * @author YJM
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PageNameTag extends TagSupport {
 	static final long serialVersionUID = 0;
