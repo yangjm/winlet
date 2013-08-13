@@ -9,8 +9,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.FormImpl;
-import com.aggrepoint.winlet.form.InputImpl;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
 /**
@@ -31,13 +31,12 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String pageUrl;
 	private String viewId;
 	private String actionId;
-	private String formId;
 	private String winRes;
 	private String validateFieldName;
 	private String validateFieldValue;
 	private boolean pageRefresh;
 	private ViewInstance vi;
-	private FormImpl form;
+	private Form form;
 	private PageStorage ws;
 	private ReturnDef rd;
 
@@ -56,20 +55,20 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 		requestId = REQUEST_ID++;
 
-		pageId = getParameter(request, PARAM_PAGE_PATH, null);
+		pageId = getParameter(PARAM_PAGE_PATH, null);
 		if (pageId == null)
 			pageId = request.getRequestURI();
 
-		pageUrl = getParameter(request, PARAM_PAGE_URL, null);
+		pageUrl = getParameter(PARAM_PAGE_URL, null);
 		if (pageUrl == null)
 			pageUrl = request.getRequestURL().toString();
 
-		winId = getParameter(request, PARAM_WIN_ID, "");
-		viewId = getParameter(request, PARAM_WIN_VIEW, "");
+		winId = getParameter(PARAM_WIN_ID, "");
+		viewId = getParameter(PARAM_WIN_VIEW, "");
 		if ("".equals(viewId))
 			viewId = winId;
 
-		actionId = getParameter(request, PARAM_WIN_ACTION, null);
+		actionId = getParameter(PARAM_WIN_ACTION, null);
 		if (actionId != null) {
 			Matcher m;
 			synchronized (P_DECODE) {
@@ -83,24 +82,20 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 				} catch (Exception e) {
 				}
 				actionId = m.group(3);
-
-				if (m.groupCount() > 3)
-					formId = m.group(4);
 			}
 		} else {
-			pageRefresh = "yes".equalsIgnoreCase(getParameter(request,
+			pageRefresh = "yes".equalsIgnoreCase(getParameter(
 					PARAM_PAGE_REFRESH, ""));
 		}
 
-		if (formId != null && !formId.trim().equals("")) {
-			validateFieldName = getParameter(request, PARAM_WIN_VALIDATE_FIELD,
-					null);
-			if (validateFieldName != null)
-				validateFieldValue = getParameter(request,
-						PARAM_WIN_VALIDATE_FIELD_VALUE, "");
-		}
+		validateFieldName = getParameter(PARAM_WIN_VALIDATE_FIELD, null);
+		if (validateFieldName != null)
+			validateFieldValue = getParameter(PARAM_WIN_VALIDATE_FIELD_VALUE,
+					"");
 
-		winRes = getParameter(request, PARAM_WIN_RES, null);
+		form = new FormImpl(this);
+
+		winRes = getParameter(PARAM_WIN_RES, null);
 		if (winRes != null) {
 			Matcher m;
 			synchronized (P_DECODE) {
@@ -128,8 +123,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	 * HttpServletRequest, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public String getParameter(HttpServletRequest request, String name,
-			String def) {
+	public String getParameter(String name, String def) {
 		String str;
 
 		str = request.getParameter(name);
@@ -140,10 +134,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 	public void setViewInstance(ViewInstance vi) {
 		this.vi = vi;
-	}
-
-	public void setForm(FormImpl form) {
-		this.form = form;
 	}
 
 	public void setReturnDef(ReturnDef rd) {
@@ -248,11 +238,11 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getFormId()
+	 * @see com.aggrepoint.winlet.ReqInfo#getFormName()
 	 */
 	@Override
-	public String getFormId() {
-		return formId;
+	public Form getForm() {
+		return form;
 	}
 
 	/*
@@ -303,30 +293,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public ViewInstance getViewInstance() {
 		return vi;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getForm()
-	 */
-	@Override
-	public FormImpl getForm() {
-		return form;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getValidateField()
-	 */
-	@Override
-	public InputImpl getValidateField() {
-		String name = getValidateFieldName();
-		if (name == null)
-			return null;
-
-		return form.getInputByName(name);
 	}
 
 	/*

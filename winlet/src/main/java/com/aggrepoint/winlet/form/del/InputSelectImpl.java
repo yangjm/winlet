@@ -1,8 +1,9 @@
-package com.aggrepoint.winlet.form;
+package com.aggrepoint.winlet.form.del;
 
 import java.util.Map;
 import java.util.Vector;
 
+import com.aggrepoint.winlet.form.ChangeUpdateList;
 import com.icebean.core.common.TypeCast;
 
 /**

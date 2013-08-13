@@ -1,36 +1,33 @@
 package com.aggrepoint.winlet.form;
 
-
 /**
- * 表单
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface Form {
-	/**
-	 * 表单校验过程中是否遇到错误
-	 * 
-	 * @return true 有错误
-	 */
-	public boolean hasError();
-
-	/**
-	 * 根据Input的name获取Input实例
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public Input getInputByName(String name);
-
 	public boolean isValidateField();
 
-	public Input getValidateField();
+	public String getValue(String field);
 
-	public Input disable(String name);
+	public String getValue(String field, String def);
 
-	public Input enable(String name);
+	public String[] getValues(String field);
 
-	public Input setDisabled(String name, boolean disabled);
+	public void setValue(String field, String value);
 
-	public Form reset();
+	public void setValue(String fields, String[] value);
+
+	public boolean hasError();
+
+	public String[] getErrors(String field);
+
+	public void addError(String field, String error);
+
+	public void clearError(String field);
+
+	public void setDisabled(String field);
+
+	public void setEnabled(String field);
+
+	public String[] getDisabledFields();
 }

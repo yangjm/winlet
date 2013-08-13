@@ -17,47 +17,31 @@ public class ValidationImpl implements Validation {
 		return reqInfo.isValidateField();
 	}
 
-	public InputImpl getValidateField() {
-		if (reqInfo.getForm() == null)
-			return null;
-
-		return reqInfo.getForm().getValidateField();
-	}
-
 	public String getValidateFieldName() {
-		InputImpl input = getValidateField();
-		if (input == null)
-			return null;
-		return input.getName();
+		if (reqInfo.isValidateField())
+			return reqInfo.getValidateFieldName();
+		return null;
 	}
 
 	public boolean hasError() {
-		FormImpl form = reqInfo.getForm();
+		Form form = reqInfo.getForm();
 		return form != null && form.hasError();
 	}
 
 	public void addError(String name, String msg) {
-		FormImpl form = reqInfo.getForm();
+		Form form = reqInfo.getForm();
 		if (form == null)
 			return;
 
-		InputImpl input = form.getInputByName(name);
-		if (input == null)
-			return;
-
-		input.addError(msg);
+		form.addError(name, msg);
 	}
 
 	public void removeError(String name) {
-		FormImpl form = reqInfo.getForm();
+		Form form = reqInfo.getForm();
 		if (form == null)
 			return;
 
-		InputImpl input = form.getInputByName(name);
-		if (input == null)
-			return;
-
-		input.removeError();
+		form.clearError(name);
 	}
 
 	public boolean validate(String name) {

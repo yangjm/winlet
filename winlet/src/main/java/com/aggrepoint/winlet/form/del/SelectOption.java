@@ -1,4 +1,4 @@
-package com.aggrepoint.winlet.form;
+package com.aggrepoint.winlet.form.del;
 
 import java.util.Collection;
 

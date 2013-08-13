@@ -3,8 +3,7 @@ package com.aggrepoint.winlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.aggrepoint.winlet.form.FormImpl;
-import com.aggrepoint.winlet.form.InputImpl;
+import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 
 /**
@@ -12,9 +11,7 @@ import com.aggrepoint.winlet.spring.def.ReturnDef;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface ReqInfo {
-
-	public abstract String getParameter(HttpServletRequest request,
-			String name, String def);
+	public abstract String getParameter(String name, String def);
 
 	public abstract HttpServletRequest getRequest();
 
@@ -36,7 +33,7 @@ public interface ReqInfo {
 
 	public abstract String getActionId();
 
-	public abstract String getFormId();
+	public abstract Form getForm();
 
 	public abstract boolean isValidateField();
 
@@ -47,10 +44,6 @@ public interface ReqInfo {
 	public abstract boolean isPageRefresh();
 
 	public abstract ViewInstance getViewInstance();
-
-	public abstract FormImpl getForm();
-
-	public abstract InputImpl getValidateField();
 
 	public abstract PageStorage getPageStorage();
 

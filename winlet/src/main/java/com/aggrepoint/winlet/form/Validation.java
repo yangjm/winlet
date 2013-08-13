@@ -9,8 +9,6 @@ public interface Validation {
 
 	public String getValidateFieldName();
 
-	public InputImpl getValidateField();
-
 	public boolean hasError();
 
 	public void addError(String name, String msg);

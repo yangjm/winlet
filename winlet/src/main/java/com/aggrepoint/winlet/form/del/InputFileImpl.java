@@ -1,6 +1,8 @@
-package com.aggrepoint.winlet.form;
+package com.aggrepoint.winlet.form.del;
 
 import javax.servlet.http.HttpServletRequest;
+
+import com.aggrepoint.winlet.form.ValidateResultType;
 
 /**
  * 

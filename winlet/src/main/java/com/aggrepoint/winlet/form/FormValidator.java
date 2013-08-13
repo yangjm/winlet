@@ -17,15 +17,17 @@ import com.icebean.core.common.StringUtils;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class Validator implements PropertyTypeCode {
+public class FormValidator implements PropertyTypeCode {
 	/** 日志 */
 	static org.apache.log4j.Category m_log = com.icebean.core.common.Log4jIniter
 			.getCategory();
 
 	static final Class<?>[] PARAMS = new Class<?>[] { HttpServletRequest.class,
-			Input.class };
+			Form.class };
 
-	InputImpl input;
+	Object controller;
+	String strName;
+	Pattern pattern;
 	String strId;
 	String strMethod;
 	ValidateResultType passSkip;
@@ -36,16 +38,19 @@ public class Validator implements PropertyTypeCode {
 	boolean methodWithParam;
 	Object methodObject;
 
-	public Validator(InputImpl input, String id, String method,
-			String ps, String fs, String error, Vector<String> args) {
-		this.input = input;
+	public FormValidator(Object c, String n, String p, String id,
+			String method, String ps, String fs, String error,
+			Vector<String> args) {
+		controller = c;
+		strName = n;
+		if ("".equals(strName))
+			pattern = Pattern.compile(p);
 		strId = id;
 		if (strId != null)
 			strId = strId.trim();
 		strMethod = method;
 		if ("property".equalsIgnoreCase(ps)
-				|| ValidateResultType.PASS_SKIP_PROPERTY.name()
-						.equals(ps))
+				|| ValidateResultType.PASS_SKIP_PROPERTY.name().equals(ps))
 			passSkip = ValidateResultType.PASS_SKIP_PROPERTY;
 		else if ("all".equalsIgnoreCase(ps)
 				|| ValidateResultType.PASS_SKIP_ALL.name().equals(ps))
@@ -61,8 +66,8 @@ public class Validator implements PropertyTypeCode {
 		else
 			failSkip = ValidateResultType.FAILED_SKIP_PROPERTY;
 		strErrorMsg = error;
-		if (strErrorMsg == null || strErrorMsg.equals(""))
-			strErrorMsg = input.strDefaultError;
+		if (strErrorMsg == null)
+			strErrorMsg = "";
 		vecArgs = args;
 
 		String m = strMethod;
@@ -71,17 +76,17 @@ public class Validator implements PropertyTypeCode {
 			try {
 				int idx = strMethod.lastIndexOf(".");
 				if (idx == -1) {
-					methodObject = input.form.winlet;
+					methodObject = controller;
 				} else {
 					String name = strMethod.substring(0, idx);
 					m = strMethod.substring(idx + 1);
 
 					if (name.indexOf(".") > 0)
 						methodObject = PropertyUtils.getNestedProperty(
-								input.form.winlet, name);
+								controller, name);
 					else
 						methodObject = PropertyUtils.getSimpleProperty(
-								input.form.winlet, name);
+								controller, name);
 				}
 
 				try {
@@ -93,10 +98,16 @@ public class Validator implements PropertyTypeCode {
 				}
 			} catch (Exception e) {
 				m_log.error("Unable to find validation method \"" + strMethod
-						+ "\" in winlet \""
-						+ input.form.winlet.getClass().getName() + "\".", e);
+						+ "\" in winlet \"" + controller.getClass().getName()
+						+ "\".", e);
 			}
 		}
+	}
+
+	public boolean matches(String field) {
+		if (pattern != null)
+			return pattern.matcher(field).find();
+		return strName.equals(field);
 	}
 
 	static Hashtable<String, Pattern> PATTERNS = new Hashtable<String, Pattern>();
@@ -123,7 +134,8 @@ public class Validator implements PropertyTypeCode {
 		return p;
 	}
 
-	public ValidateResult validate(HttpServletRequest req, Object value) {
+	public ValidateResult validate(HttpServletRequest req, Form data,
+			Object value) {
 		if (strId != null && !strId.equals("")) {
 			try {
 				if (strId.equalsIgnoreCase("ne")) {
@@ -131,6 +143,25 @@ public class Validator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase("tne")) {
 					if (value == null || value.toString().trim().equals(""))
+						return new ValidateResult(failSkip, strErrorMsg);
+				} else if (strId.equalsIgnoreCase("eq")) {
+					if (value == null && !vecArgs.elementAt(0).equals(""))
+						return new ValidateResult(failSkip, strErrorMsg);
+
+					if (value != null
+							&& !vecArgs.elementAt(0).equals(value.toString()))
+						return new ValidateResult(failSkip, strErrorMsg);
+				} else if (strId.equalsIgnoreCase("neq")) {
+					if (value != null
+							&& vecArgs.elementAt(0).equals(value.toString()))
+						return new ValidateResult(failSkip, strErrorMsg);
+				} else if (strId.equalsIgnoreCase("teq")) {
+					if (value == null && !vecArgs.elementAt(0).equals(""))
+						return new ValidateResult(failSkip, strErrorMsg);
+
+					if (value != null
+							&& !vecArgs.elementAt(0).equals(
+									value.toString().trim()))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase("maxlen")) { // 最大长度
 					int len = 0;
@@ -217,21 +248,21 @@ public class Validator implements PropertyTypeCode {
 				}
 			} catch (Exception e) {
 				m_log.error("Error running validation id \"" + strId
-						+ "\" in winlet \""
-						+ input.form.winlet.getClass().getName() + "\".", e);
+						+ "\" in winlet \"" + controller.getClass().getName()
+						+ "\".", e);
 				return new ValidateResult(failSkip, strErrorMsg);
 			}
 		} else if (method != null) {
 			try {
 				if (methodWithParam)
 					return (ValidateResult) method.invoke(methodObject, req,
-							input);
+							data);
 				else
 					return (ValidateResult) method.invoke(methodObject);
 			} catch (Exception e) {
 				m_log.error("Error running validation method \"" + strMethod
-						+ "\" in winlet \""
-						+ input.form.winlet.getClass().getName() + "\".", e);
+						+ "\" in winlet \"" + controller.getClass().getName()
+						+ "\".", e);
 				return new ValidateResult(failSkip, strErrorMsg);
 			}
 		}

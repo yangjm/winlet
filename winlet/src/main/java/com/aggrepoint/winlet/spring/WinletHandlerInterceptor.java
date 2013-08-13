@@ -15,9 +15,7 @@ import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.RespHeaderConst;
-import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.form.FormImpl;
-import com.aggrepoint.winlet.form.InputImpl;
 import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.spring.annotation.Unspecified;
@@ -65,31 +63,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				return true;
 
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
-
-			FormImpl form = WinletManager.getForm(ri);
-			if (form == null)
-				return true;
-			ri.setForm(form);
-
-			form.bindAction(hm.getMethod());
-
-			if (ri.isValidateField()) { // 单个字段校验
-				form.setValidateField(null);
-				form.startRecordChanges();
-
-				InputImpl input = ri.getValidateField();
-
-				if (input == null)
-					return true;
-
-				form.setValidateField(input);
-				input.populate(ri.getRequest(), ri.getValidateFieldValue());
-			} else {
-				form.clearError();
-
-				for (InputImpl input : form.getInputs())
-					input.populate(ri.getRequest());
-			}
+			FormImpl form = ((FormImpl) ri.getForm());
+			form.validate(ri, hm.getBean(), hm.getMethod());
 		}
 
 		return true;
@@ -154,17 +129,14 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				li.setReturnDef(rd);
 
 				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
+				FormImpl form = (FormImpl) reqInfo.getForm();
 				reqInfo.setReturnDef(rd);
-
-				if (view != null)
-					WinletManager.markFormRequestId(reqInfo);
 
 				if (action != null && reqInfo.isValidateField()) {
 					response.setHeader("Content-Type",
 							"application/json; charset=UTF-8");
 					response.getOutputStream().write(
-							StringUtils.fixJson(
-									reqInfo.getForm().getJsonChanges())
+							StringUtils.fixJson(form.getJsonChanges())
 									.getBytes("UTF-8"));
 
 					if (modelAndView != null)
@@ -196,8 +168,17 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
 						if (modelAndView != null
-								&& !viewName.startsWith(Const.REDIRECT))
+								&& !viewName.startsWith(Const.REDIRECT)) {
 							modelAndView.clear();
+
+							if (form.isValidateForm() && form.hasError())
+								response.getOutputStream().write(
+										StringUtils.fixJson(
+												form.getJsonChanges())
+												.getBytes("UTF-8"));
+
+							return;
+						}
 					}
 				} else {
 					if ("".equals(viewName)) {

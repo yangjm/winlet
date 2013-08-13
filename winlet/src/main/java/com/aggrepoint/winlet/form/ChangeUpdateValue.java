@@ -12,6 +12,11 @@ public class ChangeUpdateValue extends Change {
 		this.value = value;
 	}
 
+	public ChangeUpdateValue(String input, String[] value) {
+		super(input, "u");
+		this.value = value;
+	}
+
 	public Object getValue() {
 		return value;
 	}

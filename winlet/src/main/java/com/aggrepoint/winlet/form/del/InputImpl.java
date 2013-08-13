@@ -1,4 +1,4 @@
-package com.aggrepoint.winlet.form;
+package com.aggrepoint.winlet.form.del;
 
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
@@ -14,6 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import com.aggrepoint.winlet.EnumMarkup;
+import com.aggrepoint.winlet.form.ChangeUpdateValidateResult;
+import com.aggrepoint.winlet.form.ChangeUpdateValue;
+import com.aggrepoint.winlet.form.Validate;
+import com.aggrepoint.winlet.form.ValidateResult;
+import com.aggrepoint.winlet.form.ValidateResultType;
+import com.aggrepoint.winlet.form.Validates;
 import com.aggrepoint.winlet.taglib.MarkupTag;
 import com.icebean.core.beanutil.BeanProperty;
 import com.icebean.core.common.StringUtils;
@@ -63,7 +69,7 @@ public abstract class InputImpl implements Input {
 	/** 是否存在校验错误 */
 	protected boolean bHasError;
 	/** 对应表单 */
-	FormImpl form;
+	Form0Impl form;
 
 	protected InputImpl() {
 	}
@@ -143,7 +149,7 @@ public abstract class InputImpl implements Input {
 	}
 
 	@Override
-	public Form getForm() {
+	public Form0 getForm() {
 		return form;
 	}
 
@@ -486,7 +492,7 @@ public abstract class InputImpl implements Input {
 		return str;
 	}
 
-	static InputImpl getInstance(FormImpl form, String type, Object winlet,
+	static InputImpl getInstance(Form0Impl form, String type, Object winlet,
 			String name) {
 		if (type == null)
 			return null;

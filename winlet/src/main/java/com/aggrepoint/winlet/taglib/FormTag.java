@@ -1,8 +1,6 @@
 package com.aggrepoint.winlet.taglib;
 
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Iterator;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -12,9 +10,6 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.WinletConst;
-import com.aggrepoint.winlet.WinletManager;
-import com.aggrepoint.winlet.form.FormImpl;
-import com.aggrepoint.winlet.form.InputImpl;
 
 /**
  * Form
@@ -41,16 +36,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 	protected boolean m_bHideLoading;
 
 	protected String m_strUpdate;
-
-	/** 表单对象 */
-	protected FormImpl m_form;
-
-	protected InputImpl m_currentInput;
-
-	/** 由嵌套在FormTag中的FunctionTag生成的脚本 */
-	Hashtable<String, String> m_htScripts;
-	/** 由嵌套在FormTag中的FunctionTag生成的，要用winform函数生成的函数 */
-	Hashtable<String, String> m_htFormScripts;
 
 	public void setName(String name) {
 		m_strName = name;
@@ -92,42 +77,8 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 		m_strUpdate = update;
 	}
 
-	public void setScript(String func, String content) {
-		if (m_htScripts == null) {
-			m_htScripts = new Hashtable<String, String>();
-			m_htFormScripts = new Hashtable<String, String>();
-		}
-		m_htScripts.put(func, content);
-		m_htFormScripts.remove(func);
-	}
-
-	public void setFormScript(String func, String def) {
-		if (m_htFormScripts == null) {
-			m_htScripts = new Hashtable<String, String>();
-			m_htFormScripts = new Hashtable<String, String>();
-		}
-		m_htFormScripts.put(func, def);
-		m_htScripts.remove(func);
-	}
-
 	public int doStartTag() throws JspException {
-		m_htScripts = null;
-		m_htFormScripts = null;
-
 		ReqInfo ri = ContextUtils.getReqInfo();
-
-		m_form = WinletManager.getForm(ri, m_strName);
-		m_form.setAction(m_strAction);
-		if (m_objResetRef == null) {
-			if (m_form.getInvalidateRequestId() != ri.getRequestId()
-					|| ri.isPageRefresh())
-				m_form.reset();
-
-			m_form.setInvalidateRequestId(0l);
-		} else if (!(m_objResetRef == m_form.getResetRef())) {
-			m_form.reset();
-			m_form.setResetRef(m_objResetRef);
-		}
 
 		try {
 			JspWriter out = pageContext.getOut();
@@ -158,8 +109,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 			out.print(ri.getViewId());
 			out.print("!");
 			out.print(m_strAction);
-			out.print("!");
-			out.print(m_form.getId());
 			out.print("\"");
 
 			// {Method
@@ -198,35 +147,16 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 			out.println("</form>");
 
 			out.println("<script language=\"javascript\" defer>");
-			if (m_htScripts != null) {
-				// 输出由FunctionTag生成的脚本
-				for (Iterator<String> it = m_htScripts.values().iterator(); it
-						.hasNext();)
-					out.println(it.next());
-			}
 
 			StringBuffer sb = new StringBuffer();
-			sb.append("iid: '" + ri.getWinId() + "', vid: '" + ri.getViewId()
-					+ "'");
+			sb.append("name: '" + m_strName + "', iid: '" + ri.getWinId()
+					+ "', vid: '" + ri.getViewId() + "'");
 			if (m_strFocus != null)
 				sb.append(", focus: '" + m_strFocus + "'");
 			if (m_strUpdate != null)
 				sb.append(", update: '" + m_strUpdate + "'");
 			if (m_bValidate)
-				sb.append(", validate: 'yes', formid: '" + m_form.getId() + "'");
-			if (m_htFormScripts != null) {
-				boolean bFirst = true;
-
-				sb.append(", func :[");
-				for (String func : m_htFormScripts.values()) {
-					if (bFirst)
-						bFirst = false;
-					else
-						sb.append(", ");
-					sb.append(func);
-				}
-				sb.append("]");
-			}
+				sb.append(", validate: 'yes'");
 
 			out.print("$(function() {$(\"#");
 			out.print(name);

@@ -1,8 +1,10 @@
-package com.aggrepoint.winlet.form;
+package com.aggrepoint.winlet.form.del;
 
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
+
+import com.aggrepoint.winlet.form.ValidateResultType;
 
 /**
  * 
@@ -19,7 +21,7 @@ public interface Input {
 
 	public String getErrorValue();
 
-	public Form getForm();
+	public Form0 getForm();
 
 	public Vector<String> getErrors();
 

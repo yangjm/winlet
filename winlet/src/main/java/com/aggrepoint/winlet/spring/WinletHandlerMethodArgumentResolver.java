@@ -17,6 +17,7 @@ import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.UserProfile;
+import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
@@ -35,7 +36,8 @@ public class WinletHandlerMethodArgumentResolver implements
 		return clz.isAssignableFrom(Validation.class)
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
 				|| clz.isAssignableFrom(PageStorage.class)
-				|| clz.isAssignableFrom(UserProfile.class)
+				|| clz.isAssignableFrom(Form.class)
+				|| UserProfile.class.isAssignableFrom(clz)
 				|| clz.isAssignableFrom(UserEngine.class)
 				|| clz.isAssignableFrom(ConfigProvider.class)
 				|| clz.isAssignableFrom(PsnRuleEngine.class)
@@ -57,12 +59,15 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(ReqInfoImpl.class))
 			return ContextUtils.getReqInfo();
 
+		if (clz.isAssignableFrom(Form.class))
+			return ContextUtils.getReqInfo().getForm();
+
 		if (clz.isAssignableFrom(PageStorage.class))
 			return ContextUtils.getReqInfo().getPageStorage();
 
 		HttpServletRequest req = ContextUtils.getRequest();
 
-		if (clz.isAssignableFrom(UserProfile.class))
+		if (UserProfile.class.isAssignableFrom(clz))
 			return ContextUtils.getUserEngine(req).getUser(req);
 
 		if (clz.isAssignableFrom(UserEngine.class))
