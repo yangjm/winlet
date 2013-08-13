@@ -2,6 +2,7 @@ package com.aggrepoint.winlet.site;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.aggrepoint.winlet.site.dao.fs.BranchDao;
 import com.aggrepoint.winlet.site.domain.Branch;
@@ -57,6 +58,8 @@ public class FileSystemCfgLoader {
 				}
 			}
 		}
+
+		Collections.sort(bs);
 
 		return bs;
 	}

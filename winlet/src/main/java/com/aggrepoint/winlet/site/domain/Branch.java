@@ -28,6 +28,8 @@ public class Branch extends Base {
 		for (Area area : areas)
 			area.setCascade(true);
 
+		Collections.sort(rootPage.getPages());
+
 		for (Page p : rootPage.getPages())
 			p.init(rootPage, areas, template);
 	}
