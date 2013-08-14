@@ -82,7 +82,7 @@ public class SubCountTag extends TagSupport {
 			}
 
 			if (page != null)
-				count = page.getPages(re).size();
+				count = page.getPages(re, false).size();
 
 			if (m_strName == null)
 				out.print(count);

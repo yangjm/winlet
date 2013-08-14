@@ -23,8 +23,6 @@ import com.aggrepoint.winlet.LangTextProcessor;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.Resolver;
 import com.aggrepoint.winlet.UrlConstructor;
-import com.aggrepoint.winlet.site.SiteController;
-import com.aggrepoint.winlet.site.domain.Page;
 import com.icebean.core.beanutil.BeanProperty;
 import com.icebean.core.common.StringUtils;
 import com.icebean.core.locale.LocaleManager;
@@ -403,10 +401,6 @@ public class ELFunction {
 
 	public static String funcPageUrl(String param) {
 		ReqInfo reqInfo = ContextUtils.getReqInfo();
-		Page page = SiteController.getPage(
-				ContextUtils.getAccessRuleEngine(reqInfo.getRequest()), param);
-		if (page == null)
-			return param;
 		return new UrlConstructor(reqInfo.getRequest()).getPageUrl(param);
 	}
 

@@ -67,6 +67,17 @@
 	</tag>
 
 	<tag>
+		<name>pageurl</name>
+		<tagclass>com.aggrepoint.winlet.site.taglib.PathUrlTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>page</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
 		<name>subcount</name>
 		<tagclass>com.aggrepoint.winlet.site.taglib.SubCountTag</tagclass>
 		<teiclass>com.aggrepoint.winlet.site.taglib.SubCountTei</teiclass>

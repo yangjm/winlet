@@ -33,6 +33,7 @@ public class PageDao {
 			page.setTemplate(cfgs.get("template"));
 			page.setLink(cfgs.get("link"));
 			page.setSkip("true".equalsIgnoreCase(cfgs.get("skip")));
+			page.setHide("true".equalsIgnoreCase(cfgs.get("hide")));
 
 			for (File f : dir.listFiles()) {
 				if (f.isDirectory()) { // 页面

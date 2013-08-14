@@ -22,6 +22,7 @@ public class Page extends Base {
 	private String template;
 	private String link;
 	private boolean skip;
+	private boolean hide;
 	private List<Area> areas = new ArrayList<Area>();
 	private Hashtable<String, List<Area>> areasByName = new Hashtable<String, List<Area>>();
 	private List<Page> pages = new ArrayList<Page>();
@@ -105,6 +106,14 @@ public class Page extends Base {
 		this.skip = skip;
 	}
 
+	public boolean isHide() {
+		return hide;
+	}
+
+	public void setHide(boolean hide) {
+		this.hide = hide;
+	}
+
 	public List<Area> getAreas(String name) {
 		return areasByName.get(name);
 	}
@@ -121,12 +130,15 @@ public class Page extends Base {
 		return pages;
 	}
 
-	public List<Page> getPages(AccessRuleEngine re) {
+	public List<Page> getPages(AccessRuleEngine re, boolean includeHide) {
 		if (pages.size() == 0)
 			return pages;
 
 		List<Page> list = new ArrayList<Page>();
 		for (Page p : pages) {
+			if (!includeHide && p.isHide())
+				continue;
+
 			try {
 				if (p.getRule() == null || re.eval(p.getRule()))
 					list.add(p);
@@ -137,6 +149,10 @@ public class Page extends Base {
 		}
 
 		return list;
+	}
+
+	public List<Page> getPages(AccessRuleEngine re) {
+		return getPages(re, true);
 	}
 
 	public void addPage(Page page) {
