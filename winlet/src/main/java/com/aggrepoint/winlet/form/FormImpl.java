@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.json.JSONNull;
 import net.sf.json.JSONSerializer;
@@ -48,6 +50,10 @@ public class FormImpl implements Form, ReqConst {
 				"no"));
 	}
 
+	public boolean validate(String field) {
+		return fields.contains(field);
+	}
+
 	public void recordChange(Change change) {
 		change.addTo(vecChanges);
 	}
@@ -84,8 +90,22 @@ public class FormImpl implements Form, ReqConst {
 		return val[0];
 	}
 
+	static Pattern ARRAY = Pattern.compile("^(.+)\\[(\\d+)\\]$");
+
 	@Override
 	public String[] getValues(String field) {
+		Matcher m = ARRAY.matcher(field);
+		if (m.find()) {
+			String name = m.group(1);
+			int idx = Integer.parseInt(m.group(2));
+
+			Vector<String> vals = fieldValues.get(name);
+			if (vals == null || vals.size() <= idx)
+				return null;
+
+			return new String[] { vals.get(idx) };
+		}
+
 		Vector<String> vals = fieldValues.get(field);
 		if (vals != null)
 			return vals.toArray(new String[vals.size()]);

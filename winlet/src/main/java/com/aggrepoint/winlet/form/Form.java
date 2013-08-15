@@ -7,6 +7,8 @@ package com.aggrepoint.winlet.form;
 public interface Form {
 	public boolean isValidateField();
 
+	public boolean validate(String field);
+
 	public String getValue(String field);
 
 	public String getValue(String field, String def);
