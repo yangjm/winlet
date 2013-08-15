@@ -94,42 +94,67 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public String[] getValues(String field) {
+		String name = field;
+		Integer idx = null;
+
 		Matcher m = ARRAY.matcher(field);
 		if (m.find()) {
-			String name = m.group(1);
-			int idx = Integer.parseInt(m.group(2));
-
-			Vector<String> vals = fieldValues.get(name);
-			if (vals == null || vals.size() <= idx)
-				return null;
-
-			return new String[] { vals.get(idx) };
+			name = m.group(1);
+			idx = Integer.parseInt(m.group(2));
 		}
 
-		Vector<String> vals = fieldValues.get(field);
-		if (vals != null)
-			return vals.toArray(new String[vals.size()]);
+		Vector<String> vals = fieldValues.get(name);
 
-		String[] val = null;
+		if (vals != null) {
+			if (idx == null)
+				return vals.toArray(new String[vals.size()]);
+
+			if (vals.size() > idx)
+				return new String[] { vals.get(idx) };
+		}
+
 		if (ri.isValidateField()) {
 			if (field.equals(ri.getValidateFieldName()))
-				val = new String[] { ri.getValidateFieldValue() };
-		} else
-			val = ri.getRequest().getParameterValues(field);
+				return new String[] { ri.getValidateFieldValue() };
+		} else {
+			String[] val = ri.getRequest().getParameterValues(name);
 
-		return val;
+			if (idx == null)
+				return val;
+
+			if (val.length > idx)
+				return new String[] { val[idx] };
+		}
+
+		return null;
 	}
 
 	@Override
 	public void setValue(String field, String value) {
-		Vector<String> values = fieldValues.get(field);
-		if (values == null) {
-			values = new Vector<String>();
-			fieldValues.put(field, values);
+		String name = field;
+		Integer idx = null;
+
+		Matcher m = ARRAY.matcher(field);
+		if (m.find()) {
+			name = m.group(1);
+			idx = Integer.parseInt(m.group(2));
 		}
 
-		values.clear();
-		values.add(value);
+		Vector<String> values = fieldValues.get(name);
+		if (values == null) {
+			values = new Vector<String>();
+			fieldValues.put(name, values);
+		}
+
+		if (idx == null) {
+			values.clear();
+			values.add(value);
+		} else {
+			for (int i = values.size(); i <= idx; i++) {
+				values.add("");
+			}
+			values.set(idx, value);
+		}
 
 		recordChange(new ChangeUpdateValue(field, value));
 	}
