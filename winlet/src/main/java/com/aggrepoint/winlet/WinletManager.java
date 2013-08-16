@@ -193,16 +193,18 @@ public class WinletManager implements WinletConst {
 			}
 		}
 
-		for (WinletInstance wi : wis) {
-			if (wi.iid.equals(req.getWinId())) {
-				if (wi.viewInstance.viewDef != def) {
-					// Update the WinInstance
-					wis.remove(wi);
-					wi = new WinletInstance(req.getWinId(), def, getWinlet(
-							context, req, def.getWinletDef()));
-					wis.add(wi);
+		synchronized (wis) {
+			for (WinletInstance wi : wis) {
+				if (wi.iid.equals(req.getWinId())) {
+					if (wi.viewInstance.viewDef != def) {
+						// Update the WinInstance
+						wis.remove(wi);
+						wi = new WinletInstance(req.getWinId(), def, getWinlet(
+								context, req, def.getWinletDef()));
+						wis.add(wi);
+					}
+					return wi;
 				}
-				return wi;
 			}
 		}
 

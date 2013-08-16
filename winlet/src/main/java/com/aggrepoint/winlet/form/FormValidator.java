@@ -114,6 +114,8 @@ public class FormValidator implements PropertyTypeCode {
 	static Pattern EMAIL = Pattern.compile(
 			"^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
 			Pattern.CASE_INSENSITIVE);
+	static Pattern INT = Pattern.compile("^\\d+$");
+	static Pattern FLOAT = Pattern.compile("^\\d+(\\.\\d+)?$");
 
 	static Pattern getPattern(Vector<String> args) {
 		if (args == null || args.size() == 0)
@@ -197,6 +199,18 @@ public class FormValidator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 
 					if (!EMAIL.matcher(value.toString()).find())
+						return new ValidateResult(failSkip, strErrorMsg);
+				} else if (strId.equalsIgnoreCase("int")) { // 整数
+					if (value == null)
+						return new ValidateResult(failSkip, strErrorMsg);
+
+					if (!INT.matcher(value.toString()).find())
+						return new ValidateResult(failSkip, strErrorMsg);
+				} else if (strId.equalsIgnoreCase("float")) { // 浮点数
+					if (value == null)
+						return new ValidateResult(failSkip, strErrorMsg);
+
+					if (!FLOAT.matcher(value.toString()).find())
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase(">")
 						|| strId.equalsIgnoreCase("gt")) { // 大于
