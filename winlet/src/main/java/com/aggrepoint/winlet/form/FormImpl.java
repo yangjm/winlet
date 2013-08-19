@@ -22,10 +22,13 @@ public class FormImpl implements Form, ReqConst {
 
 	private ReqInfo ri;
 	private ArrayList<String> fields = new ArrayList<String>();
+	private HashSet<String> groupNames = new HashSet<String>();
 	private Hashtable<String, Vector<String>> fieldValues = new Hashtable<String, Vector<String>>();
 	private Hashtable<String, ArrayList<String>> fieldErrors = new Hashtable<String, ArrayList<String>>();
 	private HashSet<String> disabledFields;
 	private Vector<Change> vecChanges = new Vector<Change>();
+
+	static Pattern ARRAY = Pattern.compile("^(.+)\\[(\\d+)\\]$");
 
 	public FormImpl(ReqInfo ri) {
 		this.ri = ri;
@@ -39,10 +42,22 @@ public class FormImpl implements Form, ReqConst {
 			disabledFields = toSet(ri.getRequest().getParameterValues(
 					PARAM_WIN_FORM_DISABLED_FIELD));
 		}
+
+		for (String field : fields) {
+			Matcher m = ARRAY.matcher(field);
+			if (m.find())
+				groupNames.add(m.group(1));
+		}
 	}
 
 	public boolean isValidateField() {
 		return ri.isValidateField();
+	}
+
+	public String getValidateFieldName() {
+		if (ri.isValidateField())
+			return ri.getValidateFieldName();
+		return null;
 	}
 
 	public boolean isValidateForm() {
@@ -51,7 +66,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public boolean validate(String field) {
-		return fields.contains(field);
+		return fields.contains(field) || groupNames.contains(field);
 	}
 
 	public void recordChange(Change change) {
@@ -89,8 +104,6 @@ public class FormImpl implements Form, ReqConst {
 			return null;
 		return val[0];
 	}
-
-	static Pattern ARRAY = Pattern.compile("^(.+)\\[(\\d+)\\]$");
 
 	@Override
 	public String[] getValues(String field) {

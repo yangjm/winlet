@@ -71,6 +71,9 @@ public class SiteController {
 			if (page == null)
 				return "/WEB-INF/site/error/pagenotfound.jsp";
 
+			if (page.getLink() != null)
+				return "redirect:" + page.getLink();
+
 			SiteContext sc = new SiteContext(req, page);
 			req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
 

@@ -1,5 +1,6 @@
 package com.aggrepoint.winlet.spring;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,8 @@ import org.objectweb.asm.ClassWriter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
 
+import com.aggrepoint.winlet.spring.annotation.Action;
+import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
 
 /**
@@ -37,8 +40,17 @@ public class WinletClassLoader extends ClassLoader {
 
 		Class<?> ret = clz;
 
-		Winlet winlet = AnnotationUtils.findAnnotation(clz, Winlet.class);
-		if (winlet != null) {
+		boolean process = AnnotationUtils.findAnnotation(clz, Winlet.class) != null;
+		if (!process) {
+			for (Method m : clz.getMethods()) {
+				process = AnnotationUtils.findAnnotation(m, Action.class) != null
+						|| AnnotationUtils.findAnnotation(m, Window.class) != null;
+				if (process)
+					break;
+			}
+		}
+
+		if (process) {
 			try {
 				ClassReader cr = new ClassReader(clz.getResource(
 						"/" + name.replace('.', '/') + ".class").openStream());

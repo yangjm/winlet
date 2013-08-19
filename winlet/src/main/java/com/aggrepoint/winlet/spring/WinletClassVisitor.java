@@ -34,18 +34,20 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 
 	final String DESC_WINLET = getClassDesc(Winlet.class);
 	final String DESC_ACTION = getClassDesc(Action.class);
-	final String DESC_VIEW = getClassDesc(Window.class);
+	final String DESC_WINDOW = getClassDesc(Window.class);
 	final String DESC_REQUEST_MAPPING = getClassDesc(RequestMapping.class);
 	final String DESC_SCOPE = getClassDesc(Scope.class);
 
 	String winletPath = "";
+	boolean hasWindow = false;
+	boolean hasAction = false;
 
 	public WinletClassVisitor(ClassVisitor inner) {
 		super(ASM4, inner);
 	}
 
 	public boolean isWinlet() {
-		return !"".equals(winletPath);
+		return !"".equals(winletPath) || hasWindow || hasAction;
 	}
 
 	@Override
@@ -92,9 +94,6 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc,
 			String signature, String[] exceptions) {
-		if (!isWinlet())
-			return super.visitMethod(access, name, desc, signature, exceptions);
-
 		final String methodName = name;
 
 		return new MethodVisitor(ASM4, super.visitMethod(access, name, desc,
@@ -105,7 +104,9 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 				if (DESC_REQUEST_MAPPING.equals(desc))
 					return null;
 
-				if (DESC_VIEW.equals(desc)) {
+				if (DESC_WINDOW.equals(desc)) {
+					hasWindow = true;
+
 					// 1. 在@View之前添加@RequestMapping
 					// 2. 当@View没有指定value()时，取方法的名称作为value()的值
 					final AnnotationVisitor theAv = mv.visitAnnotation(
@@ -135,12 +136,14 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 							av1.visitEnd();
 							theAv.visitEnd();
 
-							av1 = mv.visitAnnotation(DESC_VIEW, true);
+							av1 = mv.visitAnnotation(DESC_WINDOW, true);
 							av1.visit("value", value);
 							av1.visitEnd();
 						}
 					};
 				} else if (DESC_ACTION.equals(desc)) {
+					hasAction = true;
+
 					// 当@Action没有指定value()时，取方法的名称作为value()的值
 					return new AnnotationVisitor(ASM4, mv.visitAnnotation(desc,
 							visible)) {
