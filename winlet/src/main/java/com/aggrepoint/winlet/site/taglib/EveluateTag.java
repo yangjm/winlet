@@ -65,7 +65,7 @@ public class EveluateTag extends TagSupport {
 			Page page = Utils.getPage(this, pageContext, m_strPage, m_iLevel);
 
 			if (m_strType.equals("hassub")) { // 判断指定的页是否包含子页面
-				if (page.getPages(re, false).size() > 0)
+				if (page.getPages(re, false, true).size() > 0)
 					bResult = true;
 			} else if (m_strType.equals("current")) { // 判断指定的页是否当前页
 				if (currentPage == page)

@@ -21,6 +21,7 @@ import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
+import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.Storage;
 
 /**
@@ -33,7 +34,7 @@ public class WinletHandlerMethodArgumentResolver implements
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> clz = parameter.getParameterType();
 
-		return clz.isAssignableFrom(Validation.class)
+		if (clz.isAssignableFrom(Validation.class)
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
 				|| clz.isAssignableFrom(PageStorage.class)
 				|| clz.isAssignableFrom(Form.class)
@@ -44,7 +45,14 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| clz.isAssignableFrom(AccessRuleEngine.class)
 				|| clz.isAssignableFrom(CodeMapProvider.class)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
-				|| parameter.getParameterAnnotation(Storage.class) != null;
+				|| parameter.getParameterAnnotation(Storage.class) != null)
+			return true;
+
+		if (clz == Boolean.class || clz == boolean.class)
+			if (parameter.getParameterAnnotation(PageRefresh.class) != null)
+				return true;
+
+		return false;
 	}
 
 	@Override
@@ -52,6 +60,9 @@ public class WinletHandlerMethodArgumentResolver implements
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
 		Class<?> clz = parameter.getParameterType();
+
+		if (clz == Boolean.class || clz == boolean.class)
+			return ContextUtils.getReqInfo().isPageRefresh();
 
 		if (clz.isAssignableFrom(Validation.class))
 			return new ValidationImpl(ContextUtils.getReqInfo());

@@ -22,11 +22,7 @@ import com.aggrepoint.winlet.UserProfile;
 public class DefaultAccessRuleEngine implements AccessRuleEngine {
 	Hashtable<String, Expression> htExpressionCache = new Hashtable<String, Expression>();
 
-	@Override
-	public boolean eval(String rule) throws Exception {
-		if (rule == null)
-			return true;
-
+	protected Expression getExpression(String rule) {
 		Expression exp = null;
 
 		synchronized (htExpressionCache) {
@@ -37,6 +33,15 @@ public class DefaultAccessRuleEngine implements AccessRuleEngine {
 			}
 		}
 
+		return exp;
+	}
+
+	@Override
+	public boolean eval(String rule) throws Exception {
+		if (rule == null)
+			return true;
+
+		Expression exp = getExpression(rule);
 		HttpServletRequest req = ContextUtils.getRequest();
 		UserProfile user = ContextUtils.getUser(req);
 		synchronized (exp) {

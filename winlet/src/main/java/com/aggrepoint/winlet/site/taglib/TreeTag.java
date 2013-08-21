@@ -133,7 +133,7 @@ public class TreeTag extends BodyTagSupport {
 			if (page == null)
 				return SKIP_BODY;
 
-			m_enum = Collections.enumeration(page.getPages(re, false));
+			m_enum = Collections.enumeration(page.getPages(re, false, true));
 			Object next = nextElement();
 			if (next == null)
 				return SKIP_BODY;

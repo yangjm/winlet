@@ -130,7 +130,26 @@ public class Page extends Base {
 		return pages;
 	}
 
-	public List<Page> getPages(AccessRuleEngine re, boolean includeHide) {
+	protected boolean containsNotSkip(AccessRuleEngine re) {
+		if (!skip)
+			return true;
+
+		for (Page page : pages)
+			try {
+				if (page.getRule() == null || re.eval(page.getRule()))
+					if (page.containsNotSkip(re))
+						return true;
+			} catch (Exception e) {
+				logger.error("Error evaluating rule \"" + page.getRule()
+						+ "\" defined on page \"" + page.getFullPath() + "\".",
+						e);
+			}
+
+		return false;
+	}
+
+	public List<Page> getPages(AccessRuleEngine re, boolean includeHide,
+			boolean constainsNotSkip) {
 		if (pages.size() == 0)
 			return pages;
 
@@ -141,18 +160,15 @@ public class Page extends Base {
 
 			try {
 				if (p.getRule() == null || re.eval(p.getRule()))
-					list.add(p);
+					if (!constainsNotSkip || p.containsNotSkip(re))
+						list.add(p);
 			} catch (Exception e) {
-				logger.error("Error evaluating rule \"" + rule
+				logger.error("Error evaluating rule \"" + p.getRule()
 						+ "\" defined on page \"" + p.getFullPath() + "\".", e);
 			}
 		}
 
 		return list;
-	}
-
-	public List<Page> getPages(AccessRuleEngine re) {
-		return getPages(re, true);
 	}
 
 	public void addPage(Page page) {
@@ -178,7 +194,7 @@ public class Page extends Base {
 		if (!path.startsWith(path))
 			return null;
 
-		List<Page> list = getPages(re);
+		List<Page> list = getPages(re, true, true);
 		for (Page p : list) {
 			Page f = p.findPage(path, re);
 			if (f != null)
@@ -192,7 +208,7 @@ public class Page extends Base {
 		if (!skip)
 			return this;
 
-		List<Page> list = getPages(re);
+		List<Page> list = getPages(re, true, true);
 		if (list.size() == 0)
 			return this;
 
