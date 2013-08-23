@@ -14,6 +14,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.dao.DataAccessException;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class HibernateDaoBaseMethod<T> implements HibernateDaoMethod {
 	Class<T> clz;
 

@@ -23,6 +23,11 @@ import com.aggrepoint.dao.annotation.Param;
 import com.aggrepoint.dao.annotation.Replace;
 import com.aggrepoint.dao.annotation.Update;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class HibernateDaoAnnotationMethod<T> implements HibernateDaoMethod {
 	static Pattern P_PART = Pattern.compile("#\\{(.+?)\\}");
 	static Pattern P_COUNT = Pattern.compile(

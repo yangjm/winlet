@@ -14,6 +14,11 @@ import com.aggrepoint.jpa.CreatedDate;
 import com.aggrepoint.jpa.UpdatedBy;
 import com.aggrepoint.jpa.UpdatedDate;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class AuditTrailInterceptor extends EmptyInterceptor {
 	private static final long serialVersionUID = 1L;
 

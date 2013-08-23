@@ -18,6 +18,11 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class HibernateDaoScanner extends ClassPathBeanDefinitionScanner {
 	public HibernateDaoScanner(BeanDefinitionRegistry registry,
 			ResourceLoader resourceLoader, BeanNameGenerator beanNameGenerator) {

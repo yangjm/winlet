@@ -25,7 +25,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * @see org.mybatis.spring.mapper.MapperScannerConfigurer
- * @author Jim
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class HibernateDaoScannerConfigurer implements
 		BeanDefinitionRegistryPostProcessor, InitializingBean,

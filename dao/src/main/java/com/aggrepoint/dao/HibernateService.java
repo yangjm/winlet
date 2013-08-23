@@ -6,6 +6,11 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public interface HibernateService<T> {
 	Serializable create(T entity) throws DataAccessException;
 

@@ -12,6 +12,11 @@ import com.aggrepoint.dao.annotation.Delete;
 import com.aggrepoint.dao.annotation.Find;
 import com.aggrepoint.dao.annotation.Update;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class HibernateDaoProxy<T> implements InvocationHandler, Serializable {
 	private static final long serialVersionUID = 1L;
 

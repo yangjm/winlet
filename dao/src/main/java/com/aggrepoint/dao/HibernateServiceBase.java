@@ -7,6 +7,11 @@ import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 @Transactional
 public abstract class HibernateServiceBase<T> implements HibernateService<T> {
 	public abstract HibernateDao<T> getDao();

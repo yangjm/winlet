@@ -2,6 +2,11 @@ package com.aggrepoint.dao;
 
 import java.util.List;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class PageList<T> {
 	private List<T> list;
 	private int totalPage;

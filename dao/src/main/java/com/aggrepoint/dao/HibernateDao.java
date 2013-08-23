@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException;
 
 /**
  * @see org.springframework.orm.hibernate3.HibernateOperations
+ * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface HibernateDao<T> {
 	void clear() throws DataAccessException;

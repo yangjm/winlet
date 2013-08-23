@@ -8,22 +8,27 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 
 import org.hibernate.SessionFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.support.DaoSupport;
 
+/**
+ * 不能注入SessionFactory，不能在checkDaoConfig时获取SessionFactory，
+ * 因为会造成嵌套加载其他扫描Dao对象的情况，对象数量多时会引起堆栈溢出
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
 public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
-		FactoryBean<T> {
-	private SessionFactory factory;
+		FactoryBean<T>, ApplicationContextAware {
+	private ApplicationContext ctx;
 	private Class<T> daoInterface;
 	private T proxy;
 	private Class<K> domainClz;
 
-	public SessionFactory getSessionFactory() {
-		return factory;
-	}
-
-	public void setSessionFactory(SessionFactory factory) {
-		this.factory = factory;
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
+		ctx = applicationContext;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -49,7 +54,23 @@ public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	public T getObject() throws Exception {
+		if (proxy == null) {
+			try {
+				proxy = (T) Proxy.newProxyInstance(
+						daoInterface.getClassLoader(),
+						new Class[] { daoInterface },
+						new HibernateDaoProxy<K>(ctx
+								.getBean(SessionFactory.class), daoInterface,
+								domainClz));
+			} catch (Throwable t) {
+				logger.error("Error while creating proxy for dao interface '"
+						+ this.daoInterface + "'.", t);
+				throw new IllegalArgumentException(t);
+			}
+		}
+
 		return proxy;
 	}
 
@@ -67,21 +88,10 @@ public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void checkDaoConfig() throws IllegalArgumentException {
 		notNull(daoInterface, "Property 'daoInterface' is required");
 		isTrue(daoInterface.isInterface(),
 				"Property 'daoInterface' must be interface");
-
-		try {
-			proxy = (T) Proxy.newProxyInstance(daoInterface.getClassLoader(),
-					new Class[] { daoInterface }, new HibernateDaoProxy<K>(
-							factory, daoInterface, domainClz));
-		} catch (Throwable t) {
-			logger.error("Error while creating proxy for dao interface '"
-					+ this.daoInterface + "'.", t);
-			throw new IllegalArgumentException(t);
-		}
 	}
 }

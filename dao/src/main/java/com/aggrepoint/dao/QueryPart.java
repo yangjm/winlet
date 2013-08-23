@@ -11,6 +11,11 @@ import com.aggrepoint.dao.annotation.Like;
 import com.aggrepoint.dao.annotation.Param;
 import com.aggrepoint.dao.annotation.Replace;
 
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ *
+ */
 public class QueryPart {
 	static Pattern P_PARAM = Pattern.compile(":(\\w+)");
 	static Pattern P_REPLACE = Pattern.compile("^[\\w+\\s+\\.,]*$");
