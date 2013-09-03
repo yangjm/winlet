@@ -1,0 +1,13 @@
+package com.aggrepoint.winlet;
+
+/**
+ * 
+ * @author Jiangming Yang (yangjm@gmail.com)
+ */
+public interface SharedPageStorage {
+	public <T> T getAttribute(Object obj);
+
+	public void setAttribute(Object key, Object value);
+
+	public void removeAttribute(Object key);
+}

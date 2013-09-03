@@ -47,6 +47,8 @@ public interface ReqInfo {
 
 	public abstract PageStorage getPageStorage();
 
+	public abstract SharedPageStorage getSharedPageStorage();
+
 	public abstract ReturnDef getReturnDef();
 
 }

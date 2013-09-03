@@ -68,6 +68,8 @@ public class Resolver extends javax.el.ELResolver implements
 		if (base == null) {
 			if (property.equals("w")) {
 				val = ContextUtils.getReqInfo().getViewInstance().getWinlet();
+			} else if (property.equals("sps")) {
+				val = ContextUtils.getReqInfo().getSharedPageStorage();
 			} else if (property.equals("ps")) {
 				val = ContextUtils.getReqInfo().getPageStorage();
 			} else if (property.equals("return")) {
@@ -75,8 +77,8 @@ public class Resolver extends javax.el.ELResolver implements
 			} else if (property.equals("u")) {
 				val = ContextUtils.getUser(ContextUtils.getRequest());
 			} else if (property.equals("c")) {
-				val = ContextUtils.getCodeMapProvider(ContextUtils
-						.getRequest());
+				val = ContextUtils
+						.getCodeMapProvider(ContextUtils.getRequest());
 			} else if (property.equals("f")) {
 				// val = ThreadContext.getAttribute(THREAD_ATTR_REQUEST);
 			} else if (property.equals("e")) {
@@ -93,6 +95,9 @@ public class Resolver extends javax.el.ELResolver implements
 			if (base instanceof PageStorage) {
 				val = ((PageStorage) base).getAttribute(property);
 				context.setPropertyResolved(true);
+			} else if (base instanceof SharedPageStorage) {
+				val = ((SharedPageStorage) base).getAttribute(property);
+				context.setPropertyResolved(true);
 			} else if (base instanceof CodeMapProvider) {
 				val = ((CodeMapProvider) base).getMap(property.toString());
 				context.setPropertyResolved(true);
@@ -106,7 +111,7 @@ public class Resolver extends javax.el.ELResolver implements
 					context.setPropertyResolved(true);
 				}
 			} else if (base instanceof CodeMapWrapper) {
-				val = ((CodeMapWrapper)base).get(property.toString());
+				val = ((CodeMapWrapper) base).get(property.toString());
 				context.setPropertyResolved(true);
 			} else {
 				Winlet winlet = AnnotationUtils.findAnnotation(base.getClass(),

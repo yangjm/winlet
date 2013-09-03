@@ -15,6 +15,7 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqInfoImpl;
+import com.aggrepoint.winlet.SharedPageStorage;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.form.Form;
@@ -37,6 +38,7 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(Validation.class)
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
 				|| clz.isAssignableFrom(PageStorage.class)
+				|| clz.isAssignableFrom(SharedPageStorage.class)
 				|| clz.isAssignableFrom(Form.class)
 				|| UserProfile.class.isAssignableFrom(clz)
 				|| clz.isAssignableFrom(UserEngine.class)
@@ -75,6 +77,9 @@ public class WinletHandlerMethodArgumentResolver implements
 
 		if (clz.isAssignableFrom(PageStorage.class))
 			return ContextUtils.getReqInfo().getPageStorage();
+
+		if (clz.isAssignableFrom(SharedPageStorage.class))
+			return ContextUtils.getReqInfo().getSharedPageStorage();
 
 		HttpServletRequest req = ContextUtils.getRequest();
 

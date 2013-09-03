@@ -37,7 +37,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private boolean pageRefresh;
 	private ViewInstance vi;
 	private Form form;
-	private PageStorage ws;
+	private PageStorage ps;
+	private SharedPageStorage sps;
 	private ReturnDef rd;
 
 	// 待移植
@@ -298,13 +299,25 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getWinletStorage()
+	 * @see com.aggrepoint.winlet.ReqInfo#getPageStorage()
 	 */
 	@Override
 	public PageStorage getPageStorage() {
-		if (ws == null)
-			ws = new PageStorageImpl(this);
-		return ws;
+		if (ps == null)
+			ps = new PageStorageImpl(this);
+		return ps;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.aggrepoint.winlet.ReqInfo#getPageStorage()
+	 */
+	@Override
+	public SharedPageStorage getSharedPageStorage() {
+		if (sps == null)
+			sps = new SharedPageStorageImpl(this);
+		return sps;
 	}
 
 	/*

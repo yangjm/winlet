@@ -178,11 +178,11 @@ public class ViewInstance {
 		}
 		// }
 
-		if (!bUpdateWholeWin)
+		if (bUpdateWholeWin)
+			vecUpdates.add(wis.iid);
+		else
 			wis.viewInstance.getUpdateViews(updates, vecUpdates, viewDef
 					.getWinletDef().getName());
-		else
-			vecUpdates.add(wis.iid);
 
 		StringBuffer sb = new StringBuffer();
 		boolean bFirst = true;

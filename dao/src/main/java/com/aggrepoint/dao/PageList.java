@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
- *
+ * 
  */
 public class PageList<T> {
 	private List<T> list;
@@ -19,15 +19,15 @@ public class PageList<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void setList(List<?> list) {
-		this.list = (List<T>)list;
+	public void setList(List<?> list) {
+		this.list = (List<T>) list;
 	}
 
 	public int getTotalPage() {
 		return totalPage;
 	}
 
-	protected void setTotalPage(int totalPage) {
+	public void setTotalPage(int totalPage) {
 		this.totalPage = totalPage;
 	}
 
@@ -35,7 +35,7 @@ public class PageList<T> {
 		return totalCount;
 	}
 
-	protected void setTotalCount(int totalCount) {
+	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;
 	}
 
@@ -43,7 +43,7 @@ public class PageList<T> {
 		return pageSize;
 	}
 
-	protected void setPageSize(int pageSize) {
+	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
 
@@ -51,7 +51,7 @@ public class PageList<T> {
 		return currentPage;
 	}
 
-	protected void setCurrentPage(int currentPage) {
+	public void setCurrentPage(int currentPage) {
 		this.currentPage = currentPage;
 	}
 }
