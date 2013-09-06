@@ -2,6 +2,7 @@ package com.aggrepoint.dao;
 
 import static org.springframework.util.Assert.notNull;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeansException;
@@ -38,6 +39,8 @@ public class HibernateDaoScannerConfigurer implements
 	private boolean processPropertyPlaceHolders;
 
 	private BeanNameGenerator nameGenerator;
+
+	private List<IFunc> functions;
 
 	public String getBasePackage() {
 		return basePackage;
@@ -101,7 +104,7 @@ public class HibernateDaoScannerConfigurer implements
 			processPropertyPlaceHolders();
 
 		HibernateDaoScanner scanner = new HibernateDaoScanner(registry,
-				applicationContext, nameGenerator);
+				applicationContext, nameGenerator, functions);
 		scanner.scan(StringUtils.tokenizeToStringArray(this.basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
 	}
@@ -133,5 +136,9 @@ public class HibernateDaoScannerConfigurer implements
 
 	public void setNameGenerator(BeanNameGenerator nameGenerator) {
 		this.nameGenerator = nameGenerator;
+	}
+
+	public void setFunctions(List<IFunc> funcs) {
+		this.functions = funcs;
 	}
 }

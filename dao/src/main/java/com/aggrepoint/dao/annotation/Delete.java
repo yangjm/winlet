@@ -8,10 +8,12 @@ import java.lang.annotation.Target;
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
- *
+ * 
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Delete {
 	String value() default "";
+
+	String sql() default "";
 }

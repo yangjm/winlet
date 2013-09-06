@@ -6,6 +6,7 @@ import static org.springframework.util.Assert.notNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
@@ -17,6 +18,7 @@ import org.springframework.dao.support.DaoSupport;
 /**
  * 不能注入SessionFactory，不能在checkDaoConfig时获取SessionFactory，
  * 因为会造成嵌套加载其他扫描Dao对象的情况，对象数量多时会引起堆栈溢出
+ * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
@@ -25,6 +27,7 @@ public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
 	private Class<T> daoInterface;
 	private T proxy;
 	private Class<K> domainClz;
+	private List<IFunc> funcs;
 
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
@@ -51,6 +54,10 @@ public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
 							+ daoInterface + "'.");
 	}
 
+	public void setFuncs(List<IFunc> funcs) {
+		this.funcs = funcs;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -63,7 +70,7 @@ public class HibernateDaoFactoryBean<T, K> extends DaoSupport implements
 						new Class[] { daoInterface },
 						new HibernateDaoProxy<K>(ctx
 								.getBean(SessionFactory.class), daoInterface,
-								domainClz));
+								domainClz, funcs));
 			} catch (Throwable t) {
 				logger.error("Error while creating proxy for dao interface '"
 						+ this.daoInterface + "'.", t);

@@ -8,10 +8,14 @@ import java.lang.annotation.Target;
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
- *
+ * 
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Find {
 	String value() default "";
+
+	String sql() default "";
+
+	Class<?> entity() default Object.class;
 }

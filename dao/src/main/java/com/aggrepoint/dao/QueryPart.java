@@ -8,43 +8,43 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.aggrepoint.dao.annotation.Like;
-import com.aggrepoint.dao.annotation.Param;
 import com.aggrepoint.dao.annotation.Replace;
 
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
- *
+ * 
  */
 public class QueryPart {
-	static Pattern P_PARAM = Pattern.compile(":(\\w+)");
-	static Pattern P_REPLACE = Pattern.compile("^[\\w+\\s+\\.,]*$");
+	static Pattern P_PARAM = Pattern.compile(":([\\w\\d]+(\\[.*\\])?)");
+	static Pattern P_REPLACE = Pattern.compile("^[\\w\\d\\s\\.,]*$");
 
 	boolean optional;
 	String part;
 	String[] paramDepends;
-	Hashtable<String, Param> params;
-	Hashtable<String, Like> likes;
 	Hashtable<String, String> replace = new Hashtable<String, String>();
+	Hashtable<String, String> depends = new Hashtable<String, String>();
 
 	public QueryPart(Method method, boolean optional, String part,
-			Hashtable<String, Param> params, Hashtable<String, Like> likes,
-			Hashtable<String, Replace> replaces) {
+			HashSet<String> params, Hashtable<String, Like> likes,
+			Hashtable<String, Replace> replaces,
+			Hashtable<String, Function> funcs) {
 		this.optional = optional;
 		this.part = part;
-		this.params = params;
-		this.likes = likes;
 
 		HashSet<String> vecParam = new HashSet<String>();
 
 		Matcher m = P_PARAM.matcher(part);
 		while (m.find()) {
 			String p = m.group(1);
-			if (params.containsKey(p) || likes.containsKey(p)) {
+			if (params.contains(p) || likes.containsKey(p)) {
 				vecParam.add(p);
 				continue;
 			} else if (replaces.containsKey(p)) {
 				replace.put(m.group(0), p);
+				continue;
+			} else if (funcs.containsKey(p)) {
+				depends.put(m.group(0), p);
 				continue;
 			}
 
@@ -65,17 +65,18 @@ public class QueryPart {
 		if (optional) {
 			for (String param : paramDepends) {
 				Object v = values.get(param);
-				Param p = params.get(param);
-				if (p != null) {
-					if (v == null)
-						return null;
-				} else if (v == null) // like - can't be null
+				if (v == null)
 					return null;
 			}
 
 			// replace - can't be null
 			for (String param : replace.values())
 				if (values.get(param) == null)
+					return null;
+
+			// function - can't be null
+			for (String func : depends.values())
+				if (values.get(func) == null)
 					return null;
 		}
 
@@ -92,6 +93,14 @@ public class QueryPart {
 								+ str + "'.");
 
 			part = part.replaceAll(r, str);
+		}
+
+		for (String func : depends.keySet()) {
+			Object val = values.get(depends.get(func));
+			if (val == null)
+				val = "";
+			String str = val.toString();
+			part = part.replaceAll(Pattern.quote(func), str);
 		}
 
 		return part;

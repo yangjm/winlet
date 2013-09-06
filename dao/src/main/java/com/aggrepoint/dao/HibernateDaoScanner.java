@@ -2,6 +2,7 @@ package com.aggrepoint.dao;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -21,12 +22,17 @@ import org.springframework.core.type.filter.TypeFilter;
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
- *
+ * 
  */
 public class HibernateDaoScanner extends ClassPathBeanDefinitionScanner {
+	List<IFunc> functions;
+
 	public HibernateDaoScanner(BeanDefinitionRegistry registry,
-			ResourceLoader resourceLoader, BeanNameGenerator beanNameGenerator) {
+			ResourceLoader resourceLoader, BeanNameGenerator beanNameGenerator,
+			List<IFunc> funcs) {
 		super(registry, false);
+
+		functions = funcs;
 		setResourceLoader(resourceLoader);
 		setBeanNameGenerator(beanNameGenerator);
 
@@ -77,6 +83,7 @@ public class HibernateDaoScanner extends ClassPathBeanDefinitionScanner {
 				// but, the actual class of the bean is HibernateDaoFactoryBean
 				definition.getPropertyValues().add("daoInterface",
 						definition.getBeanClassName());
+				definition.getPropertyValues().add("funcs", functions);
 				definition.setBeanClass(HibernateDaoFactoryBean.class);
 
 				definition
