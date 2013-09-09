@@ -1,6 +1,7 @@
 package com.aggrepoint.dao;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -32,15 +33,15 @@ public class Function {
 			throw new FunctionNotFoundException(funcName);
 
 		Vector<String> vec = new Vector<String>();
-		StringTokenizer st = new StringTokenizer(m.group(3), ", ");
+		StringTokenizer st = new StringTokenizer(m.group(3), ",");
 		while (st.hasMoreTokens())
-			vec.add(st.nextToken());
+			vec.add(st.nextToken().trim());
 
 		params = vec.toArray(new String[vec.size()]);
 	}
 
-	public String exec(Object[] args, Annotation[][] anns) {
-		return func.exec(params, args, anns);
+	public String exec(Method method, Object[] args, Annotation[][] anns) {
+		return func.exec(method, params, args, anns);
 	}
 
 	public String getMatch() {

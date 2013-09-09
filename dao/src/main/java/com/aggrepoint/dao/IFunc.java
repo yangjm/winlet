@@ -1,6 +1,7 @@
 package com.aggrepoint.dao;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
@@ -19,5 +20,5 @@ public interface IFunc {
 	 *            Dao方法参数的注解
 	 * @return
 	 */
-	public String exec(String[] params, Object[] args, Annotation[][] anns);
+	public String exec(Method method, String[] params, Object[] args, Annotation[][] anns);
 }

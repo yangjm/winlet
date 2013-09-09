@@ -48,6 +48,7 @@ public class HibernateDaoAnnotationMethod<T> implements HibernateDaoMethod {
 	static final int RETURN_OBJECT = 3;
 
 	SessionFactory factory;
+	Method method;
 	Annotation[][] pans;
 	int type;
 	int retType;
@@ -65,6 +66,7 @@ public class HibernateDaoAnnotationMethod<T> implements HibernateDaoMethod {
 	public HibernateDaoAnnotationMethod(Method method, Annotation ann,
 			List<IFunc> funcs, SessionFactory factory) {
 		this.factory = factory;
+		this.method = method;
 
 		if (ann.annotationType() == Find.class) {
 			if (!"".equals(((Find) ann).sql())) {
@@ -293,7 +295,7 @@ public class HibernateDaoAnnotationMethod<T> implements HibernateDaoMethod {
 		for (String p : replaces.keySet())
 			values.put(p, args[positions.get(p)]);
 		for (String f : funcs.keySet())
-			values.put(f, funcs.get(f).exec(args, pans));
+			values.put(f, funcs.get(f).exec(method, args, pans));
 
 		HashSet<String> paramsInUse = new HashSet<String>();
 
