@@ -61,22 +61,32 @@ public class QueryPart {
 		return paramDepends;
 	}
 
+	static boolean nullOrEmptyArray(Object o) {
+		if (o == null)
+			return true;
+		if (o.getClass().isArray()) {
+			return (((Object[]) o).length == 0);
+		}
+
+		return false;
+	}
+
 	public String get(HashMap<String, Object> values) {
 		if (optional) {
 			for (String param : paramDepends) {
 				Object v = values.get(param);
-				if (v == null)
+				if (nullOrEmptyArray(v))
 					return null;
 			}
 
 			// replace - can't be null
 			for (String param : replace.values())
-				if (values.get(param) == null)
+				if (nullOrEmptyArray(values.get(param)))
 					return null;
 
 			// function - can't be null
 			for (String func : depends.values())
-				if (values.get(func) == null)
+				if (nullOrEmptyArray(values.get(func)))
 					return null;
 		}
 

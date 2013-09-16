@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class Function {
-	static Pattern P_FUNC = Pattern.compile(":(([\\w\\d]+)\\[(.*)\\])");
+	static Pattern P_FUNC = Pattern.compile(":(([\\w\\d]+)\\[(.*?)\\])");
 
 	String match;
 	IFunc func;
