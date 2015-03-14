@@ -9,5 +9,9 @@ public interface SharedPageStorage {
 
 	public void setAttribute(Object key, Object value);
 
+	public void setAttribute(Object key, Object value, boolean clearOnRefresh);
+
 	public void removeAttribute(Object key);
+
+	public void refresh();
 }

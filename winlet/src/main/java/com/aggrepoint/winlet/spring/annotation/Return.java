@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet.spring.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -11,10 +12,13 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Returns.class)
 public @interface Return {
 	static final String NOT_SPECIFIED = "!!NOT_SPECIFIED!!";
 
-	Code[] value() default {};
+	String value() default NOT_SPECIFIED;
+
+	String rule() default "";
 
 	String update() default "";
 
@@ -23,6 +27,8 @@ public @interface Return {
 	boolean cache() default false;
 
 	String log() default "";
+
+	String msg() default "";
 
 	String logexclude() default "";
 

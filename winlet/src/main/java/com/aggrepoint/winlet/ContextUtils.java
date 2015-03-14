@@ -3,6 +3,7 @@ package com.aggrepoint.winlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -12,6 +13,11 @@ import org.springframework.web.context.request.RequestContextHolder;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ContextUtils {
+	public static final String REQUEST_ATTR_REQUEST = ContextUtils.class
+			.getName() + "REQ_INFO";
+
+	private static String REQUEST_WEB_APP_CONTEXT = ContextUtils.class
+			.getName() + ".REQUEST_WEB_APP_CONTEXT";
 	private static String REQUEST_USER_ENGINE = ContextUtils.class.getName()
 			+ ".REQUEST_USER_ENGINE";
 	private static String REQUEST_RULE_ENGINE = ContextUtils.class.getName()
@@ -20,15 +26,20 @@ public class ContextUtils {
 			.getName() + ".REQUEST_PSN_RULE_ENGINE";
 	private static String REQUEST_CONFIG_PROVIDER = ContextUtils.class
 			.getName() + ".REQUEST_CONFIG_PROVIDER";
-	private static String REQUEST_CODE_MAP_PROVIDER = ContextUtils.class
-			.getName() + ".REQUEST_CODE_TABLE_PROVIDER";
+	private static String REQUEST_LIST_PROVIDER = ContextUtils.class.getName()
+			+ ".REQUEST_LIST_PROVIDER";
 	private static String REQUEST_LOGINFO_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_LOGINFO_KEY";
 
 	public static ReqInfoImpl getReqInfo() {
 		return (ReqInfoImpl) RequestContextHolder.currentRequestAttributes()
-				.getAttribute(WinletConst.REQUEST_ATTR_REQUEST,
+				.getAttribute(REQUEST_ATTR_REQUEST,
 						RequestAttributes.SCOPE_REQUEST);
+	}
+
+	public static void setReqInfo(ReqInfo reqInfo) {
+		RequestContextHolder.currentRequestAttributes().setAttribute(
+				REQUEST_ATTR_REQUEST, reqInfo, RequestAttributes.SCOPE_REQUEST);
 	}
 
 	public static HttpServletRequest getRequest() {
@@ -68,7 +79,30 @@ public class ContextUtils {
 	}
 
 	public static void setLogInfo(HttpServletRequest request, LogInfo li) {
+		if (li == null)
+			request.removeAttribute(REQUEST_LOGINFO_KEY);
 		request.setAttribute(REQUEST_LOGINFO_KEY, li);
+	}
+
+	public static void setApplicationContext(HttpServletRequest request,
+			WebApplicationContext context) {
+		request.setAttribute(REQUEST_WEB_APP_CONTEXT, context);
+	}
+
+	public static WebApplicationContext getApplicationContext(
+			HttpServletRequest request) {
+		return (WebApplicationContext) request
+				.getAttribute(REQUEST_WEB_APP_CONTEXT);
+	}
+
+	public static <T> T getBean(HttpServletRequest request, Class<T> clz) {
+		return ((WebApplicationContext) request
+				.getAttribute(REQUEST_WEB_APP_CONTEXT)).getBean(clz);
+	}
+
+	public static <T> T getBean(Class<T> clz) {
+		return ((WebApplicationContext) getRequest().getAttribute(
+				REQUEST_WEB_APP_CONTEXT)).getBean(clz);
 	}
 
 	public static UserEngine getUserEngine(HttpServletRequest request) {
@@ -108,19 +142,22 @@ public class ContextUtils {
 		return (ConfigProvider) request.getAttribute(REQUEST_CONFIG_PROVIDER);
 	}
 
+	public static ConfigProvider getConfigProvider() {
+		return (ConfigProvider) getRequest().getAttribute(
+				REQUEST_CONFIG_PROVIDER);
+	}
+
 	public static void setConfigProvider(HttpServletRequest request,
 			ConfigProvider provider) {
 		request.setAttribute(REQUEST_CONFIG_PROVIDER, provider);
 	}
 
-	public static CodeMapProvider getCodeMapProvider(
-			HttpServletRequest request) {
-		return (CodeMapProvider) request
-				.getAttribute(REQUEST_CODE_MAP_PROVIDER);
+	public static ListProvider getListProvider(HttpServletRequest request) {
+		return (ListProvider) request.getAttribute(REQUEST_LIST_PROVIDER);
 	}
 
-	public static void setCodeMapProvider(HttpServletRequest request,
-			CodeMapProvider provider) {
-		request.setAttribute(REQUEST_CODE_MAP_PROVIDER, provider);
+	public static void setListProvider(HttpServletRequest request,
+			ListProvider provider) {
+		request.setAttribute(REQUEST_LIST_PROVIDER, provider);
 	}
 }

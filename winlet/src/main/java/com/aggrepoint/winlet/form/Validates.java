@@ -1,14 +1,17 @@
 package com.aggrepoint.winlet.form;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
 /**
  * 校验规则组
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public @interface Validates {
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+abstract @interface Validates {
 	Validate[] value();
 }

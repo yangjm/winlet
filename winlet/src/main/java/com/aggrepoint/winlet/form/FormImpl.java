@@ -1,5 +1,6 @@
 package com.aggrepoint.winlet.form;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,19 +8,34 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import net.sf.json.JSONNull;
-import net.sf.json.JSONSerializer;
+import javax.servlet.http.HttpServletRequest;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.support.RequestContextUtils;
+
+import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
+import com.aggrepoint.winlet.spring.WinletDefaultFormattingConversionService;
 
 public class FormImpl implements Form, ReqConst {
 	static final String FORM_DATA_SESSION_KEY = FormImpl.class.getName();
 
+	private ArrayList<ServletRequestDataBinder> binders = new ArrayList<ServletRequestDataBinder>();
 	private ReqInfo ri;
 	private ArrayList<String> fields = new ArrayList<String>();
 	private HashSet<String> groupNames = new HashSet<String>();
@@ -60,6 +76,12 @@ public class FormImpl implements Form, ReqConst {
 		return null;
 	}
 
+	public String getValidateFieldId() {
+		if (ri.isValidateField())
+			return ri.getValidateFieldId();
+		return null;
+	}
+
 	public boolean isValidateForm() {
 		return "yes".equalsIgnoreCase(ri.getParameter(PARAM_WIN_FORM_VALIDATE,
 				"no"));
@@ -93,12 +115,16 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public String getValue(String field, String def) {
+		processBinders();
+
 		String val = getValue(field);
 		return val == null ? def : val;
 	}
 
 	@Override
 	public String getValue(String field) {
+		processBinders();
+
 		String[] val = getValues(field);
 		if (val == null || val.length < 1)
 			return null;
@@ -107,6 +133,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public String[] getValues(String field) {
+		processBinders();
+
 		String name = field;
 		Integer idx = null;
 
@@ -144,6 +172,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void setValue(String field, String value) {
+		processBinders();
+
 		String name = field;
 		Integer idx = null;
 
@@ -174,6 +204,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void setValue(String field, String[] value) {
+		processBinders();
+
 		Vector<String> values = fieldValues.get(field);
 		if (values == null) {
 			values = new Vector<String>();
@@ -190,13 +222,17 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public boolean hasError() {
+		processBinders();
+
 		return fieldErrors.size() > 0;
 	}
 
 	@Override
 	public String[] getErrors(String field) {
+		processBinders();
+
 		ArrayList<String> errors = fieldErrors.get(field);
-		if (errors == null)
+		if (errors == null || errors.size() == 0)
 			return null;
 
 		return errors.toArray(new String[errors.size()]);
@@ -204,6 +240,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void addError(String field, String error) {
+		processBinders();
+
 		ArrayList<String> errors = fieldErrors.get(field);
 		if (errors == null) {
 			errors = new ArrayList<String>();
@@ -217,6 +255,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void clearError(String field) {
+		processBinders();
+
 		fieldErrors.remove(field);
 
 		removeChange(new ChangeUpdateValidateResult(field, ""));
@@ -224,6 +264,8 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void setDisabled(String field) {
+		processBinders();
+
 		disabledFields.add(field);
 		clearError(field);
 		recordChange(new ChangeDisable(field));
@@ -231,12 +273,16 @@ public class FormImpl implements Form, ReqConst {
 
 	@Override
 	public void setEnabled(String field) {
+		processBinders();
+
 		disabledFields.remove(field);
 		recordChange(new ChangeEnable(field));
 	}
 
 	@Override
 	public String[] getDisabledFields() {
+		processBinders();
+
 		return disabledFields.toArray(new String[disabledFields.size()]);
 	}
 
@@ -249,14 +295,14 @@ public class FormImpl implements Form, ReqConst {
 			validators = new ArrayList<FormValidator>();
 			HT_VALIDATORS.put(m, validators);
 
-			Validates ann = m.getAnnotation(Validates.class);
+			Validate[] ann = m.getAnnotationsByType(Validate.class);
 			ArrayList<Validate> vs = new ArrayList<Validate>();
 
 			if (ann != null) {
-				for (Validate vl : ann.value())
+				for (Validate vl : ann)
 					if (!vl.after())
 						vs.add(vl);
-				for (Validate vl : ann.value())
+				for (Validate vl : ann)
 					if (vl.after())
 						vs.add(vl);
 
@@ -272,6 +318,8 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public void validate(ReqInfo ri, Object controller, Method method) {
+		processBinders();
+
 		ArrayList<FormValidator> vs = getValidators(controller, method);
 
 		for (String field : fields) {
@@ -310,11 +358,78 @@ public class FormImpl implements Form, ReqConst {
 		}
 	}
 
-	public String getJsonChanges() {
-		if (vecChanges == null)
-			return JSONSerializer.toJSON(JSONNull.getInstance()).toString();
+	public String getJsonChanges() throws JsonGenerationException,
+			JsonMappingException, IOException {
+		processBinders();
 
-		return JSONSerializer.toJSON(
-				vecChanges.toArray(new Change[vecChanges.size()])).toString();
+		if (vecChanges == null)
+			return "{}";
+
+		return new ObjectMapper().writeValueAsString(vecChanges
+				.toArray(new Change[vecChanges.size()]));
+	}
+
+	/**
+	 * 获取Spring为控制器生成参数值过程中建立的binder，以便将binder处理中遇到的错误合并到form中，
+	 * 并且利用binder来获得经过conversion和format处理之后的参数值
+	 * 
+	 * @param binder
+	 */
+	public void addBinder(ServletRequestDataBinder binder) {
+		binders.add(binder);
+	}
+
+	protected void mergeBindingResult(String field,
+			Collection<BindingResult> values) {
+		HttpServletRequest request = ContextUtils.getRequest();
+		WebApplicationContext context = RequestContextUtils
+				.getWebApplicationContext(request);
+		Locale locale = RequestContextUtils.getLocale(request);
+
+		for (BindingResult val : values) {
+			if (!(val instanceof BeanPropertyBindingResult))
+				continue;
+
+			BeanPropertyBindingResult br = (BeanPropertyBindingResult) val;
+
+			if (br.getTarget() != null && br.getFieldType(field) != null
+					|| br.getObjectName().equals(field)) {
+				// merge Spring conversion & validation errors
+				List<FieldError> errors = br.getFieldErrors(field);
+				if (errors != null && errors.size() > 0) {
+					errors.forEach(p -> {
+						addError(field, context.getMessage(p, locale));
+					});
+				} else if (getErrors(field) == null && br.getTarget() != null) {
+					// no error, apply Spring formatter
+					String value = WinletDefaultFormattingConversionService
+							.format(br.getPropertyAccessor(), br.getTarget(),
+									field);
+					if (value != null)
+						setValue(field, value.toString());
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Merge Spring conversion / format / validation errors into form
+	 * 
+	 * @param values
+	 */
+	protected void mergeBindingResult(Collection<BindingResult> values) {
+		if (ri.isValidateField()) {
+			mergeBindingResult(ri.getValidateFieldName(), values);
+		} else {
+			fields.forEach(p -> mergeBindingResult(p, values));
+		}
+	}
+
+	protected void processBinders() {
+		Collection<BindingResult> col = binders.stream()
+				.map(p -> p.getBindingResult()).collect(Collectors.toList());
+		binders.clear();
+		mergeBindingResult(col);
 	}
 }

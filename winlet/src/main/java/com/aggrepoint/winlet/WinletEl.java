@@ -50,7 +50,7 @@ public class WinletEl {
 		// if (reqInfo.m_bUseAjax)
 		// sb.append("document.");
 		sb.append(param);
-		sb.append(reqInfo.getWinId());
+		sb.append(reqInfo.getWindowId());
 		return sb.toString();
 	}
 }

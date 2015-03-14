@@ -24,6 +24,8 @@ public @interface Code {
 
 	String log() default "";
 
+	String msg() default "";
+
 	String logexclude() default "";
 
 	String title() default "";

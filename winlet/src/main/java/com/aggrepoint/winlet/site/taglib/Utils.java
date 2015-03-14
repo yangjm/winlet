@@ -34,6 +34,8 @@ public class Utils {
 		if (strPage != null) {
 			if (strPage.equals("AE_ROOT"))
 				page = sc.getBranch().getHome(re);
+			else if (strPage.equals("AE_CURRENT"))
+				page = sc.getPage();
 			else
 				page = (Page) context.getAttribute(strPage);
 		} else if (iLevel >= 0) {

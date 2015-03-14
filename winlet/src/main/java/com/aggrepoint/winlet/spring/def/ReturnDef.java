@@ -3,7 +3,6 @@ package com.aggrepoint.winlet.spring.def;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
-import com.aggrepoint.winlet.spring.annotation.Code;
 import com.aggrepoint.winlet.spring.annotation.Return;
 
 /**
@@ -11,12 +10,13 @@ import com.aggrepoint.winlet.spring.annotation.Return;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ReturnDef {
-	private String code;
+	private String value;
 	private String rule;
 	private String update;
 	private boolean isDialog = false;
 	private boolean cache = false;
 	private String log;
+	private String msg;
 	private HashSet<String> logExclude;
 	private String title;
 	private String viewName;
@@ -36,7 +36,7 @@ public class ReturnDef {
 
 	private void setLogExclude(String str) {
 		logExclude = null;
-		if (str != null && !"".equals(str))
+		if (str == null || "".equals(str))
 			return;
 
 		logExclude = new HashSet<String>();
@@ -45,26 +45,14 @@ public class ReturnDef {
 			logExclude.add(st.nextToken());
 	}
 
-	public ReturnDef(Code code) {
-		this.code = code.value();
-		rule = code.rule();
-		update = code.update();
-		isDialog = code.dialog();
-		cache = code.cache();
-		log = code.log();
-		title = code.title();
-		viewName = code.view();
-		setLogExclude(code.logexclude());
-		setNull();
-	}
-
 	public ReturnDef(Return ret) {
-		this.code = Return.NOT_SPECIFIED;
-		rule = null;
+		this.value = ret.value();
+		rule = ret.rule();
 		update = ret.update();
 		isDialog = ret.dialog();
 		cache = ret.cache();
 		log = ret.log();
+		msg = ret.msg();
 		title = ret.title();
 		viewName = ret.view();
 		setLogExclude(ret.logexclude());
@@ -72,12 +60,12 @@ public class ReturnDef {
 	}
 
 	public boolean hasValue() {
-		return !"".equals(code) || update != null || log != null
+		return !"".equals(value) || update != null || log != null
 				|| title != null || viewName != null || isDialog;
 	}
 
-	public String getCode() {
-		return code;
+	public String getValue() {
+		return value;
 	}
 
 	public String getRule() {
@@ -98,6 +86,10 @@ public class ReturnDef {
 
 	public String getLog() {
 		return log;
+	}
+
+	public String getMsg() {
+		return msg;
 	}
 
 	public String getTitle() {

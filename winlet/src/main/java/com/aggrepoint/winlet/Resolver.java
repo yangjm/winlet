@@ -16,8 +16,9 @@ import javax.servlet.jsp.JspFactory;
 
 import org.springframework.core.annotation.AnnotationUtils;
 
+import com.aggrepoint.winlet.spring.WinletDefaultFormattingConversionService;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
-import com.icebean.core.beanutil.BeanProperty;
+import com.aggrepoint.winlet.utils.BeanProperty;
 
 /**
  * 支持在EL中通过w.访问Winlet对象，通过ps.访问Page Storage，通过ret.访问响应码对象，通过win访问taglib功能等
@@ -67,18 +68,28 @@ public class Resolver extends javax.el.ELResolver implements
 
 		if (base == null) {
 			if (property.equals("w")) {
-				val = ContextUtils.getReqInfo().getViewInstance().getWinlet();
+				val = ContextUtils.getReqInfo().getWindowInstance().getWinlet();
 			} else if (property.equals("sps")) {
 				val = ContextUtils.getReqInfo().getSharedPageStorage();
 			} else if (property.equals("ps")) {
 				val = ContextUtils.getReqInfo().getPageStorage();
-			} else if (property.equals("return")) {
+			} else if (property.equals("r")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
 			} else if (property.equals("u")) {
 				val = ContextUtils.getUser(ContextUtils.getRequest());
-			} else if (property.equals("c")) {
-				val = ContextUtils
-						.getCodeMapProvider(ContextUtils.getRequest());
+			} else if (property.equals("c")) { // config provider
+				val = ContextUtils.getConfigProvider(ContextUtils.getRequest());
+			} else if (property.equals("m")) { // object map
+				val = ContextUtils.getListProvider(ContextUtils.getRequest());
+			} else if (property.equals("cm")) { // code value map
+				val = new ListProviderWrapper(1,
+						ContextUtils.getListProvider(ContextUtils.getRequest()));
+			} else if (property.equals("l")) { // object list
+				val = new ListProviderWrapper(2,
+						ContextUtils.getListProvider(ContextUtils.getRequest()));
+			} else if (property.equals("cl")) { // code value list
+				val = new ListProviderWrapper(3,
+						ContextUtils.getListProvider(ContextUtils.getRequest()));
 			} else if (property.equals("f")) {
 				// val = ThreadContext.getAttribute(THREAD_ATTR_REQUEST);
 			} else if (property.equals("e")) {
@@ -98,8 +109,28 @@ public class Resolver extends javax.el.ELResolver implements
 			} else if (base instanceof SharedPageStorage) {
 				val = ((SharedPageStorage) base).getAttribute(property);
 				context.setPropertyResolved(true);
-			} else if (base instanceof CodeMapProvider) {
-				val = ((CodeMapProvider) base).getMap(property.toString());
+			} else if (base instanceof ConfigProvider) {
+				val = ((ConfigProvider) base).getStr(property.toString());
+				context.setPropertyResolved(true);
+			} else if (base instanceof ListProviderWrapper) {
+				switch (((ListProviderWrapper) base).getType()) {
+				case 1:
+					val = ((ListProvider) base).getCodeValueMap(property
+							.toString());
+					context.setPropertyResolved(true);
+					break;
+				case 2:
+					val = ((ListProvider) base).getList(property.toString());
+					context.setPropertyResolved(true);
+					break;
+				case 3:
+					val = ((ListProvider) base).getCodeValueList(property
+							.toString());
+					context.setPropertyResolved(true);
+					break;
+				}
+			} else if (base instanceof ListProvider) {
+				val = ((ListProvider) base).getMap(property.toString());
 				context.setPropertyResolved(true);
 			} else if (base instanceof WinletEl) {
 				WinletEl winEl = (WinletEl) base;
@@ -110,8 +141,8 @@ public class Resolver extends javax.el.ELResolver implements
 					val = winEl.execute(property.toString());
 					context.setPropertyResolved(true);
 				}
-			} else if (base instanceof CodeMapWrapper) {
-				val = ((CodeMapWrapper) base).get(property.toString());
+			} else if (base instanceof HashMapWrapper) {
+				val = ((HashMapWrapper<?, ?>) base).get(property.toString());
 				context.setPropertyResolved(true);
 			} else {
 				Winlet winlet = AnnotationUtils.findAnnotation(base.getClass(),
@@ -121,6 +152,14 @@ public class Resolver extends javax.el.ELResolver implements
 						val = getObjectValue(base, property.toString());
 						context.setPropertyResolved(true);
 					} catch (Exception e) {
+					}
+				} else if (property.toString().indexOf(".") == -1) {
+					// Apply format annotation declared on fields
+					if (WinletDefaultFormattingConversionService.canFormat(
+							base, property.toString())) {
+						val = WinletDefaultFormattingConversionService.format(
+								base, property.toString());
+						context.setPropertyResolved(true);
 					}
 				}
 			}
@@ -147,9 +186,10 @@ public class Resolver extends javax.el.ELResolver implements
 
 	@Override
 	public void contextInitialized(ServletContextEvent evt) {
-		ServletContext context = evt.getServletContext();
+		ServletContext ctx = evt.getServletContext();
+
 		JspApplicationContext jspContext = JspFactory.getDefaultFactory()
-				.getJspApplicationContext(context);
-		jspContext.addELResolver(new Resolver());
+				.getJspApplicationContext(ctx);
+		jspContext.addELResolver(this);
 	}
 }

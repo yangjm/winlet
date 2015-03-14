@@ -9,11 +9,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
-import com.aggrepoint.winlet.CodeMapProvider;
+import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.PsnRuleEngine;
+import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.SharedPageStorage;
 import com.aggrepoint.winlet.UserEngine;
@@ -45,7 +46,7 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| clz.isAssignableFrom(ConfigProvider.class)
 				|| clz.isAssignableFrom(PsnRuleEngine.class)
 				|| clz.isAssignableFrom(AccessRuleEngine.class)
-				|| clz.isAssignableFrom(CodeMapProvider.class)
+				|| clz.isAssignableFrom(ListProvider.class)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
 				|| parameter.getParameterAnnotation(Storage.class) != null)
 			return true;
@@ -75,11 +76,21 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(Form.class))
 			return ContextUtils.getReqInfo().getForm();
 
-		if (clz.isAssignableFrom(PageStorage.class))
-			return ContextUtils.getReqInfo().getPageStorage();
+		if (clz.isAssignableFrom(PageStorage.class)) {
+			ReqInfo reqInfo = ContextUtils.getReqInfo();
+			PageStorage ps = reqInfo.getPageStorage();
+			if (reqInfo.isPageRefresh())
+				ps.refresh();
+			return ps;
+		}
 
-		if (clz.isAssignableFrom(SharedPageStorage.class))
-			return ContextUtils.getReqInfo().getSharedPageStorage();
+		if (clz.isAssignableFrom(SharedPageStorage.class)) {
+			ReqInfo reqInfo = ContextUtils.getReqInfo();
+			SharedPageStorage sps = reqInfo.getSharedPageStorage();
+			if (reqInfo.isPageRefresh())
+				sps.refresh();
+			return sps;
+		}
 
 		HttpServletRequest req = ContextUtils.getRequest();
 
@@ -98,12 +109,12 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(PsnRuleEngine.class))
 			return ContextUtils.getPsnRuleEngine(req);
 
-		if (clz.isAssignableFrom(CodeMapProvider.class))
-			return ContextUtils.getCodeMapProvider(req);
+		if (clz.isAssignableFrom(ListProvider.class))
+			return ContextUtils.getListProvider(req);
 
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
 		if (cfg != null) {
-			String value = ContextUtils.getConfigProvider(req).getConfig(
+			String value = ContextUtils.getConfigProvider(req).getStr(
 					cfg.value());
 			if (value == null)
 				value = cfg.def();

@@ -11,7 +11,11 @@ import com.aggrepoint.winlet.AccessRuleEngine;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class Branch extends Base {
+	private String path;
+	private boolean isStatic;
 	private String template;
+	/** 仅用于static branch，当用户给定的URL没有对应的文件存在则使用index对应的文件 */
+	private String index;
 	private List<Area> areas = new ArrayList<Area>();
 	private Page rootPage;
 
@@ -34,12 +38,36 @@ public class Branch extends Base {
 			p.init(rootPage, areas, template);
 	}
 
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public boolean isStatic() {
+		return isStatic;
+	}
+
+	public void setStatic(boolean isStatic) {
+		this.isStatic = isStatic;
+	}
+
 	public String getTemplate() {
 		return template;
 	}
 
 	public void setTemplate(String template) {
 		this.template = template;
+	}
+
+	public String getIndex() {
+		return index;
+	}
+
+	public void setIndex(String index) {
+		this.index = index;
 	}
 
 	public List<Area> getAreas() {

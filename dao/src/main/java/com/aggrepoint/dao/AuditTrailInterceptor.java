@@ -2,6 +2,7 @@ package com.aggrepoint.dao;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import com.aggrepoint.jpa.CreatedBy;
 import com.aggrepoint.jpa.CreatedDate;
 import com.aggrepoint.jpa.UpdatedBy;
 import com.aggrepoint.jpa.UpdatedDate;
+import com.aggrepoint.utils.beanhash.HashUtils;
 
 /**
  * 
@@ -43,7 +45,6 @@ public class AuditTrailInterceptor extends EmptyInterceptor {
 
 		HashMap<String, FieldDef> auditFields = new HashMap<String, FieldDef>();
 
-		// 时间关系，只支持在get方法上加入的注解
 		for (Method m : entity.getClass().getMethods()) {
 			String propName = null;
 
@@ -72,6 +73,38 @@ public class AuditTrailInterceptor extends EmptyInterceptor {
 				} else if (ann instanceof UpdatedDate) {
 					auditFields.put(propName, new FieldDef(propName,
 							UpdatedDate.class, m.getReturnType()));
+					break;
+				}
+		}
+
+		for (Field f : HashUtils.getFields(entity.getClass())) {
+			String propName = null;
+
+			for (String prop : propertyNames)
+				if (prop.equalsIgnoreCase(f.getName())) {
+					propName = prop;
+					break;
+				}
+
+			if (propName == null)
+				continue;
+
+			for (Annotation ann : f.getAnnotations())
+				if (ann instanceof CreatedBy) {
+					auditFields.put(propName, new FieldDef(propName,
+							CreatedBy.class, f.getType()));
+					break;
+				} else if (ann instanceof UpdatedBy) {
+					auditFields.put(propName, new FieldDef(propName,
+							UpdatedBy.class, f.getType()));
+					break;
+				} else if (ann instanceof CreatedDate) {
+					auditFields.put(propName, new FieldDef(propName,
+							CreatedDate.class, f.getType()));
+					break;
+				} else if (ann instanceof UpdatedDate) {
+					auditFields.put(propName, new FieldDef(propName,
+							UpdatedDate.class, f.getType()));
 					break;
 				}
 		}

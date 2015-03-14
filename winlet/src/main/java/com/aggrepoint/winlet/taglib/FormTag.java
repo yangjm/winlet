@@ -1,10 +1,12 @@
 package com.aggrepoint.winlet.taglib;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
@@ -16,16 +18,17 @@ import com.aggrepoint.winlet.WinletConst;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class FormTag extends BodyTagSupport implements WinletConst {
+public class FormTag extends BodyTagSupport implements WinletConst,
+		DynamicAttributes {
 	private static final long serialVersionUID = 1L;
+
+	HashMap<String, String> attributes = new HashMap<String, String>();
 
 	protected String m_strName;
 
 	protected String m_strAction = "";
 
 	protected String m_strMethod;
-
-	protected String m_strEncType;
 
 	protected String m_strFocus;
 
@@ -47,10 +50,6 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 
 	public void setMethod(String str) {
 		m_strMethod = str;
-	}
-
-	public void setEnctype(String str) {
-		m_strEncType = str;
 	}
 
 	public void setFocus(String focus) {
@@ -86,27 +85,20 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 			// {Name
 			out.print("<form name=\"");
 			out.print(m_strName);
-			out.print(ri.getWinId());
-			out.print(ri.getViewId());
+			out.print(ri.getWindowId());
 			// }
 
 			out.print("\" id=\"");
 			out.print(m_strName);
-			out.print(ri.getWinId());
-			out.print(ri.getViewId());
+			out.print(ri.getWindowId());
 			out.print("\"");
-
-			if (m_bHideLoading)
-				out.print(" hideloading=\"yes\"");
 
 			out.print(" action=\"");
 			out.print(ri.getPath());
 			out.print("?");
 			out.print(ReqConst.PARAM_WIN_ACTION);
 			out.print("=");
-			out.print(ri.getWinId());
-			out.print("!");
-			out.print(ri.getViewId());
+			out.print(ri.getWindowId());
 			out.print("!");
 			out.print(m_strAction);
 			out.print("\"");
@@ -121,48 +113,50 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 			}
 			// }
 
-			// Enctype
-			if (m_strEncType != null && !m_strEncType.equals("")) {
-				out.print(" enctype=\"");
-				out.print(m_strEncType);
+			// wid
+			out.print(" data-winlet-wid=\"");
+			out.print(ri.getWindowId());
+			out.print("\"");
+
+			// focus
+			if (m_strFocus != null) {
+				out.print(" data-winlet-focus=\"");
+				out.print(m_strFocus);
 				out.print("\"");
 			}
+
+			// update
+			if (m_strUpdate != null) {
+				out.print(" data-winlet-update=\"");
+				out.print(m_strUpdate);
+				out.print("\"");
+			}
+
+			// validate
+			if (m_bValidate)
+				out.print(" data-winlet-validate=\"yes\"");
+
+			// hide loading
+			if (m_bHideLoading)
+				out.print(" data-winlet-hideloading=\"yes\"");
+
+			for (String key : attributes.keySet())
+				out.print(" " + key + "=\"" + attributes.get(key) + "\"");
 
 			out.println(">");
 		} catch (Exception e) {
 			throw new JspException(e.getMessage());
 		}
+
+		attributes = new HashMap<String, String>();
 		return (EVAL_BODY_BUFFERED);
 	}
 
 	public int doAfterBody() {
 		try {
-			ReqInfo ri = ContextUtils.getReqInfo();
-
-			String name = m_strName + ri.getWinId() + ri.getViewId();
-
 			JspWriter out = getPreviousOut();
-
 			bodyContent.writeOut(out);
 			out.println("</form>");
-
-			out.println("<script language=\"javascript\" defer>");
-
-			StringBuffer sb = new StringBuffer();
-			sb.append("name: '" + m_strName + "', iid: '" + ri.getWinId()
-					+ "', vid: '" + ri.getViewId() + "'");
-			if (m_strFocus != null)
-				sb.append(", focus: '" + m_strFocus + "'");
-			if (m_strUpdate != null)
-				sb.append(", update: '" + m_strUpdate + "'");
-			if (m_bValidate)
-				sb.append(", validate: 'yes'");
-
-			out.print("$(function() {$(\"#");
-			out.print(name);
-			out.print("\").winform({" + sb.toString() + "});});");
-
-			out.print("</script>");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return SKIP_BODY;
@@ -170,5 +164,11 @@ public class FormTag extends BodyTagSupport implements WinletConst {
 
 		bodyContent.clearBody();
 		return SKIP_BODY;
+	}
+
+	@Override
+	public void setDynamicAttribute(String uri, String localName, Object value)
+			throws JspException {
+		attributes.put(localName, value.toString());
 	}
 }

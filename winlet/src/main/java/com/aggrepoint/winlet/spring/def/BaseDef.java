@@ -8,10 +8,10 @@ import java.lang.reflect.Method;
  */
 public class BaseDef extends ReturnDefList {
 	private String name;
-	private WidgetDef winletDef;
+	private WinletDef winletDef;
 	private Method method;
 
-	public BaseDef(String name, WidgetDef def, Method method) {
+	public BaseDef(String name, WinletDef def, Method method) {
 		super(method);
 
 		this.name = name;
@@ -27,7 +27,7 @@ public class BaseDef extends ReturnDefList {
 		return method;
 	}
 
-	public WidgetDef getWinletDef() {
+	public WinletDef getWinletDef() {
 		return winletDef;
 	}
 }

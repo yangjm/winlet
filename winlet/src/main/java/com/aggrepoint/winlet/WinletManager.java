@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet;
 
 import java.util.Hashtable;
+import java.util.Optional;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,20 +9,27 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.context.ApplicationContext;
 
-import com.aggrepoint.winlet.spring.def.ViewDef;
-import com.aggrepoint.winlet.spring.def.WidgetDef;
+import com.aggrepoint.winlet.spring.def.WindowDef;
+import com.aggrepoint.winlet.spring.def.WinletDef;
 
 /**
+ * 负责管理Winlet实例和WindowInstance实例
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletManager implements WinletConst {
 	public static final String WINLET_SESSION_KEY = "com.aggrepoint.winlet";
-	public static final String WINLETINSTS_SESSION_KEY = "com.aggrepoint.winsts";
+	public static final String WINDOW_INSTS_SESSION_KEY = "com.aggrepoint.winsts";
 	public static final String FORM_BY_WIDGET_SESSION_KEY = "com.aggrepoint.formbywinlet";
 	public static final String FORM_BY_ID_SESSION_KEY = "com.aggrepoint.formbyid";
 
 	static long FORM_ID = 0;
+
+	/******************************************************************************
+	 *
+	 * Winlet实例
+	 *
+	 *****************************************************************************/
 
 	/**
 	 * <pre>
@@ -51,104 +59,105 @@ public class WinletManager implements WinletConst {
 	}
 
 	/**
-	 * <pre>
-	 * WIN_INSTANCES用于保存实例范围为PROTOTYPE的Winlet对应的WinInstance实例，Key为页面ID。
-	 * 其他实例范围的Winlet的WinInstance实例保存在会话中，会话参数名称WININSTS_SESSION_KEY，Key为页面ID。
-	 * </pre>
+	 * 获取Winlet实例
+	 * 
+	 * @param req
+	 * @param winletDef
+	 * @return
 	 */
-	static Hashtable<String, Vector<WinletInstance>> WIN_INSTANCES = new Hashtable<String, Vector<WinletInstance>>();
+	static Object getWinlet(HttpSession session, String pageId,
+			String windowId, String winletName, Scope winletScope) {
+		Hashtable<String, Object> ht = getWinletHashtable(winletScope, session);
 
-	static Hashtable<String, Vector<WinletInstance>> getWinInstances(
-			Scope scope, HttpServletRequest req) {
-		if (scope == Scope.PROTOTYPE)
-			return WIN_INSTANCES;
-
-		HttpSession session = req.getSession(true);
-
-		synchronized (session) {
-			@SuppressWarnings("unchecked")
-			Hashtable<String, Vector<WinletInstance>> ht = (Hashtable<String, Vector<WinletInstance>>) session
-					.getAttribute(WINLETINSTS_SESSION_KEY);
-
-			if (ht == null) {
-				ht = new Hashtable<String, Vector<WinletInstance>>();
-				session.setAttribute(WINLETINSTS_SESSION_KEY, ht);
-			}
-			return ht;
-		}
-	}
-
-	static Object getWinlet(ReqInfo req, WidgetDef winletDef) {
-		Hashtable<String, Object> ht = getWinletHashtable(winletDef.getScope(),
-				req.getSession());
-
-		switch (winletDef.getScope()) {
+		switch (winletScope) {
 		case PAGE:
-			return ht.get(winletDef.getName() + "/P/" + req.getPageId());
+			return ht.get(winletName + "/P/" + pageId);
 		case SESSION:
-			return ht.get(winletDef.getName() + "/S");
+			return ht.get(winletName + "/S");
 		case INSTANCE:
-			return ht.get(winletDef.getName() + req.getWinId());
+			return ht.get(winletName + "/P/" + pageId + "/" + windowId);
 		case PROTOTYPE:
 		default:
-			return ht.get(winletDef.getName());
+			return ht.get(winletName);
 		}
 	}
 
-	static void putWinlet(ReqInfo req, WidgetDef winletDef, Object winlet) {
-		Hashtable<String, Object> ht = getWinletHashtable(winletDef.getScope(),
-				req.getSession());
+	/**
+	 * 保存Winlet实例
+	 * 
+	 * @param session
+	 * @param pageId
+	 * @param windowId
+	 * @param winletName
+	 * @param winletScope
+	 * @param winlet
+	 */
+	static void putWinlet(HttpSession session, String pageId, String windowId,
+			String winletName, Scope winletScope, Object winlet) {
+		Hashtable<String, Object> ht = getWinletHashtable(winletScope, session);
 
-		switch (winletDef.getScope()) {
+		switch (winletScope) {
 		case PAGE:
-			ht.put(winletDef.getName() + "/P/" + req.getPageId(), winlet);
+			ht.put(winletName + "/P/" + pageId, winlet);
 			break;
 		case SESSION:
-			ht.put(winletDef.getName() + "/S", winlet);
+			ht.put(winletName + "/S", winlet);
 			break;
 		case INSTANCE:
-			ht.put(winletDef.getName() + req.getWinId(), winlet);
+			ht.put(winletName + "/P/" + pageId + "/" + windowId, winlet);
 			break;
 		default:
 		}
-		ht.put(winletDef.getName() + req.getPageId(), winlet);
-		ht.put(winletDef.getName(), winlet);
+
+		ht.put(winletName + "/" + pageId, winlet);
+		ht.put(winletName, winlet);
 	}
 
-	static synchronized Object getWinlet(ApplicationContext context,
-			ReqInfo req, WidgetDef winletDef) throws Exception {
-		Object winlet = getWinlet(req, winletDef);
+	/**
+	 * 获取Winlet实例，如果不存在则创建
+	 * 
+	 * @param context
+	 * @param req
+	 * @param winletDef
+	 * @return
+	 * @throws Exception
+	 */
+	public static synchronized Object getWinlet(ApplicationContext context,
+			ReqInfo req, WinletDef winletDef) throws Exception {
+		Object winlet = getWinlet(req.getSession(), req.getPageId(),
+				req.getWindowId(), winletDef.getName(), winletDef.getScope());
 		if (winlet == null) {
 			winlet = context.getBean(winletDef.getName());
-			putWinlet(req, winletDef, winlet);
+			putWinlet(req.getSession(), req.getPageId(), req.getWindowId(),
+					winletDef.getName(), winletDef.getScope(), winlet);
 		}
 		return winlet;
 	}
 
 	/**
-	 * 根据Winlet名称在当前页面查找Winlet
+	 * 根据名称在当前页面查找Winlet实例
 	 */
 	public static Object getWinletInPage(ReqInfo req, String name)
 			throws Exception {
 		// 首先在嵌套Winlet中查找
-		Object w = req.getViewInstance().wis.viewInstance.getEmbedded(name);
+		Object w = req.getWindowInstance().root.getEmbedded(name);
 		if (w != null)
 			return w;
 
 		// 其次查找PROTOTYPE实例范围
 		Hashtable<String, Object> ht = getWinletHashtable(Scope.PROTOTYPE,
 				req.getSession());
-		w = ht.get(name + req.getPageId());
+		w = ht.get(name + "/" + req.getPageId());
 		if (w != null)
 			return w;
 
 		// 再查找其他实例范围
 		ht = getWinletHashtable(Scope.SESSION, req.getSession());
-		return ht.get(name + req.getPageId());
+		return ht.get(name + "/" + req.getPageId());
 	}
 
 	/**
-	 * 根据Winlet名称在所有已出浏览过的（若未浏览过Winlet实例不存在）页面中查找Winlet
+	 * 根据Winlet名称在所有已出浏览过的（若未浏览过Winlet实例不存在）页面中查找Winlet实例
 	 * 
 	 * @param req
 	 * @param className
@@ -164,59 +173,123 @@ public class WinletManager implements WinletConst {
 		return ht.get(name);
 	}
 
-	public static Vector<WinletInstance> getWinInstancesInPage(ReqInfo req) {
-		Vector<WinletInstance> vec = new Vector<WinletInstance>();
+	/******************************************************************************
+	 *
+	 * WindowInstance实例管理
+	 *
+	 *****************************************************************************/
 
-		Vector<WinletInstance> v = getWinInstances(Scope.PROTOTYPE,
-				req.getRequest()).get(req.getPageId());
+	/**
+	 * <pre>
+	 * WINDOW_INSTS用于保存实例范围为PROTOTYPE并且没有子Window的Winlet对应的WindowInstance实例，Key为页面ID。
+	 * 其它的WinInstance实例保存在会话中，会话参数名称WINDOW_INSTS_SESSION_KEY，Key为页面ID。
+	 * </pre>
+	 */
+	static Hashtable<String, Vector<WindowInstance>> WINDOW_INSTS = new Hashtable<String, Vector<WindowInstance>>();
+
+	static Hashtable<String, Vector<WindowInstance>> getSessionWindowInstances(
+			HttpServletRequest req) {
+		HttpSession session = req.getSession(true);
+
+		synchronized (session) {
+			@SuppressWarnings("unchecked")
+			Hashtable<String, Vector<WindowInstance>> ht = (Hashtable<String, Vector<WindowInstance>>) session
+					.getAttribute(WINDOW_INSTS_SESSION_KEY);
+
+			if (ht == null) {
+				ht = new Hashtable<String, Vector<WindowInstance>>();
+				session.setAttribute(WINDOW_INSTS_SESSION_KEY, ht);
+			}
+			return ht;
+		}
+	}
+
+	public static Vector<WindowInstance> getAllRootWindowInstancesInPage(
+			ReqInfo req) {
+		Vector<WindowInstance> vec = new Vector<WindowInstance>();
+
+		Vector<WindowInstance> v = WINDOW_INSTS.get(req.getPageId());
 		if (v != null)
 			vec.addAll(v);
 
-		v = getWinInstances(Scope.SESSION, req.getRequest()).get(
-				req.getPageId());
+		v = getSessionWindowInstances(req.getRequest()).get(req.getPageId());
 		if (v != null)
 			vec.addAll(v);
 
 		return vec;
 	}
 
-	public static WinletInstance getWinInstance(ApplicationContext context,
-			ReqInfo req, ViewDef def) throws Exception {
-		Hashtable<String, Vector<WinletInstance>> ht = getWinInstances(def
-				.getWinletDef().getScope(), req.getRequest());
-		Vector<WinletInstance> wis;
+	static Vector<WindowInstance> getWindowInstancesInPage(
+			Hashtable<String, Vector<WindowInstance>> ht, String pageId) {
 		synchronized (ht) {
-			wis = ht.get(req.getPageId());
+			Vector<WindowInstance> wis = ht.get(pageId);
 			if (wis == null) {
-				wis = new Vector<WinletInstance>();
-				ht.put(req.getPageId(), wis);
+				wis = new Vector<WindowInstance>();
+				ht.put(pageId, wis);
 			}
+			return wis;
+		}
+	}
+
+	static WindowInstance findRootWindowInstance(Vector<WindowInstance> wis,
+			String wid) {
+		Optional<WindowInstance> find = wis.stream()
+				.filter(p -> wid.equals(p.getId())).findFirst();
+		return find.isPresent() ? find.get() : null;
+	}
+
+	public static WindowInstance getOrCreateRootWindowInstance(
+			ApplicationContext context, ReqInfo req, WindowDef def)
+			throws Exception {
+		// 先在会话中查找
+		Vector<WindowInstance> wis = getWindowInstancesInPage(
+				getSessionWindowInstances(req.getRequest()), req.getPageId());
+		WindowInstance wi = findRootWindowInstance(wis, req.getRootWindowId());
+
+		if (wi == null && def.getWinletDef().getScope() == Scope.PROTOTYPE) {
+			wis = getWindowInstancesInPage(WINDOW_INSTS, req.getPageId());
+			wi = findRootWindowInstance(wis, req.getRootWindowId());
 		}
 
-		synchronized (wis) {
-			for (WinletInstance wi : wis) {
-				if (wi.iid.equals(req.getWinId())) {
-					if (wi.viewInstance.viewDef != def) {
-						// Update the WinInstance
-						wis.remove(wi);
-						wi = new WinletInstance(req.getWinId(), def, getWinlet(
-								context, req, def.getWinletDef()));
-						wis.add(wi);
-					}
-					return wi;
-				}
-			}
-		}
+		if (wi == null || wi != null && wi.windowDef != def) {
+			wis.remove(wi);
 
-		WinletInstance wi = new WinletInstance(req.getWinId(), def, getWinlet(
-				context, req, def.getWinletDef()));
-		wis.add(wi);
+			wi = new WindowInstance(req.getRootWindowId(), getWinlet(context,
+					req, def.getWinletDef()), def, null);
+			wis.add(wi);
+		}
 
 		return wi;
 	}
 
-	public static ViewInstance getViewInstance(ApplicationContext context,
-			ReqInfo req, ViewDef def) throws Exception {
-		return getWinInstance(context, req, def).findView(req.getViewId());
+	public static WindowInstance getWindowInstance(ApplicationContext context,
+			ReqInfo req, WindowDef def) throws Exception {
+		return getOrCreateRootWindowInstance(context, req, def).find(
+				req.getWindowId());
+	}
+
+	/**
+	 * 把WINDOW_INSTS中的窗口移到会话中。当一个公用的窗口添加了子窗口时，需要把这个窗口私有化。
+	 * 
+	 * @param wi
+	 * @return
+	 */
+	static boolean privatiseWindowInstance(ReqInfo req, WindowInstance wi) {
+		if (wi.root == wi
+				&& wi.windowDef.getWinletDef().getScope() == Scope.PROTOTYPE) {
+			Vector<WindowInstance> wis = getWindowInstancesInPage(WINDOW_INSTS,
+					req.getPageId());
+
+			if (wis.contains(wi)) {
+				wis.remove(wi);
+				getWindowInstancesInPage(
+						getSessionWindowInstances(req.getRequest()),
+						req.getPageId()).add(wi);
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

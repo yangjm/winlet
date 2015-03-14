@@ -1,17 +1,18 @@
 package com.aggrepoint.winlet.taglib;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,14 +20,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.LangTextProcessor;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.Resolver;
 import com.aggrepoint.winlet.UrlConstructor;
-import com.icebean.core.beanutil.BeanProperty;
-import com.icebean.core.common.StringUtils;
-import com.icebean.core.locale.LocaleManager;
-import com.icebean.core.xml.MatchElement;
+import com.aggrepoint.winlet.utils.BeanProperty;
+import com.aggrepoint.winlet.utils.EncodeUtils;
+import com.aggrepoint.winlet.utils.StringUtils;
 
 /**
  * 
@@ -54,7 +53,7 @@ public class ELFunction {
 
 	public static String htmlEncode(String str) {
 		try {
-			return StringUtils.toHTML(str);
+			return EncodeUtils.html(str);
 		} catch (Exception e) {
 			return str;
 		}
@@ -107,22 +106,18 @@ public class ELFunction {
 		ReqInfo ri = ContextUtils.getReqInfo();
 
 		if (ri != null)
-			text = text + ri.getWinId() + ri.getViewId();
+			text = text + ri.getWindowId();
 		return text;
 	}
 
-	public static String funcText(String text) throws IOException {
-		return LangTextProcessor.parse(text);
-	}
-
 	public static String funcIf(Boolean b, String s) {
-		if (b)
+		if (b != null && b)
 			return s;
 		return "";
 	}
 
 	public static String funcIfElse(Boolean b, String s, String e) {
-		if (b)
+		if (b != null && b)
 			return s;
 		return e;
 	}
@@ -266,42 +261,11 @@ public class ELFunction {
 				param5);
 	}
 
-	public static String cfgval(MatchElement o, String attr) {
-		if (o == null)
-			return null;
-
-		// {return attribute value if attribute exists
-		String val = o.getAttribute(attr);
-		if (val != null)
-			return val;
-		// }
-
-		// Search for child elements
-		Vector<String> lss = LocaleManager.getLSIDs(ELFunction.class, null);
-		String markup = MarkupTag.getMarkupName(ContextUtils.getRequest());
-
-		for (MatchElement sub : o.getSubs()) {
-			if (!sub.getName().equalsIgnoreCase(attr))
-				continue;
-			String str = sub.getAttribute("lsid");
-			if (!(str == null || str.equals("") || lss.contains(str)))
-				continue;
-
-			str = sub.getAttribute("markup");
-			if (!(markup == null || str == null || markup.equals("")
-					|| str.equals("") || markup.equalsIgnoreCase(str)))
-				continue;
-
-			return sub.getContent();
-		}
-		return null;
-	}
-
 	public static Object w(String property) throws Exception {
 		Object winlet = null;
 
 		try {
-			winlet = ContextUtils.getReqInfo().getViewInstance().getWinlet();
+			winlet = ContextUtils.getReqInfo().getWindowInstance().getWinlet();
 		} catch (Exception e) {
 		}
 
@@ -338,13 +302,28 @@ public class ELFunction {
 
 	public static String cfg(String name) {
 		return ContextUtils.getConfigProvider(ContextUtils.getRequest())
-				.getConfig(name);
+				.getStr(name);
 	}
 
 	public static String cfgdef(String name, String def) {
 		String cfg = ContextUtils.getConfigProvider(ContextUtils.getRequest())
-				.getConfig(name);
+				.getStr(name);
 		return cfg == null ? def : cfg;
+	}
+
+	public static Boolean contains(Object col, Object o) {
+		if (col == null || o == null)
+			return false;
+
+		if (col instanceof Collection)
+			return ((Collection<?>) col).contains(o);
+		else if (col.getClass().isArray()) {
+			for (int i = 0; i < Array.getLength(col); i++)
+				if (o.equals(Array.get(col, i)))
+					return true;
+		}
+
+		return false;
 	}
 
 	// ///////////////////////////////////////////////////////
@@ -365,8 +344,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWinId());
-		sb.append(reqInfo.getViewId());
+		sb.append(reqInfo.getWindowId());
 		sb.append(" = function");
 
 		return sb.toString();
@@ -384,8 +362,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWinId());
-		sb.append(reqInfo.getViewId());
+		sb.append(reqInfo.getWindowId());
 
 		return sb.toString();
 	}
@@ -402,6 +379,20 @@ public class ELFunction {
 	public static String funcPageUrl(String param) {
 		ReqInfo reqInfo = ContextUtils.getReqInfo();
 		return new UrlConstructor(reqInfo.getRequest()).getPageUrl(param);
+	}
+
+	public static int funcToInt(Object val) {
+		if (val instanceof Double)
+			return ((Double) val).intValue();
+		if (val instanceof Float)
+			return ((Float) val).intValue();
+		if (val instanceof Long)
+			return ((Long) val).intValue();
+		if (val instanceof Integer)
+			return ((Integer) val).intValue();
+		if (val instanceof Short)
+			return ((Short) val).intValue();
+		return 0;
 	}
 
 	// public static String resurl(String param, boolean isStatic) {

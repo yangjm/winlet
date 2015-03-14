@@ -19,8 +19,8 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  * 2) 为类添加Scope("winlet")注解
  * 2) 为类添加RequestMapping注解
  * 3) 若方法上定义了@RequestMapping注解，则将注解去除
- * 4) 若@View注解没有指明value，则将其方法名替换为value
- * 5) 对于所有@View注解，创建对应的RequestMapping注解
+ * 4) 若@Window注解没有指明value，则将其方法名替换为value
+ * 5) 对于所有@Window注解，创建对应的RequestMapping注解
  * 6) 若Action注解没有指明value，则将其方法名替换为value
  * </pre>
  * 
@@ -81,7 +81,8 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 					// 加入@RequestMapping注解
 					av = cv.visitAnnotation(DESC_REQUEST_MAPPING, true);
 					AnnotationVisitor av1 = av.visitArray("value");
-					av1.visit(null, "/" + winletPath);
+					av1.visit(null, winletPath.startsWith("/") ? winletPath
+							: "/" + winletPath);
 					av1.visitEnd();
 					av.visitEnd();
 				}
@@ -107,8 +108,8 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 				if (DESC_WINDOW.equals(desc)) {
 					hasWindow = true;
 
-					// 1. 在@View之前添加@RequestMapping
-					// 2. 当@View没有指定value()时，取方法的名称作为value()的值
+					// 1. 在@Window之前添加@RequestMapping
+					// 2. 当@Window没有指定value()时，取方法的名称作为value()的值
 					final AnnotationVisitor theAv = mv.visitAnnotation(
 							DESC_REQUEST_MAPPING, visible);
 
@@ -116,17 +117,17 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 						String value = methodName;
 
 						/**
-						 * Get value() of @View annotation
+						 * Get value() of @Window annotation
 						 */
 						@Override
 						public void visit(String name, Object value) {
 							if ("value".equals(name)
 									&& !"".equals(value.toString()))
-								value = value.toString();
+								this.value = value.toString();
 						}
 
 						/**
-						 * Replace @View value() string with RequestMapping
+						 * Replace @Window value() string with RequestMapping
 						 * value() string array
 						 */
 						@Override

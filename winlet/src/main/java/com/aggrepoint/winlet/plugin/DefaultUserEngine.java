@@ -50,7 +50,12 @@ public class DefaultUserEngine implements UserEngine {
 			HttpSession session = req.getSession(false);
 			if (session != null)
 				session.removeAttribute(SESSION_KEY);
-		} else
+		} else {
+			// start new session to prevent session fixation
+			HttpSession session = req.getSession(false);
+			if (session != null)
+				session.invalidate();
 			req.getSession(true).setAttribute(SESSION_KEY, user);
+		}
 	}
 }

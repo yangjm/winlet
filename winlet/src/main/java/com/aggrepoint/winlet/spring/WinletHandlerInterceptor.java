@@ -12,7 +12,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
-import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.RespHeaderConst;
 import com.aggrepoint.winlet.form.FormImpl;
@@ -22,8 +21,8 @@ import com.aggrepoint.winlet.spring.annotation.Unspecified;
 import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.def.ControllerMethodDef;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
-import com.aggrepoint.winlet.spring.def.WidgetDef;
-import com.icebean.core.common.StringUtils;
+import com.aggrepoint.winlet.spring.def.WinletDef;
+import com.aggrepoint.winlet.utils.StringUtils;
 
 /**
  * <pre>
@@ -36,6 +35,8 @@ import com.icebean.core.common.StringUtils;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletHandlerInterceptor implements HandlerInterceptor {
+	static final String WINLET_FORM_RESP = "WINLET_FORM_RESP:";
+
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
@@ -54,7 +55,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				throw rule.exception().newInstance();
 			}
 
-			WidgetDef def = WidgetDef.getDef(hm.getBeanType());
+			WinletDef def = WinletDef.getDef(hm.getBeanType());
 			if (def == null) // 不是Winlet
 				return true;
 			Action action = AnnotationUtils.findAnnotation(hm.getMethod(),
@@ -65,6 +66,9 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
 			FormImpl form = ((FormImpl) ri.getForm());
 			form.validate(ri, hm.getBean(), hm.getMethod());
+
+			if (request instanceof RequestAttributeRecorder)
+				((RequestAttributeRecorder) request).startRecord();
 		}
 
 		return true;
@@ -80,6 +84,17 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
+			if (hm.getBean() == TranslateUpdate.getInstance()) { // 转换update窗口
+				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
+				response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
+				response.setHeader(
+						RespHeaderConst.HEADER_UPDATE,
+						reqInfo.getWindowInstance().translateUpdateWindows(
+								reqInfo, reqInfo.getTranslateUpdate()));
+				modelAndView.clear();
+				return;
+			}
+
 			String viewName = null;
 			if (modelAndView == null)
 				viewName = "";
@@ -91,7 +106,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 			ReturnDef rd = null;
 
-			WidgetDef def = WidgetDef.getDef(hm.getBeanType());
+			WinletDef def = WinletDef.getDef(hm.getBeanType());
 			if (def == null) { // 不是Winlet
 				// 处理普通Spring MVC Controller方法上定义的@Return
 				ControllerMethodDef mdef = ControllerMethodDef.getDef(hm
@@ -104,15 +119,16 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					if (rd.getViewName() != null && modelAndView != null)
 						modelAndView.setViewName(rd.getViewName());
 				}
+
 				return;
 			}
 
-			Window view = null;
+			Window win = null;
 			Action action = null;
 
-			view = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
-			if (view != null)
-				rd = PsnReturnDefFinder.getReturnDef(def.getView(view.value())
+			win = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
+			if (win != null)
+				rd = PsnReturnDefFinder.getReturnDef(def.getWindow(win.value())
 						.getReturnDef(viewName));
 			else {
 				action = AnnotationUtils.findAnnotation(hm.getMethod(),
@@ -122,17 +138,20 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 							action.value()).getReturnDef(viewName));
 			}
 
-			if (view == null && action == null)
+			if (win == null && action == null) // 被调用的既不是Window也不是Action
 				return;
+
+			ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
+			reqInfo.saveActionRequestParameters();
 
 			if (rd != null) {
 				li.setReturnDef(rd);
 
-				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
 				FormImpl form = (FormImpl) reqInfo.getForm();
 				reqInfo.setReturnDef(rd);
 
 				if (action != null && reqInfo.isValidateField()) {
+					// 表单字段校验，返回校验结果
 					response.setHeader("Content-Type",
 							"application/json; charset=UTF-8");
 					response.getOutputStream().write(
@@ -154,44 +173,40 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 				if (action != null) {
 					if (rd.getUpdate() != null) {
-						ReqInfo ri = ContextUtils.getReqInfo();
 						response.setHeader(
 								RespHeaderConst.HEADER_UPDATE,
-								ri.getViewInstance().translateUpdateViews(ri,
-										rd.getUpdate()));
+								reqInfo.getWindowInstance()
+										.translateUpdateWindows(reqInfo,
+												rd.getUpdate()));
 					}
 
 					if (rd.cache())
 						response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
 
+					if (rd.getMsg() != null && !"".equals(rd.getMsg()))
+						response.setHeader(RespHeaderConst.HEADER_MSG,
+								URLEncoder.encode(rd.getMsg(), "UTF-8"));
+
 					if (rd.isDialog())
 						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
-						if (modelAndView != null
-								&& !viewName.startsWith(Const.REDIRECT)) {
-							modelAndView.clear();
+						if (!viewName.startsWith(Const.REDIRECT)
+								&& form.isValidateForm() && form.hasError()) { // 表单校验出错
+							response.getOutputStream().write(
+									(WINLET_FORM_RESP + StringUtils
+											.fixJson(form.getJsonChanges()))
+											.getBytes("UTF-8"));
 
-							if (form.isValidateForm() && form.hasError())
-								response.getOutputStream().write(
-										StringUtils.fixJson(
-												form.getJsonChanges())
-												.getBytes("UTF-8"));
-
+							if (modelAndView != null)
+								modelAndView.clear();
 							return;
 						}
 					}
-				} else {
-					if ("".equals(viewName)) {
-						if (modelAndView != null)
-							modelAndView.clear();
-					}
-				}
-			} else {
-				if (action != null || "".equals(viewName)) {
-					if (modelAndView != null)
-						modelAndView.clear();
 				}
 			}
+
+			if (modelAndView != null && "".equals(modelAndView.getViewName()))
+				modelAndView.clear();
 
 			if (modelAndView != null && modelAndView.getViewName() != null) {
 				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
@@ -201,8 +216,9 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					return;
 				}
 
-				modelAndView.setViewName(def.getName() + "/"
-						+ modelAndView.getViewName());
+				if (modelAndView.getViewName().indexOf("/") == -1)
+					modelAndView.setViewName(def.getName() + "/"
+							+ modelAndView.getViewName());
 			}
 		}
 	}

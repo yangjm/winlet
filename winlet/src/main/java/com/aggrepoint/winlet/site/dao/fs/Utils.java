@@ -46,6 +46,8 @@ public class Utils {
 						if (idx > 0)
 							cfgs.put(line.substring(0, idx).trim(), line
 									.substring(idx + 1).trim());
+						else
+							cfgs.put(line, "");
 						line = lnr.readLine();
 					}
 					lnr.close();

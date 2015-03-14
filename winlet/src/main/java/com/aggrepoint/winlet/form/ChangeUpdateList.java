@@ -2,7 +2,6 @@ package com.aggrepoint.winlet.form;
 
 import java.util.Vector;
 
-import com.aggrepoint.winlet.form.del.SelectOption;
 
 /**
  * 

@@ -1,12 +1,23 @@
 package com.aggrepoint.winlet.site;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -43,6 +54,25 @@ public class SiteController {
 		branches = loader.load(branches);
 	}
 
+	public static Branch getBranch(AccessRuleEngine engine) {
+		updateBranches();
+		Branch branch = null;
+		for (Branch b : branches) {
+			try {
+				if (b.getRule() == null || engine.eval(b.getRule())) {
+					branch = b;
+					break;
+				}
+			} catch (Exception e) {
+				logger.error(
+						"Error evaluating branch access rule \"" + b.getRule()
+								+ "\".", e);
+			}
+		}
+
+		return branch;
+	}
+
 	public static Page getPage(AccessRuleEngine engine, String path) {
 		updateBranches();
 		Branch branch = null;
@@ -64,23 +94,67 @@ public class SiteController {
 		return branch.findPage(path, engine);
 	}
 
+	static byte[] toByteArray(InputStream input) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024 * 100];
+		int n = 0;
+		while (-1 != (n = input.read(buffer)))
+			baos.write(buffer, 0, n);
+
+		return baos.toByteArray();
+	}
+
 	@RequestMapping("/site/**")
-	public String site(HttpServletRequest req, AccessRuleEngine engine) {
+	public Object site(HttpServletRequest req, HttpServletResponse resp,
+			AccessRuleEngine engine) {
+		String path = req.getServletPath().substring(5);
+
 		try {
-			Page page = getPage(engine, req.getServletPath().substring(5));
-			if (page == null)
+			Branch branch = getBranch(engine);
+			if (branch == null) {
 				return "/WEB-INF/site/error/pagenotfound.jsp";
+			}
 
-			if (page.getLink() != null)
-				return "redirect:" + page.getLink();
+			if (branch.isStatic()) { // 静态分支，直接返回要访问的资源
+				if (path.equals("/cfg.cfg")) // 不允许访问cfg.cfg
+					path = "";
 
-			SiteContext sc = new SiteContext(req, page);
-			req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
+				File file = new File(branch.getPath() + path);
+				if ((!file.exists() || file.isDirectory())
+						&& branch.getIndex() != null)
+					file = new File(branch.getPath() + branch.getIndex());
 
-			return "/WEB-INF/site/template/" + page.getTemplate() + ".jsp";
+				if (!file.exists() || file.isDirectory())
+					return "/WEB-INF/site/error/pagenotfound.jsp";
+
+				InputStream in = new FileInputStream(file);
+				final HttpHeaders headers = new HttpHeaders();
+				try {
+					headers.setContentType(MediaType.valueOf(new MimetypesFileTypeMap().getContentType(file)));
+				} catch (Exception e) {
+					headers.setContentType(MediaType
+							.valueOf("application/octet-stream"));
+				}
+				byte[] bytes = toByteArray(in);
+				in.close();
+				return new ResponseEntity<byte[]>(bytes, headers,
+						HttpStatus.CREATED);
+			} else {
+				Page page = branch.findPage(path, engine);
+				if (page == null)
+					return "/WEB-INF/site/error/pagenotfound.jsp";
+
+				if (page.getLink() != null)
+					return "redirect:" + page.getLink();
+
+				SiteContext sc = new SiteContext(req, page);
+				req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
+
+				return "/WEB-INF/site/template/" + page.getTemplate() + ".jsp";
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return "";
+			return "/WEB-INF/site/error/pagenotfound.jsp";
 		}
 	}
 }

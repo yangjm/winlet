@@ -16,7 +16,8 @@ import com.aggrepoint.dao.annotation.Replace;
  * 
  */
 public class QueryPart {
-	static Pattern P_PARAM = Pattern.compile(":([\\w\\d]+(\\[.*\\])?)");
+	static Pattern P_PARAM = Pattern
+			.compile(":([\\w\\d]+(\\___[\\w\\d\\_]+)?(\\[.*\\])?)");
 	static Pattern P_REPLACE = Pattern.compile("^[\\w\\d\\s\\.,]*$");
 
 	boolean optional;
@@ -37,14 +38,14 @@ public class QueryPart {
 		Matcher m = P_PARAM.matcher(part);
 		while (m.find()) {
 			String p = m.group(1);
-			if (params.contains(p) || likes.containsKey(p)) {
+			if (funcs.containsKey(p)) {
+				depends.put(m.group(0), p);
+				continue;
+			} else if (params.contains(p) || likes.containsKey(p)) {
 				vecParam.add(p);
 				continue;
 			} else if (replaces.containsKey(p)) {
 				replace.put(m.group(0), p);
-				continue;
-			} else if (funcs.containsKey(p)) {
-				depends.put(m.group(0), p);
 				continue;
 			}
 

@@ -1,7 +1,6 @@
 package com.aggrepoint.dao;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.ReplicationMode;
@@ -17,11 +16,7 @@ public interface HibernateDao<T> {
 
 	boolean contains(T entity) throws DataAccessException;
 
-	void delete(T entity) throws DataAccessException;
-
-	void deleteAll(Collection<T> entities) throws DataAccessException;
-
-	void evict(T entity) throws DataAccessException;
+	void evict(Object entity) throws DataAccessException;
 
 	List<T> find(String queryString) throws DataAccessException;
 
@@ -58,11 +53,7 @@ public interface HibernateDao<T> {
 
 	void flush() throws DataAccessException;
 
-	T get(Serializable id) throws DataAccessException;
-
 	void load(T entity, Serializable id) throws DataAccessException;
-
-	List<T> loadAll() throws DataAccessException;
 
 	T merge(T entity) throws DataAccessException;
 
@@ -72,10 +63,4 @@ public interface HibernateDao<T> {
 
 	void replicate(T entity, ReplicationMode replicationMode)
 			throws DataAccessException;
-
-	Serializable save(T entity) throws DataAccessException;
-
-	void saveOrUpdate(T entity) throws DataAccessException;
-
-	void update(T entity) throws DataAccessException;
 }

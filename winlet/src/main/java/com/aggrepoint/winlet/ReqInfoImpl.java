@@ -1,23 +1,30 @@
 package com.aggrepoint.winlet;
 
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+import org.owasp.esapi.errors.ValidationException;
 
 import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.FormImpl;
+import com.aggrepoint.winlet.spring.RequestAttributeRecorder;
+import com.aggrepoint.winlet.spring.WinletRequestWrapper;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
+import com.aggrepoint.winlet.spring.def.WinletDef;
+import com.aggrepoint.winlet.utils.BufferedResponse;
 
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ReqInfoImpl implements ReqConst, ReqInfo {
+	private static final String REQ_PARAMETERS_FROM_ACTION_KEY = ".req.param.from.action";
+
 	private static long REQUEST_ID = 0;
 
 	private long requestId;
@@ -25,17 +32,19 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private HttpServletRequest request;
 	// 遇到当执行了一定逻辑后，request.getSession(true)会不定期返回null
 	private HttpSession session;
+	String requestPath;
 	private String path;
-	private String winId;
+	private String rootWindowId;
+	private String windowId;
 	private String pageId;
 	private String pageUrl;
-	private String viewId;
 	private String actionId;
-	private String winRes;
 	private String validateFieldName;
 	private String validateFieldValue;
+	private String validateFieldId;
 	private boolean pageRefresh;
-	private ViewInstance vi;
+	private String translateUpdate;
+	private WindowInstance wi;
 	private Form form;
 	private PageStorage ps;
 	private SharedPageStorage sps;
@@ -47,12 +56,20 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	/**
 	 * 用于分解Action或Resource
 	 */
-	Pattern P_DECODE = Pattern.compile("([^!]*)!([^!]*)!([^!]+)(?:!(.*))?");
+	Pattern P_DECODE = Pattern.compile("([^!]*)!([^!]+)");
 
 	public ReqInfoImpl(HttpServletRequest request, String path) {
 		this.request = request;
 		this.session = request.getSession(true);
 		this.path = request.getContextPath() + path;
+
+		// 将IncludeTag需要获得的当前Winlet的RequestPath取出保存
+		// 发现如果在WinletDispatcherServlet中用HttpServletRequestWrapper的派生类将request封装，请求forward到JSP页面后
+		// ，用ReqInfoImpl中保存的request对象的getRequestURI()方法只能获得当前JSP的URI而不是期望的Winlet
+		// URI。如果不封装，或者封装类不从HttpServletRequestWrapper派生，则ReqInfoImpl中request.getRequestURI()可以正常工作。为了避免这个问题，这里直接将requestURI取出保存。
+		requestPath = request.getRequestURI();
+		int idx = requestPath.indexOf("/", 1);
+		requestPath = requestPath.substring(idx);
 
 		requestId = REQUEST_ID++;
 
@@ -64,10 +81,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		if (pageUrl == null)
 			pageUrl = request.getRequestURL().toString();
 
-		winId = getParameter(PARAM_WIN_ID, "");
-		viewId = getParameter(PARAM_WIN_VIEW, "");
-		if ("".equals(viewId))
-			viewId = winId;
+		windowId = request.getHeader(WinletConst.REQUEST_HEADER_WINDOW_ID);
+		if (windowId == null || windowId.equals(""))
+			windowId = getParameter(PARAM_WIN_ID, null);
 
 		actionId = getParameter(PARAM_WIN_ACTION, null);
 		if (actionId != null) {
@@ -78,11 +94,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 			if (m.find()) {
 				try {
-					winId = m.group(1);
-					viewId = m.group(2);
+					windowId = m.group(1);
 				} catch (Exception e) {
 				}
-				actionId = m.group(3);
+				actionId = m.group(2);
 			}
 		} else {
 			pageRefresh = "yes".equalsIgnoreCase(getParameter(
@@ -90,39 +105,21 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		}
 
 		validateFieldName = getParameter(PARAM_WIN_VALIDATE_FIELD, null);
-		if (validateFieldName != null)
+		if (validateFieldName != null) {
 			validateFieldValue = getParameter(PARAM_WIN_VALIDATE_FIELD_VALUE,
 					"");
+			validateFieldId = getParameter(PARAM_WIN_VALIDATE_FIELD_ID, "");
+		}
+
+		translateUpdate = getParameter(PARAM_TRANSLATE_UPDATE, null);
 
 		form = new FormImpl(this);
 
-		winRes = getParameter(PARAM_WIN_RES, null);
-		if (winRes != null) {
-			Matcher m;
-			synchronized (P_DECODE) {
-				m = P_DECODE.matcher(winRes);
-			}
-			if (m.find()) {
-				try {
-					winId = m.group(1);
-					viewId = m.group(2);
-				} catch (Exception e) {
-				}
-				winRes = m.group(3);
-			}
-		}
+		rootWindowId = WindowInstance.getRootWindowId(windowId);
 
-		RequestContextHolder.currentRequestAttributes().setAttribute(
-				WinletConst.REQUEST_ATTR_REQUEST, this,
-				RequestAttributes.SCOPE_REQUEST);
+		ContextUtils.setReqInfo(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getParameter(javax.servlet.http.
-	 * HttpServletRequest, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public String getParameter(String name, String def) {
 		String str;
@@ -133,31 +130,74 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return str.trim();
 	}
 
-	public void setViewInstance(ViewInstance vi) {
-		this.vi = vi;
+	@Override
+	public int getParameter(String name, int def) {
+		return Integer.parseInt(getParameter(name, Integer.toString(def)));
+	}
+
+	@Override
+	public long getParameter(String name, long def) {
+		return Long.parseLong(getParameter(name, Long.toString(def)));
+	}
+
+	/**
+	 * Save the request attributes set by action to session in order to pass
+	 * them to window request
+	 */
+	public void saveActionRequestParameters() {
+		HttpSession ses = getSession();
+
+		if (actionId == null || wi == null || request == null || ses == null
+				|| !(request instanceof RequestAttributeRecorder))
+			return;
+
+		ses.setAttribute(wi.getWinlet().toString()
+				+ REQ_PARAMETERS_FROM_ACTION_KEY,
+				((RequestAttributeRecorder) request).getRecorded());
+	}
+
+	public void setWindowIntance(WindowInstance wi) {
+		HttpSession ses = getSession();
+
+		this.wi = wi;
+
+		// { retrieve attributes passed to window by action
+		if (actionId == null && request != null && ses != null) {
+			@SuppressWarnings("unchecked")
+			HashMap<String, Object> attrs = (HashMap<String, Object>) ses
+					.getAttribute(wi.getWinlet().toString()
+							+ REQ_PARAMETERS_FROM_ACTION_KEY);
+			if (attrs != null) {
+				for (String key : attrs.keySet())
+					request.setAttribute(key, attrs.get(key));
+				ses.removeAttribute(wi.getWinlet().toString()
+						+ REQ_PARAMETERS_FROM_ACTION_KEY);
+			}
+		}
+		// }
 	}
 
 	public void setReturnDef(ReturnDef rd) {
 		this.rd = rd;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getRequest()
-	 */
 	@Override
 	public HttpServletRequest getRequest() {
 		return request;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getSession()
-	 */
+	public String getRequestPath() throws ValidationException {
+		String str = request.getHeader(WinletConst.REQUEST_HEADER_REQ_PATH);
+		if (str == null || str.equals(""))
+			str = requestPath;
+		return str;
+	}
+
 	@Override
 	public HttpSession getSession() {
+		HttpSession s = request.getSession();
+		if (s != null)
+			session = s;
 		return session;
 	}
 
@@ -166,141 +206,81 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return ContextUtils.getUser(request);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getPath()
-	 */
 	@Override
 	public String getPath() {
 		return path;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getRequestId()
-	 */
 	@Override
 	public long getRequestId() {
 		return requestId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getWinId()
-	 */
 	@Override
-	public String getWinId() {
-		return winId;
+	public String getRootWindowId() {
+		return rootWindowId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getPageId()
-	 */
 	@Override
 	public String getPageId() {
 		return pageId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getPageUrl()
-	 */
 	@Override
 	public String getPageUrl() {
 		return pageUrl;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getViewId()
-	 */
 	@Override
-	public String getViewId() {
-		return viewId;
+	public String getWindowId() {
+		return windowId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getActionId()
-	 */
 	@Override
 	public String getActionId() {
 		return actionId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getFormName()
-	 */
 	@Override
 	public Form getForm() {
 		return form;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#isValidateField()
-	 */
 	@Override
 	public boolean isValidateField() {
 		return validateFieldName != null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getValidateFieldName()
-	 */
 	@Override
 	public String getValidateFieldName() {
 		return validateFieldName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getValidateFieldValue()
-	 */
 	@Override
 	public String getValidateFieldValue() {
 		return validateFieldValue;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#isPageRefresh()
-	 */
+	@Override
+	public String getValidateFieldId() {
+		return validateFieldId;
+	}
+
 	@Override
 	public boolean isPageRefresh() {
 		return pageRefresh;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getViewInstance()
-	 */
 	@Override
-	public ViewInstance getViewInstance() {
-		return vi;
+	public String getTranslateUpdate() {
+		return translateUpdate;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getPageStorage()
-	 */
+	@Override
+	public WindowInstance getWindowInstance() {
+		return wi;
+	}
+
 	@Override
 	public PageStorage getPageStorage() {
 		if (ps == null)
@@ -308,11 +288,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return ps;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getPageStorage()
-	 */
 	@Override
 	public SharedPageStorage getSharedPageStorage() {
 		if (sps == null)
@@ -320,13 +295,75 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return sps;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.aggrepoint.winlet.ReqInfo#getReturnDef()
-	 */
 	@Override
 	public ReturnDef getReturnDef() {
 		return rd;
+	}
+
+	@Override
+	public IncludeResult include(WinletDef winletDef, String window,
+			Hashtable<String, String> params, String uniqueId) throws Exception {
+		LogInfoImpl log = ContextUtils.getLogInfo(request);
+
+		WindowInstance wi = getWindowInstance();
+
+		WindowInstance childWindow = wi.addSub(this, winletDef == null ? null
+				: WinletManager.getWinlet(Context.get(), this, winletDef),
+				window, null, uniqueId);
+		childWindow.setParams(params);
+
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put(WinletConst.REQUEST_HEADER_WINDOW_ID, childWindow.getId());
+		headers.put(WinletConst.REQUEST_HEADER_REQ_PATH, getRequestPath());
+
+		HashMap<String, String> reqParams = new HashMap<String, String>();
+		reqParams.putAll(params);
+		reqParams.put(PARAM_WIN_ACTION, null);
+
+		BufferedResponse response = new BufferedResponse();
+
+		// 注：
+		// 这里使用forward而不是include，因为使用include的情况下在被include对象
+		// 中使用getRequestURI()等方法获得的是当前的URI而不是被include对象的URI，
+		// 因此ADK无法正确判断被include的资源。使用forward则不存在这个问题。因为已经
+		// 使用了responseWrapper，因此用forward也是可行的。
+		try {
+			// 避免被包含的功能改变当前LogInfo
+			ContextUtils.setLogInfo(request, null);
+			request.getServletContext()
+					.getRequestDispatcher(getRequestPath())
+					.forward(
+							new WinletRequestWrapper(request, headers,
+									reqParams), response);
+		} finally {
+			// 恢复当前请求的ReqInfo
+			ContextUtils.setReqInfo(this);
+			// 恢复当前请求的LogInfo
+			ContextUtils.setLogInfo(request, log);
+		}
+		byte[] bytes = response.getBuffered();
+
+		String str = bytes == null ? "" : new String(bytes, "UTF-8");
+
+		// { 必须在这里替换好win$.的调用，因为客户端js不会正确使用子窗口的wid
+		str = str.replaceAll("win\\$\\.wid\\s*\\(.*\\)", "win\\$._wid("
+				+ childWindow.getId() + ")");
+		str = str.replaceAll("win\\$\\.post\\s*\\(", "win\\$._post("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.ajax\\s*\\(", "win\\$._ajax("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.get\\s*\\(", "win\\$._get("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.toggle\\s*\\(", "win\\$._toggle("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.url\\s*\\(", "win\\$._url("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.submit\\s*\\(", "win\\$._submit("
+				+ childWindow.getId() + ", ");
+		str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
+				"win\\$._aftersubmit(" + childWindow.getId() + ", ");
+		// }
+
+		return new IncludeResult(childWindow, str);
 	}
 }

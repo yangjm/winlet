@@ -11,4 +11,5 @@ public interface RespHeaderConst {
 	String HEADER_DIALOG = "X-Winlet-Dialog";
 	String HEADER_REDIRECT = "X-Winlet-Redirect";
 	String HEADER_CACHE = "X-Winlet-Cache";
+	String HEADER_MSG = "X-Winlet-Msg";
 }

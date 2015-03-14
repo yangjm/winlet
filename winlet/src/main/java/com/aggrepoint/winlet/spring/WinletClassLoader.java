@@ -26,6 +26,8 @@ public class WinletClassLoader extends ClassLoader {
 	Map<Class<?>, Class<?>> classMap = Collections
 			.synchronizedMap(new HashMap<Class<?>, Class<?>>());
 
+	static Map<String, Class<?>> pathToClassMap = new HashMap<String, Class<?>>();
+
 	public WinletClassLoader(ClassLoader inner) {
 		super(inner);
 		innerLoader = inner;
@@ -40,7 +42,8 @@ public class WinletClassLoader extends ClassLoader {
 
 		Class<?> ret = clz;
 
-		boolean process = AnnotationUtils.findAnnotation(clz, Winlet.class) != null;
+		Winlet winlet = AnnotationUtils.findAnnotation(clz, Winlet.class);
+		boolean process = winlet != null;
 		if (!process) {
 			for (Method m : clz.getMethods()) {
 				process = AnnotationUtils.findAnnotation(m, Action.class) != null
@@ -60,6 +63,11 @@ public class WinletClassLoader extends ClassLoader {
 				byte[] b = cw.toByteArray();
 
 				ret = defineClass(name, b, 0, b.length);
+
+				if (winlet != null)
+					pathToClassMap.put(
+							winlet.value().startsWith("/") ? winlet.value()
+									: "/" + winlet.value(), ret);
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -76,9 +84,6 @@ public class WinletClassLoader extends ClassLoader {
 		try {
 			ClassReader cr = new ClassReader(res.getInputStream());
 
-			// cr.accept(new TraceClassVisitor(null, new ASMifier(),
-			// new PrintWriter(System.out)), ClassReader.SKIP_DEBUG);
-
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			WinletClassVisitor wcv = new WinletClassVisitor(cw);
 			cr.accept(wcv, 0);
@@ -88,14 +93,18 @@ public class WinletClassLoader extends ClassLoader {
 
 			byte[] b = cw.toByteArray();
 
-			// cr = new ClassReader(new ByteArrayInputStream(b));
-			// cr.accept(new TraceClassVisitor(null, new ASMifier(),
-			// new PrintWriter(System.out)), ClassReader.SKIP_DEBUG);
-
 			return new WinletResource(res, b);
 		} catch (Exception e) {
 		}
 
 		return res;
+	}
+
+	public static Class<?> getWinletClassByPath(String path) {
+		if (path == null)
+			return null;
+		if (!path.startsWith("/"))
+			path = "/" + path;
+		return pathToClassMap.get(path);
 	}
 }

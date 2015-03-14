@@ -23,6 +23,7 @@ public class Page extends Base {
 	private String link;
 	private boolean skip;
 	private boolean hide;
+	private boolean expand;
 	private List<Area> areas = new ArrayList<Area>();
 	private Hashtable<String, List<Area>> areasByName = new Hashtable<String, List<Area>>();
 	private List<Page> pages = new ArrayList<Page>();
@@ -114,6 +115,14 @@ public class Page extends Base {
 		this.hide = hide;
 	}
 
+	public boolean isExpand() {
+		return expand;
+	}
+
+	public void setExpand(boolean expand) {
+		this.expand = expand;
+	}
+
 	public List<Area> getAreas(String name) {
 		return areasByName.get(name);
 	}
@@ -191,7 +200,7 @@ public class Page extends Base {
 		if (path.equals(fullPath))
 			return this;
 
-		if (!path.startsWith(path))
+		if (!path.startsWith(fullPath))
 			return null;
 
 		List<Page> list = getPages(re, true, true);
@@ -200,6 +209,9 @@ public class Page extends Base {
 			if (f != null)
 				return f;
 		}
+
+		if (isExpand())
+			return this;
 
 		return null;
 	}

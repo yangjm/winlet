@@ -10,14 +10,16 @@ import javax.servlet.http.HttpSession;
  */
 public class PageStorageImpl implements PageStorage {
 	HashMap<Object, Object> winletSession = null;
+	HashMap<Object, Object> winletRefreshSession = null;
 
 	public static final String WINLET_SESSION_KEY_PREFIX = "com.aggrepoint.winlet.prefix";
+	public static final String REFRESH_PREFIX = "REFRESH_";
 
 	protected PageStorageImpl(ReqInfo reqInfo) {
 		HttpSession session = reqInfo.getSession();
 		synchronized (session) {
 			String key = WINLET_SESSION_KEY_PREFIX
-					+ reqInfo.getViewInstance().getWinlet().toString();
+					+ reqInfo.getWindowInstance().getWinlet().toString();
 
 			@SuppressWarnings("unchecked")
 			HashMap<String, HashMap<Object, Object>> htByWinlet = (HashMap<String, HashMap<Object, Object>>) session
@@ -32,25 +34,51 @@ public class PageStorageImpl implements PageStorage {
 				winletSession = new HashMap<Object, Object>();
 				htByWinlet.put(reqInfo.getPageId(), winletSession);
 			}
+
+			winletRefreshSession = htByWinlet.get(REFRESH_PREFIX
+					+ reqInfo.getPageId());
+			if (winletRefreshSession == null) {
+				winletRefreshSession = new HashMap<Object, Object>();
+				htByWinlet.put(REFRESH_PREFIX + reqInfo.getPageId(),
+						winletRefreshSession);
+			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getAttribute(Object obj) {
-		return (T) winletSession.get(obj);
+		T t = (T) winletSession.get(obj);
+		return t == null ? (T) winletRefreshSession.get(obj) : t;
 	}
 
 	@Override
 	public void setAttribute(Object key, Object value) {
+		setAttribute(key, value, false);
+	}
+
+	@Override
+	public synchronized void setAttribute(Object key, Object value,
+			boolean clearOnRefresh) {
+		removeAttribute(key);
+
 		if (value == null)
-			winletSession.remove(key);
+			return;
+
+		if (clearOnRefresh)
+			winletRefreshSession.put(key, value);
 		else
 			winletSession.put(key, value);
 	}
 
 	@Override
-	public void removeAttribute(Object key) {
+	public synchronized void removeAttribute(Object key) {
 		winletSession.remove(key);
+		winletRefreshSession.remove(key);
+	}
+
+	@Override
+	public void refresh() {
+		winletRefreshSession.clear();
 	}
 }

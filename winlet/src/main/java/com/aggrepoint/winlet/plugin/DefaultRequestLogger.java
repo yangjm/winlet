@@ -18,6 +18,7 @@ import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
+import com.aggrepoint.winlet.utils.EncodeUtils;
 
 /**
  * 
@@ -30,9 +31,8 @@ public class DefaultRequestLogger implements RequestLogger {
 		for (String str : new String[] { ReqConst.PARAM_PAGE_PATH,
 				ReqConst.PARAM_PAGE_URL, ReqConst.PARAM_WIN_ACTION,
 				ReqConst.PARAM_WIN_ID, ReqConst.PARAM_WIN_PARAM,
-				ReqConst.PARAM_WIN_RES, ReqConst.PARAM_WIN_VALIDATE_FIELD,
-				ReqConst.PARAM_WIN_VALIDATE_FIELD_VALUE,
-				ReqConst.PARAM_WIN_VIEW })
+				ReqConst.PARAM_WIN_VALIDATE_FIELD,
+				ReqConst.PARAM_WIN_VALIDATE_FIELD_VALUE })
 			SYSTEM_PARAMS.add(str);
 	}
 
@@ -56,10 +56,6 @@ public class DefaultRequestLogger implements RequestLogger {
 			sb.append(" | ");
 			sb.append(log.getRequest().getRemoteAddr());
 
-			// request url
-			sb.append(" | ");
-			sb.append(log.getRequest().getRequestURL());
-
 			// reqinfo
 			ReqInfo ri = log.getReqInfo();
 			addUser(sb, ContextUtils.getUser(ri.getRequest()));
@@ -68,7 +64,7 @@ public class DefaultRequestLogger implements RequestLogger {
 				sb.append(" | ");
 				sb.append(ri.getPageId());
 				sb.append(" | ");
-				sb.append(ri.getViewId());
+				sb.append(ri.getWindowId());
 			}
 
 			// handler object & method
@@ -93,14 +89,20 @@ public class DefaultRequestLogger implements RequestLogger {
 			if (log.getReturnDef() != null)
 				sb.append(log.getReturnDef().getLog());
 
+			// request url
+			sb.append(" | ");
+			sb.append(log.getRequest().getRequestURL());
+
 			addParams(sb, log.getRequest(), log.getReturnDef());
 
 			addCookies(sb, log.getRequest());
 
 			if (log.getException() != null)
-				logger.error(sb.toString(), log.getException());
+				logger.error(EncodeUtils.logMessage(sb.toString()),
+						log.getException());
 			else
-				logger.info(sb.toString(), log.getException());
+				logger.info(EncodeUtils.logMessage(sb.toString()),
+						log.getException());
 		}
 	}
 
@@ -127,6 +129,24 @@ public class DefaultRequestLogger implements RequestLogger {
 
 	}
 
+	protected String getParameter(HttpServletRequest req, String name) {
+		String[] values = req.getParameterValues(name);
+		if (values == null || values.length == 0)
+			return "";
+		if (values.length == 1)
+			return values[0];
+
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		for (int i = 0; i < values.length; i++) {
+			if (i > 0)
+				sb.append(", ");
+			sb.append(values[i]);
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
 	protected void addParams(StringBuffer sb, HttpServletRequest req,
 			ReturnDef def) {
 		sb.append(" | ");
@@ -148,7 +168,7 @@ public class DefaultRequestLogger implements RequestLogger {
 				bFirst = false;
 			else
 				sb.append(", ");
-			sb.append(name).append("=").append(req.getParameter(name));
+			sb.append(name).append("=").append(getParameter(req, name));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package com.aggrepoint.dao;
 
-import com.icebean.core.common.ThreadContext;
+import com.aggrepoint.utils.ThreadContext;
 
 /**
  * 

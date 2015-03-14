@@ -32,8 +32,9 @@ public class PageDao {
 			page.setRule(cfgs.get("rule"));
 			page.setTemplate(cfgs.get("template"));
 			page.setLink(cfgs.get("link"));
-			page.setSkip("true".equalsIgnoreCase(cfgs.get("skip")));
-			page.setHide("true".equalsIgnoreCase(cfgs.get("hide")));
+			page.setSkip("".equals(cfgs.get("skip")) || "true".equalsIgnoreCase(cfgs.get("skip")));
+			page.setHide("".equals(cfgs.get("hide")) || "true".equalsIgnoreCase(cfgs.get("hide")));
+			page.setExpand("".equals(cfgs.get("expand")) || "true".equalsIgnoreCase(cfgs.get("expand")));
 
 			for (File f : dir.listFiles()) {
 				if (f.isDirectory()) { // 页面

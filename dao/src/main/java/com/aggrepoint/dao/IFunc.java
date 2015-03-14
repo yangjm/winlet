@@ -20,5 +20,6 @@ public interface IFunc {
 	 *            Dao方法参数的注解
 	 * @return
 	 */
-	public String exec(Method method, String[] params, Object[] args, Annotation[][] anns);
+	public String exec(Method method, String[] params, Object[] args,
+			Annotation[][] anns);
 }

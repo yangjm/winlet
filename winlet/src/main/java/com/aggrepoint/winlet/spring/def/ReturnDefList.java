@@ -29,17 +29,13 @@ public class ReturnDefList {
 	}
 
 	public ReturnDefList(Method method) {
-		Return ret = AnnotationUtils.findAnnotation(method, Return.class);
-		if (ret != null) {
-			ReturnDef rd = new ReturnDef(ret);
-			if (rd.hasValue())
-				getRetDefList(rd.getCode()).add(rd);
-			for (Code code : ret.value()) {
-				rd = new ReturnDef(code);
+		Return[] rets = method.getAnnotationsByType(Return.class);
+		if (rets != null)
+			for (Return ret : rets) {
+				ReturnDef rd = new ReturnDef(ret);
 				if (rd.hasValue())
-					getRetDefList(rd.getCode()).add(rd);
+					getRetDefList(rd.getValue()).add(rd);
 			}
-		}
 	}
 
 	public ArrayList<ReturnDef> getReturnDef(String code) {

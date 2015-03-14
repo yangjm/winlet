@@ -2,9 +2,11 @@ package com.aggrepoint.winlet.spring;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.web.context.support.XmlWebApplicationContext;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
  * 
@@ -12,6 +14,8 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  */
 public class WinletXmlApplicationContext extends XmlWebApplicationContext {
 	public final static String SCOPE_WINLET = "winlet";
+
+	private WinletClassLoader classLoader;
 
 	/**
 	 * 引入winlet scope
@@ -21,6 +25,16 @@ public class WinletXmlApplicationContext extends XmlWebApplicationContext {
 			ConfigurableListableBeanFactory beanFactory) {
 		super.postProcessBeanFactory(beanFactory);
 		beanFactory.registerScope(SCOPE_WINLET, new WinletScope());
+
+		// replace RequestMappingHandlerAdapter with
+		// WinletRequestMappingHandlerAdapter
+		for (String name : beanFactory.getBeanDefinitionNames()) {
+			BeanDefinition bd = beanFactory.getBeanDefinition(name);
+			if (bd.getBeanClassName().equals(
+					RequestMappingHandlerAdapter.class.getName()))
+				bd.setBeanClassName(WinletRequestMappingHandlerAdapter.class
+						.getName());
+		}
 	}
 
 	/**
@@ -28,7 +42,13 @@ public class WinletXmlApplicationContext extends XmlWebApplicationContext {
 	 */
 	@Override
 	public ClassLoader getClassLoader() {
-		return new WinletClassLoader(super.getClassLoader());
+		if (classLoader == null) {
+			if (!(super.getClassLoader() instanceof WinletClassLoader))
+				classLoader = new WinletClassLoader(getParent()
+						.getClassLoader());
+		}
+
+		return classLoader;
 	}
 
 	/**
@@ -39,12 +59,10 @@ public class WinletXmlApplicationContext extends XmlWebApplicationContext {
 	 */
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
-		WinletClassLoader wcl = new WinletClassLoader(super.getClassLoader());
-
 		Resource[] reses = super.getResources(locationPattern);
 
 		for (int i = 0; i < reses.length; i++)
-			reses[i] = wcl.convert(reses[i]);
+			reses[i] = ((WinletClassLoader) getClassLoader()).convert(reses[i]);
 
 		return reses;
 	}

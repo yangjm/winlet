@@ -1,14 +1,19 @@
 package com.aggrepoint.winlet.form;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
 /**
  * 校验规则
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
+@Target({ ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@Repeatable(Validates.class)
 public @interface Validate {
 	/** 要校验的属性名称 */
 	String name() default "";

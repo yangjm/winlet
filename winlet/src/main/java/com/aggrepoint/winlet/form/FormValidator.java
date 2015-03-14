@@ -8,10 +8,13 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import com.icebean.core.beanutil.BeanProperty;
-import com.icebean.core.beanutil.PropertyTypeCode;
-import com.icebean.core.common.StringUtils;
+import com.aggrepoint.winlet.spring.WinletExceptionResolver;
+import com.aggrepoint.winlet.utils.BeanProperty;
+import com.aggrepoint.winlet.utils.PropertyTypeCode;
+import com.aggrepoint.winlet.utils.StringUtils;
 
 /**
  * 
@@ -19,8 +22,7 @@ import com.icebean.core.common.StringUtils;
  */
 public class FormValidator implements PropertyTypeCode {
 	/** 日志 */
-	static org.apache.log4j.Category m_log = com.icebean.core.common.Log4jIniter
-			.getCategory();
+	static final Log logger = LogFactory.getLog(WinletExceptionResolver.class);
 
 	static final Class<?>[] PARAMS = new Class<?>[] { HttpServletRequest.class,
 			Form.class };
@@ -97,7 +99,7 @@ public class FormValidator implements PropertyTypeCode {
 					methodWithParam = false;
 				}
 			} catch (Exception e) {
-				m_log.error("Unable to find validation method \"" + strMethod
+				logger.error("Unable to find validation method \"" + strMethod
 						+ "\" in winlet \"" + controller.getClass().getName()
 						+ "\".", e);
 			}
@@ -257,11 +259,11 @@ public class FormValidator implements PropertyTypeCode {
 							|| val > Double.parseDouble(vecArgs.elementAt(0)))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else {
-					m_log.error("Unsupported validation id \"" + strId + "\".");
+					logger.error("Unsupported validation id \"" + strId + "\".");
 					return new ValidateResult(failSkip, strErrorMsg);
 				}
 			} catch (Exception e) {
-				m_log.error("Error running validation id \"" + strId
+				logger.error("Error running validation id \"" + strId
 						+ "\" in winlet \"" + controller.getClass().getName()
 						+ "\".", e);
 				return new ValidateResult(failSkip, strErrorMsg);
@@ -274,7 +276,7 @@ public class FormValidator implements PropertyTypeCode {
 				else
 					return (ValidateResult) method.invoke(methodObject);
 			} catch (Exception e) {
-				m_log.error("Error running validation method \"" + strMethod
+				logger.error("Error running validation method \"" + strMethod
 						+ "\" in winlet \"" + controller.getClass().getName()
 						+ "\".", e);
 				return new ValidateResult(failSkip, strErrorMsg);

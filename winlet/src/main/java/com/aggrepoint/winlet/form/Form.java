@@ -8,8 +8,11 @@ public interface Form {
 	/** 判断当前是是否在进行表单单字段校验 */
 	public boolean isValidateField();
 
-	/** 若当前在进行表单字段校验，返回被校验的字段的名称*/
+	/** 若当前在进行表单字段校验，返回被校验的字段的名称 */
 	public String getValidateFieldName();
+
+	/** 若当前在进行表单字段校验，返回被校验的字段的ID */
+	public String getValidateFieldId();
 
 	/**
 	 * 判断当前是否需要对字段field进行校验

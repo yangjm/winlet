@@ -14,17 +14,17 @@ import org.springframework.web.servlet.View;
 
 import com.aggrepoint.dao.UserContext;
 import com.aggrepoint.winlet.AccessRuleEngine;
-import com.aggrepoint.winlet.CodeMapProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.ContextUtils;
+import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
-import com.aggrepoint.winlet.plugin.DefaultCodeMapProvider;
 import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
+import com.aggrepoint.winlet.plugin.DefaultListProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultUserEngine;
 
@@ -39,7 +39,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 	AccessRuleEngine accessRuleEngine;
 	PsnRuleEngine psnRuleEngine;
 	ConfigProvider configProvider;
-	CodeMapProvider codeTableProvider;
+	ListProvider listProvider;
 
 	public WinletDispatcherServlet() {
 		this.setContextClass(WinletXmlApplicationContext.class);
@@ -80,11 +80,11 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 			configProvider = new DefaultConfigProvider();
 
 		try {
-			codeTableProvider = context.getBean(CodeMapProvider.class);
+			listProvider = context.getBean(ListProvider.class);
 		} catch (Exception e) {
 		}
-		if (codeTableProvider == null)
-			codeTableProvider = new DefaultCodeMapProvider();
+		if (listProvider == null)
+			listProvider = new DefaultListProvider();
 	}
 
 	protected View resolveViewName(String viewName, Map<String, Object> model,
@@ -96,11 +96,14 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		req = new RequestAttributeRecorder(req);
+
+		ContextUtils.setApplicationContext(req, getWebApplicationContext());
 		ContextUtils.setUserEngine(req, userEngine);
 		ContextUtils.setAccessRuleEngine(req, accessRuleEngine);
 		ContextUtils.setPsnRuleEngine(req, psnRuleEngine);
 		ContextUtils.setConfigProvider(req, configProvider);
-		ContextUtils.setCodeMapProvider(req, codeTableProvider);
+		ContextUtils.setListProvider(req, listProvider);
 		UserContext.setUser(userEngine.getUser(req).getLoginId());
 
 		LogInfoImpl li = LogInfoImpl.getLogInfo(req, resp);
