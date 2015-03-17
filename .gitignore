@@ -1,8 +1,11 @@
 .settings
-target
+target/
 .classpath
 .project
-classes
+classes/
 .springBeans
 .settings
 .DS_Store
+node_modules/
+bower_components/
+winlet_local/dist/

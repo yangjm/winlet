@@ -156,8 +156,8 @@ public class DefaultRequestLogger implements RequestLogger {
 			logExclude = def.getLogExclude();
 
 		boolean bFirst = true;
-		for (@SuppressWarnings("unchecked")
-		Enumeration<String> e = req.getParameterNames(); e.hasMoreElements();) {
+		for (Enumeration<String> e = req.getParameterNames(); e
+				.hasMoreElements();) {
 			String name = e.nextElement();
 			if (SYSTEM_PARAMS.contains(name))
 				continue;

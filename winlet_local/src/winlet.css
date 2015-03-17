@@ -1,0 +1,7 @@
+.win_valfailed {background:url(stop.png) no-repeat left center; padding: 2px 0px 2px 20px; margin: 0px 1px 0px 1px; color:#7C0000}
+.win_valpassed {background:url(go.png) no-repeat left center; padding: 2px 0px 2px 20px; margin: 0px 1px 0px 1px}
+.win_validating {background:url(validate.gif) no-repeat left center; padding: 2px 0px 2px 20px; margin: 0px 1px 0px 1px}
+
+.winlet_background {background-image:url(gray.png)}
+.winlet_loading {background-image:url(loading.gif)}
+.winlet_validating {background-image:url(hourglass.gif)}

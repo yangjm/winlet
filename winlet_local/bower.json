@@ -1,0 +1,17 @@
+{
+  "name": "winlet_local",
+  "version": "0.1.0",
+  "description": "Client side Javascript engine for winlet applications running on local server",
+  "main": "dist/winlet_local_bootstrap.js",
+  "keywords": [
+    "winlet",
+    "css",
+    "js",
+    "web"
+  ],
+  "authors": [
+    "Jiangming Yang"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/yangjm/winlet"
+}
