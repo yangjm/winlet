@@ -81,12 +81,9 @@
 		</dependency>
 	</dependencies>
 
-	<!--
-	<distributionManagement>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<url>http://localhost:8081/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-	-->
+	<scm>
+		<url>https://github.com/yangjm/winlet</url>
+		<connection>scm:git:git://github.com/yangjm/winlet.git</connection>
+		<developerConnection>scm:git:git@github.com:yangjm/winlet.git</developerConnection>
+	</scm>
 </project>
