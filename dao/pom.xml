@@ -11,6 +11,7 @@
 
 	<artifactId>apdao</artifactId>
 	<name>AggrePoint Framework - DAO</name>
+	<description>Data Access Object layer utilities</description>
 
 	<build>
 		<finalName>apdao</finalName>

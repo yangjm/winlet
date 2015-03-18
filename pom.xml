@@ -8,16 +8,32 @@
 	<packaging>pom</packaging>
 
 	<name>AggrePoint Framework Aggregator</name>
+	<description>Aggregator POM for Winlet framework projects</description>
+	<url>http://https://github.com/yangjm/winlet</url>
 
-	<modules>
-		<module>utils</module>
-		<module>dao</module>
-		<module>winlet</module>
-	</modules>
+	<licenses>
+	  <license>
+	    <name>MIT License</name>
+	    <url>http://www.opensource.org/licenses/mit-license.php</url>
+	  </license>
+	</licenses>
+
+	<developers>
+    <developer>
+      <name>Jiang Ming Yang</name>
+      <email>yangjm@gmail.com</email>
+    </developer>
+  </developers>
 
 	<scm>
 		<url>https://github.com/yangjm/winlet</url>
 		<connection>scm:git:git://github.com/yangjm/winlet.git</connection>
 		<developerConnection>scm:git:git@github.com:yangjm/winlet.git</developerConnection>
 	</scm>
+
+	<modules>
+		<module>utils</module>
+		<module>dao</module>
+		<module>winlet</module>
+	</modules>
 </project>

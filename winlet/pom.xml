@@ -11,6 +11,7 @@
 
 	<artifactId>apwinlet</artifactId>
 	<name>AggrePoint Framework - Winlet</name>
+	<description>A web application framework based on Spring MVC for building lightweight portlet style web applications</description>
 
 	<build>
 		<finalName>apwinlet</finalName>
