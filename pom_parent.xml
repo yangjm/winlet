@@ -12,18 +12,18 @@
 	<url>http://https://github.com/yangjm/winlet</url>
 
 	<licenses>
-	  <license>
-	    <name>MIT License</name>
-	    <url>http://www.opensource.org/licenses/mit-license.php</url>
-	  </license>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
 	</licenses>
 
 	<developers>
-    <developer>
-      <name>Jiang Ming Yang</name>
-      <email>yangjm@gmail.com</email>
-    </developer>
-  </developers>
+		<developer>
+			<name>Jiang Ming Yang</name>
+			<email>yangjm@gmail.com</email>
+		</developer>
+	</developers>
 
 	<scm>
 		<url>https://github.com/yangjm/winlet</url>
@@ -69,25 +69,25 @@
 			<version>${org.slf4j-version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>jcl-over-slf4j</artifactId>
-		    <version>${org.slf4j-version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j-version}</version>
 		</dependency>
 
 		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-classic</artifactId>
-		    <version>${logback-version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-core</artifactId>
-		    <version>${logback-version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback-version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-access</artifactId>
-		    <version>${logback-version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-access</artifactId>
+			<version>${logback-version}</version>
 		</dependency>
 
 		<dependency>
