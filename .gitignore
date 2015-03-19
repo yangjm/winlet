@@ -6,6 +6,3 @@ classes/
 .springBeans
 .settings
 .DS_Store
-node_modules/
-bower_components/
-winlet_local/dist/
