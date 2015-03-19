@@ -9,13 +9,9 @@
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
-	<artifactId>apwinlet</artifactId>
+	<artifactId>winlet</artifactId>
 	<name>AggrePoint Framework - Winlet</name>
 	<description>A web application framework based on Spring MVC for building lightweight portlet style web applications</description>
-
-	<build>
-		<finalName>apwinlet</finalName>
-	</build>
 
 	<properties>
 		<javax.servlet-version>3.1.0</javax.servlet-version>

@@ -13,10 +13,6 @@
 	<name>AggrePoint Framework - Utils</name>
 	<description>Common utilities used by both Dao and Winlet project</description>
 
-	<build>
-		<finalName>aputils</finalName>
-	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.imgscalr</groupId>

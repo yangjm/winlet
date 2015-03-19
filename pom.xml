@@ -35,5 +35,17 @@
 		<module>utils</module>
 		<module>dao</module>
 		<module>winlet</module>
+		<module>pom_parent.xml</module>
 	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

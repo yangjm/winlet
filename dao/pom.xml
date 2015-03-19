@@ -13,10 +13,6 @@
 	<name>AggrePoint Framework - DAO</name>
 	<description>Data Access Object layer utilities</description>
 
-	<build>
-		<finalName>apdao</finalName>
-	</build>
-
 	<properties>
 		<org.hibernate-em-version>4.3.8.Final</org.hibernate-em-version>
 		<org.hibernate-validator-version>5.1.3.Final</org.hibernate-validator-version>
