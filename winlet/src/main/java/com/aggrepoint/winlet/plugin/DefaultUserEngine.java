@@ -3,6 +3,7 @@ package com.aggrepoint.winlet.plugin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.UserProfile;
 
@@ -57,5 +58,15 @@ public class DefaultUserEngine implements UserEngine {
 				session.invalidate();
 			req.getSession(true).setAttribute(SESSION_KEY, user);
 		}
+	}
+
+	@Override
+	public UserProfile getUser() {
+		return getUser(ContextUtils.getRequest());
+	}
+
+	@Override
+	public void setUser(UserProfile user) {
+		setUser(ContextUtils.getRequest(), user);
 	}
 }

@@ -28,6 +28,8 @@ public interface ReqInfo {
 
 	public abstract HttpSession getSession();
 
+	public abstract HttpSession getSession(boolean create);
+
 	public abstract UserProfile getUser();
 
 	public abstract String getPath();

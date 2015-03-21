@@ -202,6 +202,14 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	}
 
 	@Override
+	public HttpSession getSession(boolean create) {
+		HttpSession s = request.getSession(create);
+		if (s != null)
+			session = s;
+		return session;
+	}
+
+	@Override
 	public UserProfile getUser() {
 		return ContextUtils.getUser(request);
 	}

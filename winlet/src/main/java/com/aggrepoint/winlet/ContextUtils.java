@@ -62,6 +62,10 @@ public class ContextUtils {
 		return getReqInfo().getSession();
 	}
 
+	public static HttpSession getSession(boolean create) {
+		return getReqInfo().getSession(create);
+	}
+
 	public static Object getSessionAttribute(String name) {
 		return getSession().getAttribute(name);
 	}
