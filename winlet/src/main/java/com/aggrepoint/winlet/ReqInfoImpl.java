@@ -168,8 +168,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 					.getAttribute(wi.getWinlet().toString()
 							+ REQ_PARAMETERS_FROM_ACTION_KEY);
 			if (attrs != null) {
-				for (String key : attrs.keySet())
-					request.setAttribute(key, attrs.get(key));
+				synchronized (attrs) {
+					for (String key : attrs.keySet())
+						request.setAttribute(key, attrs.get(key));
+				}
 				ses.removeAttribute(wi.getWinlet().toString()
 						+ REQ_PARAMETERS_FROM_ACTION_KEY);
 			}
