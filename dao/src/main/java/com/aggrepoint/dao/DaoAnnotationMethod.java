@@ -24,7 +24,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.expression.EvaluationContext;
@@ -68,8 +67,9 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	static final int RETURN_PAGE = 2;
 	static final int RETURN_OBJECT = 3;
 
-	static private KeyGenerator keyGenerator = new SimpleKeyGenerator();
+	static private KeyGenerator keyGenerator = new DaoCacheKeyGenerator();
 
+	Class<T> clz;
 	SessionFactory factory;
 	CacheManager cacheManager;
 	ConversionService cs;
@@ -99,9 +99,10 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 			this.count = count;
 	};
 
-	public DaoAnnotationMethod(Method method, Annotation ann,
+	public DaoAnnotationMethod(Class<T> clz, Method method, Annotation ann,
 			List<IFunc> funcs, SessionFactory factory,
 			CacheManager cacheManager, ConversionService cs) {
+		this.clz = clz;
 		this.factory = factory;
 		this.cacheManager = cacheManager;
 		this.cs = cs;
@@ -497,9 +498,9 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 		if (type == TYPE_CACHE || type == TYPE_CACHE_SQL) {
 			if (args == null)
-				key = keyGenerator.generate(proxy, method);
+				key = keyGenerator.generate(clz, method);
 			else
-				key = keyGenerator.generate(proxy, method, args);
+				key = keyGenerator.generate(clz, method, args);
 
 			if (cacheManager != null) {
 				theCache = cacheManager.getCache(cache.name());

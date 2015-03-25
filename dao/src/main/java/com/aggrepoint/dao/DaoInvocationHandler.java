@@ -77,26 +77,26 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 					Class<?> t = ann.annotationType();
 					if (t == Find.class || t == Cache.class
 							|| t == Update.class || t == Delete.class) {
-						addDaoMethod(method, new DaoAnnotationMethod<T>(method,
-								ann, funcs, factory, cacheManager, cs));
+						addDaoMethod(method, new DaoAnnotationMethod<T>(clz,
+								method, ann, funcs, factory, cacheManager, cs));
 						found = true;
 					} else if (t == Finds.class) {
 						for (Annotation a : ((Finds) ann).value())
-							addDaoMethod(method,
-									new DaoAnnotationMethod<T>(method, a,
-											funcs, factory, cacheManager, cs));
+							addDaoMethod(method, new DaoAnnotationMethod<T>(
+									clz, method, a, funcs, factory,
+									cacheManager, cs));
 						found = true;
 					} else if (t == Updates.class) {
 						for (Annotation a : ((Updates) ann).value())
-							addDaoMethod(method,
-									new DaoAnnotationMethod<T>(method, a,
-											funcs, factory, cacheManager, cs));
+							addDaoMethod(method, new DaoAnnotationMethod<T>(
+									clz, method, a, funcs, factory,
+									cacheManager, cs));
 						found = true;
 					} else if (t == Deletes.class) {
 						for (Annotation a : ((Deletes) ann).value())
-							addDaoMethod(method,
-									new DaoAnnotationMethod<T>(method, a,
-											funcs, factory, cacheManager, cs));
+							addDaoMethod(method, new DaoAnnotationMethod<T>(
+									clz, method, a, funcs, factory,
+									cacheManager, cs));
 						found = true;
 					}
 				}
