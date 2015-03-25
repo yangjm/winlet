@@ -102,9 +102,6 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	public DaoAnnotationMethod(Method method, Annotation ann,
 			List<IFunc> funcs, SessionFactory factory,
 			CacheManager cacheManager, ConversionService cs) {
-		if (cs == null)
-			System.out.println(cs);
-
 		this.factory = factory;
 		this.cacheManager = cacheManager;
 		this.cs = cs;
