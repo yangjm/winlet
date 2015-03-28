@@ -14,4 +14,4 @@ Winlet是一个建立在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础�
   <version>0.1.2</version>
 </dependency>
 ```
-Winlet框架需要使用Java 1.8。
+Winlet框架需要运行在Java 8环境中。
