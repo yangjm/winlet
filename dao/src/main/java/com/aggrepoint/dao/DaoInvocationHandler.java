@@ -127,10 +127,12 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 		try {
 			ArrayList<DaoMethod<T>> arr = htDaoMethods.get(method);
 			if (arr != null) {
+				Object ret = null;
 				for (DaoMethod<T> hdm : arr) {
 					if (hdm.match(args))
-						return hdm.invoke(proxy, method, args);
+						ret = hdm.invoke(proxy, method, args);
 				}
+				return ret;
 			}
 
 			if (equals.equals(method)) {

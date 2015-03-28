@@ -96,7 +96,10 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 			}
 
 			if (v == null)
-				pageContext.setAttribute(var, all.toString());
+				if (var != null)
+					pageContext.setAttribute(var, all.toString());
+				else
+					getPreviousOut().write(all.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new JspTagException(e.getMessage());
