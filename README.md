@@ -5,7 +5,7 @@ Winlet是一个在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础上建�
 
 # 使用Winlet库
 
-最新的Winlet库已经发布到Maven中央仓库。要在项目中引用Winlet，请把以下配置加入到项目的pom.xml文件中：
+最新的Winlet库已经发布到Maven中央仓库。要在项目中使用Winlet，请把以下配置加入到项目的pom.xml文件中：
 
 ```
 <dependency>
