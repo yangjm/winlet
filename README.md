@@ -1,5 +1,5 @@
 # 关于
-Winlet是一个在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础上建立的Web应用开发框架，用于开发在普通J2EE应用服务器上运行的、类似于Portlet效果的应用。
+Winlet是一个建立在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础上的Web应用开发框架。
 
 有兴趣了解Winlet框架的开发人员可以下载winlet_demo项目，体验Winlet应用的运行效果和开发机制。
 
