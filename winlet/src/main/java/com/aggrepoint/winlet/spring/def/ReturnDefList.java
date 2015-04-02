@@ -36,12 +36,17 @@ public class ReturnDefList {
 	 * @throws SecurityException
 	 */
 	private void getRets(HashMap<String, Return> all, Method method,
-			Class<?> clz) throws NoSuchMethodException, SecurityException {
+			Class<?> clz) throws SecurityException {
 		if (!clz.getSuperclass().equals(Object.class))
 			getRets(all, method, clz.getSuperclass());
 
-		Method m = clz.getDeclaredMethod(method.getName(),
-				method.getParameterTypes());
+		Method m = null;
+
+		try {
+			m = clz.getDeclaredMethod(method.getName(),
+					method.getParameterTypes());
+		} catch (NoSuchMethodException e) {
+		}
 		if (m != null) {
 			Return[] rets = m.getAnnotationsByType(Return.class);
 			if (rets != null)

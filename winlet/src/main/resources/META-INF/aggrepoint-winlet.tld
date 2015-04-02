@@ -103,7 +103,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcEncodeNameSpace(java.lang.String)
+			java.lang.String
+			funcEncodeNameSpace(java.lang.String)
 		</function-signature>
 	</function>
 
@@ -113,7 +114,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcIf(java.lang.Boolean, java.lang.String)
+			java.lang.String funcIf(java.lang.Boolean,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -123,7 +125,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcIfElse(java.lang.Boolean, java.lang.String, java.lang.String)
+			java.lang.String funcIfElse(java.lang.Boolean,
+			java.lang.String, java.lang.String)
 		</function-signature>
 	</function>
 
@@ -143,7 +146,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcDateFormat(java.lang.String, java.util.Date)
+			java.lang.String funcDateFormat(java.lang.String,
+			java.util.Date)
 		</function-signature>
 	</function>
 
@@ -153,7 +157,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcDecimalFormat(java.lang.String, java.lang.Double)
+			java.lang.String
+			funcDecimalFormat(java.lang.String, java.lang.Double)
 		</function-signature>
 	</function>
 
@@ -163,7 +168,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcPercent(java.lang.Double, java.lang.Double)
+			java.lang.String funcPercent(java.lang.Double,
+			java.lang.Double)
 		</function-signature>
 	</function>
 
@@ -173,7 +179,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcChangePercent(java.lang.Double, java.lang.Double)
+			java.lang.String
+			funcChangePercent(java.lang.Double, java.lang.Double)
 		</function-signature>
 	</function>
 
@@ -183,7 +190,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcGet(java.lang.Object, java.lang.String)
+			java.lang.Object funcGet(java.lang.Object,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -193,7 +201,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcSet(java.lang.Object, java.lang.String, java.lang.Object)
+			java.lang.Object funcSet(java.lang.Object,
+			java.lang.String, java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -203,7 +212,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcListGet(java.util.List, java.lang.Integer)
+			java.lang.Object funcListGet(java.util.List,
+			java.lang.Integer)
 		</function-signature>
 	</function>
 
@@ -213,7 +223,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec(java.lang.Object,	java.lang.String)
+			java.lang.Object funcExec(java.lang.Object,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -223,7 +234,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec1(java.lang.Object, java.lang.String, java.lang.Object)
+			java.lang.Object funcExec1(java.lang.Object,
+			java.lang.String, java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -233,7 +245,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec2(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object)
+			java.lang.Object funcExec2(java.lang.Object,
+			java.lang.String, java.lang.Object, java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -243,7 +256,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec3(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)
+			java.lang.Object funcExec3(java.lang.Object,
+			java.lang.String, java.lang.Object, java.lang.Object,
+			java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -253,7 +268,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec4(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+			java.lang.Object funcExec4(java.lang.Object,
+			java.lang.String, java.lang.Object, java.lang.Object,
+			java.lang.Object, java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -263,7 +280,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec5(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+			java.lang.Object funcExec5(java.lang.Object,
+			java.lang.String, java.lang.Object, java.lang.Object,
+			java.lang.Object, java.lang.Object, java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -273,7 +292,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Boolean contains(java.lang.Object, java.lang.Object)
+			java.lang.Boolean contains(java.lang.Object,
+			java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -311,7 +331,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			com.aggrepoint.winlet.taglib.ContTmpl.uitmpl(com.icebean.core.adb.ADB, java.lang.String)
+			com.aggrepoint.winlet.taglib.ContTmpl.uitmpl(com.icebean.core.adb.ADB,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -321,7 +342,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String tmplexec(com.icebean.core.adb.ADB, java.lang.String[], java.util.Vector, java.util.Vector)
+			java.lang.String
+			tmplexec(com.icebean.core.adb.ADB, java.lang.String[],
+			java.util.Vector, java.util.Vector)
 		</function-signature>
 	</function>
 
@@ -331,7 +354,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.util.Collection uiprops(com.icebean.core.adb.ADB, com.icebean.core.adb.ADB, java.lang.String)
+			java.util.Collection
+			uiprops(com.icebean.core.adb.ADB, com.icebean.core.adb.ADB,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -341,7 +366,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.util.Collection propsbind(java.util.Collection, com.icebean.core.adb.ADB)
+			java.util.Collection
+			propsbind(java.util.Collection, com.icebean.core.adb.ADB)
 		</function-signature>
 	</function>
 
@@ -351,7 +377,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.util.Collection propsclearcached(java.util.Collection)
+			java.util.Collection
+			propsclearcached(java.util.Collection)
 		</function-signature>
 	</function>
 
@@ -361,7 +388,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			com.aggrepoint.winlet.ui.PropertyInstance uiprop(java.util.Collection, java.lang.String)
+			com.aggrepoint.winlet.ui.PropertyInstance
+			uiprop(java.util.Collection, java.lang.String)
 		</function-signature>
 	</function>
 
@@ -371,7 +399,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String uiattr(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.String)
+			java.lang.String
+			uiattr(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -381,7 +411,9 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String uiattach(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.Object)
+			java.lang.String
+			uiattach(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String,
+			java.lang.Object)
 		</function-signature>
 	</function>
 
@@ -391,7 +423,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object uiget(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String)
+			java.lang.Object
+			uiget(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String)
 		</function-signature>
 	</function>
 
@@ -455,7 +488,8 @@
 		<function-class>com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String cfgdef(java.lang.String, java.lang.String)
+			java.lang.String cfgdef(java.lang.String,
+			java.lang.String)
 		</function-signature>
 	</function>
 
@@ -637,16 +671,7 @@
 		<tagclass>com.aggrepoint.winlet.taglib.DialogTag
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
-		<attribute>
-			<name>title</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>close</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
+		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 
 	<tag>

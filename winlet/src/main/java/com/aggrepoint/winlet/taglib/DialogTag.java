@@ -5,8 +5,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -15,20 +17,12 @@ import com.aggrepoint.winlet.WinletConst;
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class DialogTag extends BodyTagSupport implements WinletConst {
+public class DialogTag extends BodyTagSupport implements WinletConst,
+		DynamicAttributes {
 	private static final long serialVersionUID = 1L;
 
-	String title;
-	String close;
+	HashMap<String, String> attributes = new HashMap<String, String>();
 	ArrayList<HashMap<String, String>> buttons;
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setClose(String close) {
-		this.close = close;
-	}
 
 	void addButton(HashMap<String, String> button) {
 		buttons.add(button);
@@ -48,10 +42,8 @@ public class DialogTag extends BodyTagSupport implements WinletConst {
 	@Override
 	public int doEndTag() throws JspTagException {
 		HashMap<String, Object> obj = new HashMap<String, Object>();
-		if (title != null)
-			obj.put("title", title);
-		if (close != null)
-			obj.put("close", close);
+		for (String key : attributes.keySet())
+			obj.put(key, attributes.get(key));
 		if (buttons.size() > 0)
 			obj.put("buttons", buttons);
 
@@ -64,6 +56,14 @@ public class DialogTag extends BodyTagSupport implements WinletConst {
 			throw new JspTagException(e.getMessage());
 		}
 		getBodyContent().clearBody();
+
+		attributes = new HashMap<String, String>();
 		return EVAL_PAGE;
+	}
+
+	@Override
+	public void setDynamicAttribute(String uri, String localName, Object value)
+			throws JspException {
+		attributes.put(localName, value.toString());
 	}
 }
