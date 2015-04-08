@@ -1,6 +1,7 @@
 package com.aggrepoint.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,6 +38,8 @@ public class PageList<T> implements Serializable {
 	}
 
 	public List<T> getList() {
+		if (list == null)
+			list = new ArrayList<T>();
 		return list;
 	}
 

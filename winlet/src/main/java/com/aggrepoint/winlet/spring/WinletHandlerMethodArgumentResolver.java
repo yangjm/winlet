@@ -9,9 +9,9 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
-import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
+import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqInfo;
@@ -42,11 +42,11 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| clz.isAssignableFrom(SharedPageStorage.class)
 				|| clz.isAssignableFrom(Form.class)
 				|| UserProfile.class.isAssignableFrom(clz)
-				|| clz.isAssignableFrom(UserEngine.class)
-				|| clz.isAssignableFrom(ConfigProvider.class)
-				|| clz.isAssignableFrom(PsnRuleEngine.class)
-				|| clz.isAssignableFrom(AccessRuleEngine.class)
-				|| clz.isAssignableFrom(ListProvider.class)
+				|| UserEngine.class.isAssignableFrom(clz)
+				|| ConfigProvider.class.isAssignableFrom(clz)
+				|| PsnRuleEngine.class.isAssignableFrom(clz)
+				|| AccessRuleEngine.class.isAssignableFrom(clz)
+				|| ListProvider.class.isAssignableFrom(clz)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
 				|| parameter.getParameterAnnotation(Storage.class) != null)
 			return true;
@@ -97,19 +97,19 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (UserProfile.class.isAssignableFrom(clz))
 			return ContextUtils.getUserEngine(req).getUser(req);
 
-		if (clz.isAssignableFrom(UserEngine.class))
+		if (UserEngine.class.isAssignableFrom(clz))
 			return ContextUtils.getUserEngine(req);
 
-		if (clz.isAssignableFrom(ConfigProvider.class))
+		if (ConfigProvider.class.isAssignableFrom(clz))
 			return ContextUtils.getConfigProvider(req);
 
-		if (clz.isAssignableFrom(AccessRuleEngine.class))
+		if (AccessRuleEngine.class.isAssignableFrom(clz))
 			return ContextUtils.getAccessRuleEngine(req);
 
-		if (clz.isAssignableFrom(PsnRuleEngine.class))
+		if (PsnRuleEngine.class.isAssignableFrom(clz))
 			return ContextUtils.getPsnRuleEngine(req);
 
-		if (clz.isAssignableFrom(ListProvider.class))
+		if (ListProvider.class.isAssignableFrom(clz))
 			return ContextUtils.getListProvider(req);
 
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);

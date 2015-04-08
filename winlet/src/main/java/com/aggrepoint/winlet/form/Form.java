@@ -101,4 +101,12 @@ public interface Form {
 	 * @return
 	 */
 	public String[] getDisabledFields();
+
+	/**
+	 * 是否存在field
+	 * 
+	 * @param field
+	 * @return
+	 */
+	public boolean hasField(String field);
 }

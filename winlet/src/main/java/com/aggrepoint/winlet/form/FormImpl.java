@@ -432,4 +432,9 @@ public class FormImpl implements Form, ReqConst {
 		binders.clear();
 		mergeBindingResult(col);
 	}
+
+	@Override
+	public boolean hasField(String field) {
+		return fields.contains(field);
+	}
 }

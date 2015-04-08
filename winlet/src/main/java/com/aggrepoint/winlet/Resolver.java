@@ -8,17 +8,20 @@ import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
+import javax.persistence.Entity;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspFactory;
 
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.aggrepoint.winlet.spring.WinletDefaultFormattingConversionService;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
 import com.aggrepoint.winlet.utils.BeanProperty;
+import com.aggrepoint.winlet.utils.EncodeUtils;
 
 /**
  * 支持在EL中通过w.访问Winlet对象，通过ps.访问Page Storage，通过ret.访问响应码对象，通过win访问taglib功能等
@@ -145,27 +148,47 @@ public class Resolver extends javax.el.ELResolver implements
 				val = ((HashMapWrapper<?, ?>) base).get(property.toString());
 				context.setPropertyResolved(true);
 			} else {
-				Winlet winlet = AnnotationUtils.findAnnotation(base.getClass(),
-						Winlet.class);
-				if (winlet != null) {
+				if (AnnotationUtils.findAnnotation(base.getClass(),
+						Winlet.class) != null) {
 					try {
 						val = getObjectValue(base, property.toString());
 						context.setPropertyResolved(true);
 					} catch (Exception e) {
 					}
-				} else if (property.toString().indexOf(".") == -1) {
+				} else if (property.toString().indexOf(".") == -1
+						&& WinletDefaultFormattingConversionService.canFormat(
+								base, property.toString())) {
 					// Apply format annotation declared on fields
-					if (WinletDefaultFormattingConversionService.canFormat(
-							base, property.toString())) {
-						val = WinletDefaultFormattingConversionService.format(
-								base, property.toString());
-						context.setPropertyResolved(true);
-					}
+					val = WinletDefaultFormattingConversionService.format(base,
+							property.toString());
+					context.setPropertyResolved(true);
+				} else if (AnnotationUtils.findAnnotation(base.getClass(),
+						Entity.class) != null
+						&& String.class.equals(getPropType(base,
+								property.toString()))) {
+					// 如果是Entity的属性并且类型为字符串则加上encoding
+					val = EncodeUtils.html(new BeanWrapperImpl(base)
+							.getPropertyValue(property.toString()));
+					context.setPropertyResolved(true);
 				}
 			}
 		}
 
 		return val;
+	}
+
+	static Hashtable<String, Class<?>> PROP_TYPES = new Hashtable<String, Class<?>>();
+
+	static Class<?> getPropType(Object obj, String prop) {
+		String key = obj.getClass().getName() + "_" + prop;
+		if (!PROP_TYPES.containsKey(key)) {
+			Class<?> type = new BeanWrapperImpl(obj).getPropertyType(prop);
+			if (type == null)
+				return null;
+
+			PROP_TYPES.put(key, type);
+		}
+		return PROP_TYPES.get(key);
 	}
 
 	@Override
