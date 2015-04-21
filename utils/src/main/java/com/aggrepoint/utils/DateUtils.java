@@ -57,4 +57,10 @@ public class DateUtils {
 	public static Date toGmt(Date dt) {
 		return toGmt(dt, null);
 	}
+
+	public static int getYear(Date dt) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt);
+		return cal.get(Calendar.YEAR);
+	}
 }

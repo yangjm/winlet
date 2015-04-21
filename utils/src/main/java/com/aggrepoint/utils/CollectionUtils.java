@@ -90,15 +90,21 @@ public class CollectionUtils {
 		return toHashtable(Arrays.asList(entities), keyMapper, valueMapper);
 	}
 
-	public static <T, K, V> HashMap<K, HashSet<V>> group(
+	public static <T, K, V, C extends Collection<V>> HashMap<K, C> group(
 			Collection<T> entities, Function<T, K> keyMapper,
-			Function<T, V> valueMapper) {
+			Function<T, V> valueMapper, Supplier<C> collectionFactory) {
 		return entities.stream().collect(
 				Collectors.groupingBy(
 						keyMapper,
 						HashMap::new,
 						Collectors.mapping(valueMapper,
-								Collectors.toCollection(HashSet::new))));
+								Collectors.toCollection(collectionFactory))));
+	}
+
+	public static <T, K, V> HashMap<K, HashSet<V>> group(
+			Collection<T> entities, Function<T, K> keyMapper,
+			Function<T, V> valueMapper) {
+		return group(entities, keyMapper, valueMapper, HashSet::new);
 	}
 
 	public static <T, K, V> HashMap<K, String> groupJoining(

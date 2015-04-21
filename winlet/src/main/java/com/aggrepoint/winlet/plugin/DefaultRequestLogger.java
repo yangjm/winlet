@@ -54,7 +54,8 @@ public class DefaultRequestLogger implements RequestLogger {
 
 			// request ip
 			sb.append(" | ");
-			sb.append(log.getRequest().getRemoteAddr());
+			String ip = log.getRequest().getHeader("X-Forwarded-For");
+			sb.append(ip == null ? log.getRequest().getRemoteAddr() : ip);
 
 			// reqinfo
 			ReqInfo ri = log.getReqInfo();
