@@ -318,9 +318,17 @@ public class ELFunction {
 		if (col instanceof Collection)
 			return ((Collection<?>) col).contains(o);
 		else if (col.getClass().isArray()) {
-			for (int i = 0; i < Array.getLength(col); i++)
+			for (int i = 0; i < Array.getLength(col); i++) {
+				Object val = Array.get(col, i);
+
+				if (val instanceof Number && o instanceof Number)
+					if (((Number) val).doubleValue() == ((Number) o)
+							.doubleValue())
+						return true;
+
 				if (o.equals(Array.get(col, i)))
 					return true;
+			}
 		}
 
 		return false;
