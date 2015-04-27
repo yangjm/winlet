@@ -105,7 +105,7 @@ public class SiteController {
 		return baos.toByteArray();
 	}
 
-	@RequestMapping("/site/**")
+	@RequestMapping(value = "/site/**", produces = "text/html")
 	public Object site(HttpServletRequest req, HttpServletResponse resp,
 			AccessRuleEngine engine) {
 		String path = req.getServletPath().substring(5);
@@ -131,7 +131,9 @@ public class SiteController {
 				InputStream in = new FileInputStream(file);
 				final HttpHeaders headers = new HttpHeaders();
 				try {
-					headers.setContentType(MediaType.valueOf(new MimetypesFileTypeMap().getContentType(file)));
+					headers.setContentType(MediaType
+							.valueOf(new MimetypesFileTypeMap()
+									.getContentType(file)));
 				} catch (Exception e) {
 					headers.setContentType(MediaType
 							.valueOf("application/octet-stream"));

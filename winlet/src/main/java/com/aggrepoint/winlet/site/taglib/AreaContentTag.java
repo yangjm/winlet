@@ -50,7 +50,7 @@ public class AreaContentTag extends TagSupport {
 		} else
 			req.setAttribute(PRELOAD_WINLET_ID_KEY, idx + 1);
 
-		String wid = "P" + idx;
+		String wid = Integer.toString(1000 + idx);
 		return wid.length() + wid;
 	}
 
