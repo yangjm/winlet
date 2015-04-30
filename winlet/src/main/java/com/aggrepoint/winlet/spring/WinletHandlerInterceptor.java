@@ -66,9 +66,6 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
 			FormImpl form = ((FormImpl) ri.getForm());
 			form.validate(ri, hm.getBean(), hm.getMethod());
-
-			if (request instanceof RequestAttributeRecorder)
-				((RequestAttributeRecorder) request).startRecord();
 		}
 
 		return true;
@@ -83,17 +80,6 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
-
-			if (hm.getBean() == TranslateUpdate.getInstance()) { // 转换update窗口
-				ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
-				response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
-				response.setHeader(
-						RespHeaderConst.HEADER_UPDATE,
-						reqInfo.getWindowInstance().translateUpdateWindows(
-								reqInfo, reqInfo.getTranslateUpdate()));
-				modelAndView.clear();
-				return;
-			}
 
 			String viewName = null;
 			if (modelAndView == null)
@@ -142,7 +128,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				return;
 
 			ReqInfoImpl reqInfo = ContextUtils.getReqInfo();
-			reqInfo.saveActionRequestParameters();
+			boolean cache = false;
 
 			if (rd != null) {
 				li.setReturnDef(rd);
@@ -173,15 +159,14 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 				if (action != null) {
 					if (rd.getUpdate() != null) {
-						response.setHeader(
-								RespHeaderConst.HEADER_UPDATE,
-								reqInfo.getWindowInstance()
-										.translateUpdateWindows(reqInfo,
-												rd.getUpdate()));
+						response.setHeader(RespHeaderConst.HEADER_UPDATE,
+								rd.getUpdate());
 					}
 
-					if (rd.cache())
+					if (rd.cache()) {
 						response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
+						cache = true;
+					}
 
 					if (rd.getMsg() != null && !"".equals(rd.getMsg()))
 						response.setHeader(RespHeaderConst.HEADER_MSG,
@@ -205,9 +190,6 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				}
 			}
 
-			if (modelAndView != null && "".equals(modelAndView.getViewName()))
-				modelAndView.clear();
-
 			if (modelAndView != null && modelAndView.getViewName() != null) {
 				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
 					response.setHeader(RespHeaderConst.HEADER_REDIRECT,
@@ -216,9 +198,26 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					return;
 				}
 
-				if (modelAndView.getViewName().indexOf("/") == -1)
+				if (!"".equals(modelAndView.getViewName())
+						&& modelAndView.getViewName().indexOf("/") == -1) {
 					modelAndView.setViewName(def.getName() + "/"
 							+ modelAndView.getViewName());
+					return;
+				}
+			}
+
+			if (modelAndView != null) {
+				if (!cache
+						&& (modelAndView.getViewName() == null || ""
+								.equals(modelAndView.getViewName()))
+						&& action != null)
+					response.getOutputStream().write(
+							reqInfo.getWindowContent(reqInfo.getWindowId(),
+									null, null, modelAndView.getModel())
+									.getBytes("UTF-8"));
+
+				if ("".equals(modelAndView.getViewName()))
+					modelAndView.clear();
 			}
 		}
 	}

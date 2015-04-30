@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import com.aggrepoint.winlet.Scope;
 import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
@@ -20,7 +19,6 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  */
 public class WinletDef {
 	private String name;
-	private Scope scope = Scope.PROTOTYPE;
 	private Map<String, WindowDef> windows = new HashMap<String, WindowDef>();
 	private Map<String, ActionDef> actions = new HashMap<String, ActionDef>();
 
@@ -30,7 +28,6 @@ public class WinletDef {
 			return;
 
 		this.name = winlet.value();
-		this.scope = Scope.fromName(winlet.scope());
 
 		for (Method method : clz.getMethods()) {
 			Action action = AnnotationUtils
@@ -51,10 +48,6 @@ public class WinletDef {
 
 	public String getName() {
 		return name;
-	}
-
-	public Scope getScope() {
-		return scope;
 	}
 
 	public Collection<WindowDef> getWindows() {

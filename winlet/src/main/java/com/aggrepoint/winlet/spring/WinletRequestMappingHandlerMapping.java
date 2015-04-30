@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.annotation.AnnotationUtils;
@@ -14,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfoImpl;
-import com.aggrepoint.winlet.WindowInstance;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
@@ -59,34 +57,14 @@ public class WinletRequestMappingHandlerMapping extends
 			clz = classMap.get(hm);
 
 		if (clz != null) { // This is a Winlet
-			WindowInstance wi = WinletManager.getWindowInstance(
-					getApplicationContext(),
-					req,
-					WinletDef.getDef(clz).getWindow(
-							AnnotationUtils.findAnnotation(hm.getMethod(),
-									Window.class).value()));
-
-			req.setWindowIntance(wi);
-
-			if (req.getTranslateUpdate() != null) // 转换update窗口，不执行winlet方法
-				return new HandlerMethod(TranslateUpdate.getInstance(),
-						TranslateUpdate.getMethod());
-
-			// 恢复include window时设置的parameter
-			if (req.getRequest() instanceof WinletRequestWrapper)
-				((WinletRequestWrapper) req.getRequest()).setParams(wi
-						.getParams());
-			else if (req.getRequest() instanceof ServletRequestWrapper)
-				if (((ServletRequestWrapper) req.getRequest()).getRequest() instanceof WinletRequestWrapper) {
-					((WinletRequestWrapper) ((ServletRequestWrapper) req
-							.getRequest()).getRequest()).setParams(wi
-							.getParams());
-				}
-
 			if (req.getActionId() == null) {
-				wi.clearSub();
-				return new HandlerMethod(wi.getWinlet(), wi.getWindowDef()
-						.getMethod());
+				WinletDef def = WinletDef.getDef(clz);
+				Object winlet = WinletManager.getWinlet(Context.get(), def);
+				req.setWinlet(def, winlet);
+
+				return new HandlerMethod(winlet, def.getWindow(
+						AnnotationUtils.findAnnotation(hm.getMethod(),
+								Window.class).value()).getMethod());
 			} else {
 				int idx = req.getActionId().indexOf(".");
 				if (idx > 0) {
@@ -95,14 +73,18 @@ public class WinletRequestMappingHandlerMapping extends
 
 					WinletDef def = WinletDef.getDef(WinletClassLoader
 							.getWinletClassByPath(winlet));
+					Object w = WinletManager.getWinlet(Context.get(), def);
+					req.setWinlet(def, w);
 
-					return new HandlerMethod(WinletManager.getWinlet(
-							Context.get(), req, def), def.getAction(action)
+					return new HandlerMethod(w, def.getAction(action)
 							.getMethod());
 				} else {
-					ActionDef action = wi.getWindowDef().getWinletDef()
-							.getAction(req.getActionId());
-					return new HandlerMethod(wi.getWinlet(), action.getMethod());
+					WinletDef def = WinletDef.getDef(clz);
+					Object w = WinletManager.getWinlet(Context.get(), def);
+					req.setWinlet(def, w);
+
+					ActionDef action = def.getAction(req.getActionId());
+					return new HandlerMethod(w, action.getMethod());
 				}
 			}
 		}

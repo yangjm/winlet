@@ -12,11 +12,8 @@ import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ListProvider;
-import com.aggrepoint.winlet.PageStorage;
 import com.aggrepoint.winlet.PsnRuleEngine;
-import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
-import com.aggrepoint.winlet.SharedPageStorage;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.form.Form;
@@ -38,8 +35,6 @@ public class WinletHandlerMethodArgumentResolver implements
 
 		if (clz.isAssignableFrom(Validation.class)
 				|| clz.isAssignableFrom(ReqInfoImpl.class)
-				|| clz.isAssignableFrom(PageStorage.class)
-				|| clz.isAssignableFrom(SharedPageStorage.class)
 				|| clz.isAssignableFrom(Form.class)
 				|| UserProfile.class.isAssignableFrom(clz)
 				|| UserEngine.class.isAssignableFrom(clz)
@@ -76,22 +71,6 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (clz.isAssignableFrom(Form.class))
 			return ContextUtils.getReqInfo().getForm();
 
-		if (clz.isAssignableFrom(PageStorage.class)) {
-			ReqInfo reqInfo = ContextUtils.getReqInfo();
-			PageStorage ps = reqInfo.getPageStorage();
-			if (reqInfo.isPageRefresh())
-				ps.refresh();
-			return ps;
-		}
-
-		if (clz.isAssignableFrom(SharedPageStorage.class)) {
-			ReqInfo reqInfo = ContextUtils.getReqInfo();
-			SharedPageStorage sps = reqInfo.getSharedPageStorage();
-			if (reqInfo.isPageRefresh())
-				sps.refresh();
-			return sps;
-		}
-
 		HttpServletRequest req = ContextUtils.getRequest();
 
 		if (UserProfile.class.isAssignableFrom(clz))
@@ -120,11 +99,6 @@ public class WinletHandlerMethodArgumentResolver implements
 				value = cfg.def();
 			return value;
 		}
-
-		Storage s = parameter.getParameterAnnotation(Storage.class);
-		if (s != null)
-			return ContextUtils.getReqInfo().getPageStorage()
-					.getAttribute(s.value());
 
 		return null;
 	}

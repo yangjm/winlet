@@ -265,7 +265,7 @@ public class ELFunction {
 		Object winlet = null;
 
 		try {
-			winlet = ContextUtils.getReqInfo().getWindowInstance().getWinlet();
+			winlet = ContextUtils.getReqInfo().getWinlet();
 		} catch (Exception e) {
 		}
 

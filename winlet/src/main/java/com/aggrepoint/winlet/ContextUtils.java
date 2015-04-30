@@ -7,6 +7,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import com.aggrepoint.winlet.spring.WinletDispatcherServlet;
+
 /**
  * @see ReqInfoImpl
  * 
@@ -30,6 +32,9 @@ public class ContextUtils {
 			+ ".REQUEST_LIST_PROVIDER";
 	private static String REQUEST_LOGINFO_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_LOGINFO_KEY";
+
+	private static String REQUEST_DISPATCHER = LogInfoImpl.class.getName()
+			+ ".REQUEST_DISPATCHER_KEY";
 
 	public static ReqInfoImpl getReqInfo() {
 		return (ReqInfoImpl) RequestContextHolder.currentRequestAttributes()
@@ -163,5 +168,16 @@ public class ContextUtils {
 	public static void setListProvider(HttpServletRequest request,
 			ListProvider provider) {
 		request.setAttribute(REQUEST_LIST_PROVIDER, provider);
+	}
+
+	public static WinletDispatcherServlet getDispatcher(
+			HttpServletRequest request) {
+		return (WinletDispatcherServlet) request
+				.getAttribute(REQUEST_DISPATCHER);
+	}
+
+	public static void setDispatcher(HttpServletRequest request,
+			WinletDispatcherServlet dispatcher) {
+		request.setAttribute(REQUEST_DISPATCHER, dispatcher);
 	}
 }
