@@ -54,6 +54,10 @@ public interface ReqInfo {
 
 	boolean isPageRefresh();
 
+	PageStorage getPageStorage();
+
+	SharedPageStorage getSharedPageStorage();
+
 	ReturnDef getReturnDef();
 
 	void setWinlet(WinletDef def, Object winlet);
@@ -67,4 +71,6 @@ public interface ReqInfo {
 			throws Exception;
 
 	String getWindowUrl(WinletDef winletDef, String window);
+
+	boolean noPreload();
 }

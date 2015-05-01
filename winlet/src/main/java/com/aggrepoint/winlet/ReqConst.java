@@ -31,4 +31,7 @@ public interface ReqConst {
 	public final String PARAM_PAGE_URL = "_purl";
 	/** 是否为全页面刷新而显示 */
 	public final String PARAM_PAGE_REFRESH = "_pr";
+
+	/** 不要预加载 */
+	public final String PARAM_NO_PRELOAD = "_np";
 }

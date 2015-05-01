@@ -80,14 +80,22 @@ public class AreaContentTag extends TagSupport {
 	// 在内容中寻找要预加载的winlet
 	static Pattern WINLET_PRELOAD = Pattern
 			.compile("<div\\s+data-winlet\\s*=\\s*\"\\s*(/?\\w+(/[^\"]+/\\w+))(\\?([^\\s\"]+))?(\\s+([^\"]*?))?\"\\s+(data-preload(-forced)?)\\s*>\\s*</div>");
+	static Pattern WINLET_NO_PRELOAD = Pattern
+			.compile("<div\\s+data-winlet\\s*=\\s*\"([^\">]+)\"\\s+data-preload\\s*>(\\s*)</div>");
 
 	public static String preloadWinlet(ReqInfo ri, String content)
 			throws Exception {
+		if (ri.noPreload())
+			// 不加载“判断预加载”窗口
+			content = WINLET_NO_PRELOAD.matcher(content).replaceAll(
+					"<div data-winlet=\"$1\">$2</div>");
 
 		while (true) {
 			Matcher m = WINLET_PRELOAD.matcher(content);
 			if (!m.find())
 				break;
+
+			boolean forced = m.group(7).equals("data-preload-forced");
 
 			String params = null;
 			String wid = WinletManager.getPreloadWindowId(ri.getRequest());
@@ -113,8 +121,6 @@ public class AreaContentTag extends TagSupport {
 			String str = ri.getWindowContent(wid, m.group(2), reqParams, null);
 
 			StringBuffer sb = new StringBuffer();
-
-			boolean forced = m.group(7).equals("data-preload-forced");
 
 			sb.append("<div");
 			if (!forced)

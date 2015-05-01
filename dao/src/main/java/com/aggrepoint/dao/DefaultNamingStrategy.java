@@ -11,7 +11,10 @@ public class DefaultNamingStrategy extends ImprovedNamingStrategy {
 		String name = super.classToTableName(className).toUpperCase();
 
 		if (name.endsWith("Y"))
-			return name.substring(0, name.length() - 1) + "IES";
+			if (!name.endsWith("AY") && !name.endsWith("EY")
+					&& !name.endsWith("OY") && !name.endsWith("IY")
+					&& !name.endsWith("UY"))
+				return name.substring(0, name.length() - 1) + "IES";
 
 		if (name.endsWith("S") || name.endsWith("SH") || name.endsWith("CH")
 				|| name.endsWith("X"))

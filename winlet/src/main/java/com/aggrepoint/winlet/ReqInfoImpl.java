@@ -39,9 +39,12 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String validateFieldId;
 	private boolean pageRefresh;
 	private Form form;
+	private PageStorage ps;
+	private SharedPageStorage sps;
 	private ReturnDef rd;
 	private WinletDef winletDef;
 	private Object winlet;
+	private boolean noPreload;
 
 	// 待移植
 	public boolean m_bUseAjax = true;
@@ -65,6 +68,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		requestPath = requestPath.substring(idx);
 
 		requestId = REQUEST_ID++;
+
+		noPreload = getParameter(PARAM_NO_PRELOAD, null) != null;
 
 		pageId = getParameter(PARAM_PAGE_PATH, null);
 		if (pageId == null)
@@ -225,6 +230,20 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	}
 
 	@Override
+	public PageStorage getPageStorage() {
+		if (ps == null)
+			ps = new PageStorageImpl(this);
+		return ps;
+	}
+
+	@Override
+	public SharedPageStorage getSharedPageStorage() {
+		if (sps == null)
+			sps = new SharedPageStorageImpl(this);
+		return sps;
+	}
+
+	@Override
 	public ReturnDef getReturnDef() {
 		return rd;
 	}
@@ -324,5 +343,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public WinletDef getWinletDef() {
 		return winletDef;
+	}
+
+	@Override
+	public boolean noPreload() {
+		return noPreload;
 	}
 }
