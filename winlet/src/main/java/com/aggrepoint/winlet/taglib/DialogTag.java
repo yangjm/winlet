@@ -47,7 +47,7 @@ public class DialogTag extends BodyTagSupport implements WinletConst,
 		if (buttons.size() > 0)
 			obj.put("buttons", buttons);
 
-		Writer out = getPreviousOut();
+		Writer out = pageContext.getOut();
 		try {
 			out.write("<div id=\"ap_dialog\">");
 			out.write(new ObjectMapper().writeValueAsString(obj));
@@ -55,7 +55,8 @@ public class DialogTag extends BodyTagSupport implements WinletConst,
 		} catch (IOException e) {
 			throw new JspTagException(e.getMessage());
 		}
-		getBodyContent().clearBody();
+		if (getBodyContent() != null)
+			getBodyContent().clearBody();
 
 		attributes = new HashMap<String, String>();
 		return EVAL_PAGE;
