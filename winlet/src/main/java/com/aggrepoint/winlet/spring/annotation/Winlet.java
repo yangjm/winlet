@@ -18,4 +18,5 @@ import org.springframework.stereotype.Controller;
 @Controller
 public @interface Winlet {
 	String value();
+	String viewPath() default "";
 }

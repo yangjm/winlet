@@ -123,10 +123,15 @@ public class AreaContentTag extends TagSupport {
 			StringBuffer sb = new StringBuffer();
 
 			sb.append("<div");
+
+			String settings = m.group(5);
+			if (settings == null)
+				settings = "";
+
 			if (!forced)
 				sb.append(" data-winlet=\"")
 						.append(ri.getRequest().getContextPath())
-						.append(m.group(2)).append("\"");
+						.append(m.group(2)).append(settings).append("\"");
 
 			sb.append(" data-winlet-url=\"")
 					.append(ri.getRequest().getContextPath())
@@ -162,7 +167,11 @@ public class AreaContentTag extends TagSupport {
 			List<Area> areas = sc.getPage().getAreas(m_strName);
 			if (areas != null)
 				for (Area area : areas)
-					sbContent.append(preloadWinlet(ri, area.getContent()));
+					try {
+						sbContent.append(preloadWinlet(ri, area.getContent()));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 
 			out.print(sbContent.toString());
 		} catch (Exception e) {

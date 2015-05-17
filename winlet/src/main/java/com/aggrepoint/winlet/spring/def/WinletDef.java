@@ -19,6 +19,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  */
 public class WinletDef {
 	private String name;
+	private String viewPath;
 	private Map<String, WindowDef> windows = new HashMap<String, WindowDef>();
 	private Map<String, ActionDef> actions = new HashMap<String, ActionDef>();
 
@@ -28,6 +29,10 @@ public class WinletDef {
 			return;
 
 		this.name = winlet.value();
+		if ("".equals(winlet.viewPath()))
+			this.viewPath = this.name;
+		else
+			this.viewPath = winlet.viewPath();
 
 		for (Method method : clz.getMethods()) {
 			Action action = AnnotationUtils
@@ -48,6 +53,10 @@ public class WinletDef {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getViewPath() {
+		return viewPath;
 	}
 
 	public Collection<WindowDef> getWindows() {
