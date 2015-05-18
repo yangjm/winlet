@@ -72,6 +72,10 @@ public class Resolver extends javax.el.ELResolver implements
 		if (base == null) {
 			if (property.equals("r")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
+			} else if (property.equals("sps")) {
+				val = ContextUtils.getReqInfo().getSharedPageStorage();
+			} else if (property.equals("ps")) {
+				val = ContextUtils.getReqInfo().getPageStorage();
 			} else if (property.equals("u")) {
 				val = ContextUtils.getUser(ContextUtils.getRequest());
 			} else if (property.equals("c")) { // config provider
@@ -100,7 +104,13 @@ public class Resolver extends javax.el.ELResolver implements
 			if (val != null)
 				context.setPropertyResolved(true);
 		} else {
-			if (base instanceof ConfigProvider) {
+			if (base instanceof PageStorage) {
+				val = ((PageStorage) base).getAttribute(property);
+				context.setPropertyResolved(true);
+			} else if (base instanceof SharedPageStorage) {
+				val = ((SharedPageStorage) base).getAttribute(property);
+				context.setPropertyResolved(true);
+			} else if (base instanceof ConfigProvider) {
 				val = ((ConfigProvider) base).getStr(property.toString());
 				context.setPropertyResolved(true);
 			} else if (base instanceof ListProviderWrapper) {
