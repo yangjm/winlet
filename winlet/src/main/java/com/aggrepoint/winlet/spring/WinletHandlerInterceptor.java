@@ -212,9 +212,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 								.equals(modelAndView.getViewName()))
 						&& action != null)
 					response.getOutputStream().write(
-							reqInfo.getWindowContent(reqInfo.getWindowId(),
-									null, null, modelAndView.getModel())
-									.getBytes("UTF-8"));
+							reqInfo.getWindowContent(null, null, null,
+									modelAndView.getModel()).getBytes("UTF-8"));
 
 				if ("".equals(modelAndView.getViewName()))
 					modelAndView.clear();

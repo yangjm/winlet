@@ -2,8 +2,6 @@ package com.aggrepoint.winlet;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,8 +27,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private HttpSession session;
 	private String requestPath;
 	private String path;
-	private String rootWindowId;
-	private String windowId;
 	private String pageId;
 	private String pageUrl;
 	private String actionId;
@@ -48,11 +44,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 	// 待移植
 	public boolean m_bUseAjax = true;
-
-	/**
-	 * 用于分解Action或Resource
-	 */
-	Pattern P_DECODE = Pattern.compile("([^!]*)!([^!]+)");
 
 	public ReqInfoImpl(HttpServletRequest request, String path) {
 		this.request = request;
@@ -79,25 +70,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		if (pageUrl == null)
 			pageUrl = request.getRequestURL().toString();
 
-		windowId = request.getHeader(WinletConst.REQUEST_HEADER_WINDOW_ID);
-		if (windowId == null || windowId.equals(""))
-			windowId = getParameter(PARAM_WIN_ID, null);
-
 		actionId = getParameter(PARAM_WIN_ACTION, null);
-		if (actionId != null) {
-			Matcher m;
-			synchronized (P_DECODE) {
-				m = P_DECODE.matcher(actionId);
-			}
-
-			if (m.find()) {
-				try {
-					windowId = m.group(1);
-				} catch (Exception e) {
-				}
-				actionId = m.group(2);
-			}
-		} else {
+		if (actionId == null) {
 			pageRefresh = "yes".equalsIgnoreCase(getParameter(
 					PARAM_PAGE_REFRESH, ""));
 		}
@@ -175,11 +149,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	}
 
 	@Override
-	public String getRootWindowId() {
-		return rootWindowId;
-	}
-
-	@Override
 	public String getPageId() {
 		return pageId;
 	}
@@ -187,11 +156,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public String getPageUrl() {
 		return pageUrl;
-	}
-
-	@Override
-	public String getWindowId() {
-		return windowId;
 	}
 
 	@Override
@@ -263,14 +227,34 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return requestPath;
 	}
 
+	public static String updateScriptWinletReference(Long wid, String str) {
+		if (wid != null) {
+			str = str.replaceAll("win\\$\\.post\\s*\\(", "win\\$._post(" + wid
+					+ ", ");
+			str = str.replaceAll("win\\$\\.winlet\\s*\\(", "win\\$._winlet("
+					+ wid);
+			str = str.replaceAll("win\\$\\.ajax\\s*\\(", "win\\$._ajax(" + wid
+					+ ", ");
+			str = str.replaceAll("win\\$\\.get\\s*\\(", "win\\$._get(" + wid
+					+ ", ");
+			str = str.replaceAll("win\\$\\.toggle\\s*\\(", "win\\$._toggle("
+					+ wid + ", ");
+			str = str.replaceAll("win\\$\\.url\\s*\\(", "win\\$._url(" + wid
+					+ ", ");
+			str = str.replaceAll("win\\$\\.submit\\s*\\(", "win\\$._submit("
+					+ wid + ", ");
+			str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
+					"win\\$._aftersubmit(" + wid + ", ");
+		}
+		
+		return str;
+	}
+
 	@Override
-	public String getWindowContent(String wid, String windowUrl,
+	public String getWindowContent(Long wid, String windowUrl,
 			Map<String, String> params, Map<String, Object> attributes)
 			throws Exception {
 		LogInfoImpl log = ContextUtils.getLogInfo(request);
-
-		HashMap<String, String> headers = new HashMap<String, String>();
-		headers.put(WinletConst.REQUEST_HEADER_WINDOW_ID, wid);
 
 		HashMap<String, String> reqParams = new HashMap<String, String>();
 		if (params != null) // 执行完action后获取window的内容时不指定params参数
@@ -293,8 +277,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 			request.getServletContext()
 					.getRequestDispatcher(windowUrl)
 					.forward(
-							new WinletRequestWrapper(request, headers,
-									reqParams, attributes), response);
+							new WinletRequestWrapper(request, null, reqParams,
+									attributes), response);
 		} finally {
 			// 恢复当前请求的ReqInfo
 			ContextUtils.setReqInfo(this);
@@ -304,29 +288,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		byte[] bytes = response.getBuffered();
 
 		String str = bytes == null ? "" : new String(bytes, "UTF-8");
-
-		// { 必须在这里替换好win$.的调用，因为客户端js不会正确使用子窗口的wid
-		if (wid != null) {
-			str = str.replaceAll("win\\$\\.wid\\s*\\(.*\\)", "win\\$._wid("
-					+ wid + ")");
-			str = str.replaceAll("win\\$\\.post\\s*\\(", "win\\$._post(" + wid
-					+ ", ");
-			str = str.replaceAll("win\\$\\.ajax\\s*\\(", "win\\$._ajax(" + wid
-					+ ", ");
-			str = str.replaceAll("win\\$\\.get\\s*\\(", "win\\$._get(" + wid
-					+ ", ");
-			str = str.replaceAll("win\\$\\.toggle\\s*\\(", "win\\$._toggle("
-					+ wid + ", ");
-			str = str.replaceAll("win\\$\\.url\\s*\\(", "win\\$._url(" + wid
-					+ ", ");
-			str = str.replaceAll("win\\$\\.submit\\s*\\(", "win\\$._submit("
-					+ wid + ", ");
-			str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
-					"win\\$._aftersubmit(" + wid + ", ");
-		}
-		// }
-
-		return str;
+		return updateScriptWinletReference(wid, str);
 	}
 
 	@Override

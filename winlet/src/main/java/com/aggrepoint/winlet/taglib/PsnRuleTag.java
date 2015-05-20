@@ -12,14 +12,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.WinletConst;
 
 /**
  * 个性化
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class PsnRuleTag extends BodyTagSupport implements WinletConst {
+public class PsnRuleTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
 
 	static final Log logger = LogFactory.getLog(PsnRuleTag.class);

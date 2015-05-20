@@ -106,7 +106,7 @@ public class ELFunction {
 		ReqInfo ri = ContextUtils.getReqInfo();
 
 		if (ri != null)
-			text = text + ri.getWindowId();
+			text = text + ri.getRequestId();
 		return text;
 	}
 
@@ -352,7 +352,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWindowId());
+		sb.append(reqInfo.getRequestId());
 		sb.append(" = function");
 
 		return sb.toString();
@@ -370,7 +370,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWindowId());
+		sb.append(reqInfo.getRequestId());
 
 		return sb.toString();
 	}

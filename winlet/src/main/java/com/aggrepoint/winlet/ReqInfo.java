@@ -32,10 +32,6 @@ public interface ReqInfo {
 
 	long getRequestId();
 
-	String getRootWindowId();
-
-	String getWindowId();
-
 	String getPageId();
 
 	String getPageUrl();
@@ -66,7 +62,7 @@ public interface ReqInfo {
 
 	WinletDef getWinletDef();
 
-	String getWindowContent(String wid, String windowUrl,
+	String getWindowContent(Long wid, String windowUrl,
 			Map<String, String> params, Map<String, Object> attributes)
 			throws Exception;
 

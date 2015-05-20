@@ -55,11 +55,10 @@ import com.aggrepoint.winlet.site.domain.Area;
  * 客户端是否有状态的指示。
  * 
  * 对于winlet_local.js，强制预加载的窗口被包含在<div>标签中，标签没有data-winlet属性，但是有
- * data-winlet-id和data-winlet-url属性。判断预加载窗口既有data-winlet，也有data-winlet-id和
- * data-winlet-url。普通顶级窗口只有data-winlet属性，没有data-winlet-id和data-winlet-url。服务
- * 器端include的子窗口与强制加载窗口类似，没有data-winlet属性，但是有data-winlet-id和
- * data-winlet-url属性。按回退按钮导致hash变更时，强制预加载窗口和被include生成的子窗口都无需被
- * 加载，因此他们都没有data-winlet属性。
+ * data-winlet-url属性。判断预加载窗口既有data-winlet，也有data-winlet-url。普通顶级窗口
+ * 只有data-winlet属性，没有data-winlet-url。服务器端include的子窗口与强制加载窗口类似，
+ * 没有data-winlet属性，但是有data-winlet-url属性。按回退按钮导致hash变更时，强制预加载窗口和
+ * 被include生成的子窗口都无需被加载，因此他们都没有data-winlet属性。
  * 
  * </pre>
  * 
@@ -98,7 +97,6 @@ public class AreaContentTag extends TagSupport {
 			boolean forced = m.group(7).equals("data-preload-forced");
 
 			String params = null;
-			String wid = WinletManager.getPreloadWindowId(ri.getRequest());
 
 			HashMap<String, String> reqParams = new HashMap<String, String>();
 			if (m.group(4) != null) {
@@ -116,13 +114,13 @@ public class AreaContentTag extends TagSupport {
 
 			reqParams.put(ReqConst.PARAM_PAGE_PATH, ri.getPageId());
 			reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
-			reqParams.put(ReqConst.PARAM_WIN_ID, wid);
 
+			long wid = WinletManager.getSeqId();
 			String str = ri.getWindowContent(wid, m.group(2), reqParams, null);
 
 			StringBuffer sb = new StringBuffer();
 
-			sb.append("<div");
+			sb.append("<div data-winlet-id=\"").append(wid).append("\"");
 
 			String settings = m.group(5);
 			if (settings == null)
@@ -136,8 +134,6 @@ public class AreaContentTag extends TagSupport {
 			sb.append(" data-winlet-url=\"")
 					.append(ri.getRequest().getContextPath())
 					.append(m.group(2)).append("\"");
-
-			sb.append(" data-winlet-id=\"").append(wid).append("\"");
 
 			if (params != null)
 				sb.append(" data-winlet-params=\"")

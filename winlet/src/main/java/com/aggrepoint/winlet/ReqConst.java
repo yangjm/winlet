@@ -6,12 +6,6 @@ package com.aggrepoint.winlet;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface ReqConst {
-	public final String PARAM_WIN_ID = "_w";
-	/**
-	 * <pre>
-	 * _a的值可以包含_w的值，用!分隔，例如231!test
-	 * </pre>
-	 */
 	public final String PARAM_WIN_ACTION = "_a";
 	public final String PARAM_WIN_VALIDATE_FIELD = "_vf";
 	public final String PARAM_WIN_VALIDATE_FIELD_VALUE = "_vv";

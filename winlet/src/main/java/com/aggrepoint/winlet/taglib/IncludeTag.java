@@ -10,7 +10,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqInfo;
-import com.aggrepoint.winlet.WinletConst;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.spring.WinletClassLoader;
 import com.aggrepoint.winlet.spring.def.WinletDef;
@@ -19,7 +18,7 @@ import com.aggrepoint.winlet.utils.TypeCast;
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class IncludeTag extends BodyTagSupport implements WinletConst {
+public class IncludeTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
 
 	String var;
@@ -76,15 +75,16 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 
 			for (String win : m_strWindow.split(", ")) {
 				ReqInfo ri = ContextUtils.getReqInfo();
-				String cwid = WinletManager.getChildWindowId(ri.getWindowId(),
-						ri.getRequest());
 				String windowUrl = ri.getWindowUrl(winletDef, win);
-				String response = ri.getWindowContent(cwid, windowUrl,
-						m_params, null);
+				long wid = WinletManager.getSeqId();
+				String response = ri.getWindowContent(wid, windowUrl, m_params,
+						null);
 
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div class=\"ap_child_window\" data-winlet-id=\"")
-						.append(cwid).append("\" data-winlet-url=\"")
+				sb.append(
+						"<div data-winlet-id=\""
+								+ wid
+								+ "\" class=\"winlet_child\" data-winlet-url=\"")
 						.append(ri.getRequest().getContextPath())
 						.append(windowUrl).append("\"");
 				if (m_params.size() > 0)

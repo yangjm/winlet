@@ -97,9 +97,6 @@ public class Resolver extends javax.el.ELResolver implements
 				// val = ThreadContext.getAttribute(THREAD_ATTR_EXCEPTION);
 			} else if (property.equals("win"))
 				val = new WinletEl();
-			// else if (property.equals("rinfo"))
-			// val = WinletReqInfo.getInfo((IModuleRequest) ThreadContext
-			// .getAttribute(THREAD_ATTR_REQUEST));
 
 			if (val != null)
 				context.setPropertyResolved(true);

@@ -12,13 +12,10 @@ import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.aggrepoint.winlet.WinletConst;
-
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class DialogTag extends BodyTagSupport implements WinletConst,
-		DynamicAttributes {
+public class DialogTag extends BodyTagSupport implements DynamicAttributes {
 	private static final long serialVersionUID = 1L;
 
 	HashMap<String, String> attributes = new HashMap<String, String>();
