@@ -24,12 +24,14 @@ public class Page extends Base {
 	private boolean skip;
 	private boolean hide;
 	private boolean expand;
+	private boolean isStatic;
 	private List<Area> areas = new ArrayList<Area>();
 	private Hashtable<String, List<Area>> areasByName = new Hashtable<String, List<Area>>();
 	private List<Page> pages = new ArrayList<Page>();
 	private Page parent;
 	private int level;
 	private String fullPath;
+	private String fullDir;
 
 	public void init(Page p, List<Area> cascade, String tmpl) {
 		Collections.sort(pages);
@@ -39,6 +41,7 @@ public class Page extends Base {
 		parent = p;
 		level = p.getLevel() + 1;
 		fullPath = p.fullPath + path + "/";
+		fullDir = p.fullDir + dir + "/";
 
 		if (cascade != null)
 			areas.addAll(cascade);
@@ -83,6 +86,12 @@ public class Page extends Base {
 		this.fullPath = path;
 	}
 
+	@Override
+	public void setDir(String dir) {
+		this.dir = dir;
+		this.fullDir = dir;
+	}
+
 	public String getTemplate() {
 		return template;
 	}
@@ -121,6 +130,16 @@ public class Page extends Base {
 
 	public void setExpand(boolean expand) {
 		this.expand = expand;
+	}
+
+	public boolean isStatic() {
+		return isStatic;
+	}
+
+	public void setStatic(boolean isStatic) {
+		this.isStatic = isStatic;
+		if (this.isStatic)
+			expand = true;
 	}
 
 	public List<Area> getAreas(String name) {
@@ -194,6 +213,10 @@ public class Page extends Base {
 
 	public String getFullPath() {
 		return fullPath;
+	}
+
+	public String getFullDir() {
+		return fullDir;
 	}
 
 	public Page findPage(String path, AccessRuleEngine re) {

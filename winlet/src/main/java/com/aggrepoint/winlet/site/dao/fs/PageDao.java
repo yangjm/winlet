@@ -32,21 +32,27 @@ public class PageDao {
 			page.setRule(cfgs.get("rule"));
 			page.setTemplate(cfgs.get("template"));
 			page.setLink(cfgs.get("link"));
-			page.setSkip("".equals(cfgs.get("skip")) || "true".equalsIgnoreCase(cfgs.get("skip")));
-			page.setHide("".equals(cfgs.get("hide")) || "true".equalsIgnoreCase(cfgs.get("hide")));
-			page.setExpand("".equals(cfgs.get("expand")) || "true".equalsIgnoreCase(cfgs.get("expand")));
+			page.setSkip("".equals(cfgs.get("skip"))
+					|| "true".equalsIgnoreCase(cfgs.get("skip")));
+			page.setHide("".equals(cfgs.get("hide"))
+					|| "true".equalsIgnoreCase(cfgs.get("hide")));
+			page.setExpand("".equals(cfgs.get("expand"))
+					|| "true".equalsIgnoreCase(cfgs.get("expand")));
+			page.setStatic("".equals(cfgs.get("static"))
+					|| "true".equalsIgnoreCase(cfgs.get("static")));
 
-			for (File f : dir.listFiles()) {
-				if (f.isDirectory()) { // 页面
-					Page p = load(f);
-					if (p != null)
-						page.addPage(p);
-				} else if (f.getName().endsWith(".html")) { // area内容
-					Area a = AreaDao.load(f);
-					if (a != null)
-						page.addArea(a);
+			if (!page.isStatic()) // 静态目录里面所有内容都视为静态内容，不再作为子目录处理
+				for (File f : dir.listFiles()) {
+					if (f.isDirectory()) { // 页面
+						Page p = load(f);
+						if (p != null)
+							page.addPage(p);
+					} else if (f.getName().endsWith(".html")) { // area内容
+						Area a = AreaDao.load(f);
+						if (a != null)
+							page.addArea(a);
+					}
 				}
-			}
 
 			return page;
 		} catch (Exception e) {

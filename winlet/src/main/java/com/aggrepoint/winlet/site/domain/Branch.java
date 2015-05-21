@@ -23,6 +23,7 @@ public class Branch extends Base {
 		rootPage = new Page();
 		rootPage.setName("");
 		rootPage.setPath("/");
+		rootPage.setDir("/");
 		rootPage.setSkip(true);
 		rootPage.setBranch(this);
 	}
