@@ -106,7 +106,7 @@ public class ELFunction {
 		ReqInfo ri = ContextUtils.getReqInfo();
 
 		if (ri != null)
-			text = text + ri.getWindowId();
+			text = text + ri.getRequestId();
 		return text;
 	}
 
@@ -265,7 +265,7 @@ public class ELFunction {
 		Object winlet = null;
 
 		try {
-			winlet = ContextUtils.getReqInfo().getWindowInstance().getWinlet();
+			winlet = ContextUtils.getReqInfo().getWinlet();
 		} catch (Exception e) {
 		}
 
@@ -318,9 +318,17 @@ public class ELFunction {
 		if (col instanceof Collection)
 			return ((Collection<?>) col).contains(o);
 		else if (col.getClass().isArray()) {
-			for (int i = 0; i < Array.getLength(col); i++)
+			for (int i = 0; i < Array.getLength(col); i++) {
+				Object val = Array.get(col, i);
+
+				if (val instanceof Number && o instanceof Number)
+					if (((Number) val).doubleValue() == ((Number) o)
+							.doubleValue())
+						return true;
+
 				if (o.equals(Array.get(col, i)))
 					return true;
+			}
 		}
 
 		return false;
@@ -344,7 +352,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWindowId());
+		sb.append(reqInfo.getRequestId());
 		sb.append(" = function");
 
 		return sb.toString();
@@ -362,7 +370,7 @@ public class ELFunction {
 		StringBuffer sb = new StringBuffer();
 		sb.append("document.");
 		sb.append(name);
-		sb.append(reqInfo.getWindowId());
+		sb.append(reqInfo.getRequestId());
 
 		return sb.toString();
 	}

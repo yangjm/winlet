@@ -6,10 +6,11 @@ import java.util.Vector;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import com.aggrepoint.winlet.ContextUtils;
-import com.aggrepoint.winlet.IncludeResult;
 import com.aggrepoint.winlet.ReqInfo;
-import com.aggrepoint.winlet.WinletConst;
+import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.spring.WinletClassLoader;
 import com.aggrepoint.winlet.spring.def.WinletDef;
 import com.aggrepoint.winlet.utils.TypeCast;
@@ -17,7 +18,7 @@ import com.aggrepoint.winlet.utils.TypeCast;
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class IncludeTag extends BodyTagSupport implements WinletConst {
+public class IncludeTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
 
 	String var;
@@ -25,8 +26,6 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 	String vars;
 
 	String m_strWindow;
-
-	String m_strUniqueId;
 
 	WinletDef winletDef;
 
@@ -42,10 +41,6 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 
 	public void setWindow(String window) {
 		m_strWindow = window;
-	}
-
-	public void setUniqueId(String id) {
-		m_strUniqueId = id;
 	}
 
 	public void setWinlet(String winlet) {
@@ -80,13 +75,25 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 
 			for (String win : m_strWindow.split(", ")) {
 				ReqInfo ri = ContextUtils.getReqInfo();
-				IncludeResult result = ri.include(winletDef, win, m_params,
-						m_strUniqueId);
+				String windowUrl = ri.getWindowUrl(winletDef, win);
+				long wid = WinletManager.getSeqId();
+				String response = ri.getWindowContent(wid, windowUrl, m_params,
+						null);
 
 				StringBuffer sb = new StringBuffer();
-				sb.append("<div class=\"ap_child_window\" id=\"ap_win_")
-						.append(result.getChildWindow().getId()).append("\">");
-				sb.append(result.getResponse());
+				sb.append(
+						"<div data-winlet-id=\""
+								+ wid
+								+ "\" class=\"winlet_child\" data-winlet-url=\"")
+						.append(ri.getRequest().getContextPath())
+						.append(windowUrl).append("\"");
+				if (m_params.size() > 0)
+					sb.append(" data-winlet-params=\"")
+							.append(new ObjectMapper().writeValueAsString(
+									m_params).replaceAll("\"", "&quot;"))
+							.append("\"");
+				sb.append(">");
+				sb.append(response);
 				sb.append("</div>");
 
 				if (v != null)
@@ -99,7 +106,7 @@ public class IncludeTag extends BodyTagSupport implements WinletConst {
 				if (var != null)
 					pageContext.setAttribute(var, all.toString());
 				else
-					getPreviousOut().write(all.toString());
+					pageContext.getOut().write(all.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new JspTagException(e.getMessage());

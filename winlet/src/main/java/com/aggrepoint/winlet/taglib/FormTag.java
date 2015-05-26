@@ -11,15 +11,13 @@ import javax.servlet.jsp.tagext.DynamicAttributes;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
-import com.aggrepoint.winlet.WinletConst;
 
 /**
  * Form
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class FormTag extends BodyTagSupport implements WinletConst,
-		DynamicAttributes {
+public class FormTag extends BodyTagSupport implements DynamicAttributes {
 	private static final long serialVersionUID = 1L;
 
 	HashMap<String, String> attributes = new HashMap<String, String>();
@@ -85,12 +83,11 @@ public class FormTag extends BodyTagSupport implements WinletConst,
 			// {Name
 			out.print("<form name=\"");
 			out.print(m_strName);
-			out.print(ri.getWindowId());
 			// }
 
 			out.print("\" id=\"");
 			out.print(m_strName);
-			out.print(ri.getWindowId());
+			out.print(ri.getRequestId());
 			out.print("\"");
 
 			out.print(" action=\"");
@@ -98,8 +95,6 @@ public class FormTag extends BodyTagSupport implements WinletConst,
 			out.print("?");
 			out.print(ReqConst.PARAM_WIN_ACTION);
 			out.print("=");
-			out.print(ri.getWindowId());
-			out.print("!");
 			out.print(m_strAction);
 			out.print("\"");
 
@@ -114,9 +109,7 @@ public class FormTag extends BodyTagSupport implements WinletConst,
 			// }
 
 			// wid
-			out.print(" data-winlet-wid=\"");
-			out.print(ri.getWindowId());
-			out.print("\"");
+			out.print(" data-winlet-form=\"yes\"");
 
 			// focus
 			if (m_strFocus != null) {

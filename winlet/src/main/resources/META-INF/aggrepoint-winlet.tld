@@ -153,7 +153,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcDecimalFormat(java.lang.String, java.lang.Double)
+			java.lang.String
+			funcDecimalFormat(java.lang.String, java.lang.Double)
 		</function-signature>
 	</function>
 
@@ -173,7 +174,8 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcChangePercent(java.lang.Double, java.lang.Double)
+			java.lang.String
+			funcChangePercent(java.lang.Double, java.lang.Double)
 		</function-signature>
 	</function>
 
@@ -213,7 +215,7 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.Object funcExec(java.lang.Object,	java.lang.String)
+			java.lang.Object funcExec(java.lang.Object, java.lang.String)
 		</function-signature>
 	</function>
 
@@ -302,96 +304,6 @@
 		</function-class>
 		<function-signature>
 			java.lang.String resproxy(java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uitmpl</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			com.aggrepoint.winlet.taglib.ContTmpl.uitmpl(com.icebean.core.adb.ADB, java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>tmplexec</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String tmplexec(com.icebean.core.adb.ADB, java.lang.String[], java.util.Vector, java.util.Vector)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uiprops</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.util.Collection uiprops(com.icebean.core.adb.ADB, com.icebean.core.adb.ADB, java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>propsbind</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.util.Collection propsbind(java.util.Collection, com.icebean.core.adb.ADB)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>propsclearcached</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.util.Collection propsclearcached(java.util.Collection)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uiprop</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			com.aggrepoint.winlet.ui.PropertyInstance uiprop(java.util.Collection, java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uiattr</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String uiattr(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uiattach</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String uiattach(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String, java.lang.Object)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>uiget</name>
-		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.Object uiget(com.aggrepoint.winlet.ui.PropertyInstance, java.lang.String)
 		</function-signature>
 	</function>
 
@@ -608,11 +520,6 @@
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		<attribute>
-			<name>uniqueId</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
 	</tag>
 
 	<tag>
@@ -637,16 +544,7 @@
 		<tagclass>com.aggrepoint.winlet.taglib.DialogTag
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
-		<attribute>
-			<name>title</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>close</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
+		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 
 	<tag>
@@ -655,5 +553,19 @@
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+
+	<tag>
+		<name>set</name>
+		<tagclass>com.aggrepoint.winlet.taglib.SetTag
+		</tagclass>
+		<teiclass>com.aggrepoint.winlet.taglib.SetTei
+		</teiclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>var</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 </taglib>

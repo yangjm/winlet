@@ -1,11 +1,9 @@
 package com.aggrepoint.winlet;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.owasp.esapi.errors.ValidationException;
 
 import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
@@ -16,58 +14,59 @@ import com.aggrepoint.winlet.spring.def.WinletDef;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public interface ReqInfo {
-	public abstract String getParameter(String name, String def);
+	String getParameter(String name, String def);
 
-	public abstract int getParameter(String name, int def);
+	int getParameter(String name, int def);
 
-	public abstract long getParameter(String name, long def);
+	long getParameter(String name, long def);
 
-	public abstract HttpServletRequest getRequest();
+	HttpServletRequest getRequest();
 
-	public abstract String getRequestPath() throws ValidationException;
+	HttpSession getSession();
 
-	public abstract HttpSession getSession();
+	HttpSession getSession(boolean create);
 
-	public abstract HttpSession getSession(boolean create);
+	UserProfile getUser();
 
-	public abstract UserProfile getUser();
+	String getPath();
 
-	public abstract String getPath();
+	long getRequestId();
 
-	public abstract long getRequestId();
+	String getPageId();
 
-	public abstract String getRootWindowId();
+	String getPageUrl();
 
-	public abstract String getWindowId();
+	String getActionId();
 
-	public abstract String getPageId();
+	Form getForm();
 
-	public abstract String getPageUrl();
+	boolean isValidateField();
 
-	public abstract String getActionId();
+	String getValidateFieldName();
 
-	public abstract Form getForm();
+	String getValidateFieldValue();
 
-	public abstract boolean isValidateField();
+	String getValidateFieldId();
 
-	public abstract String getValidateFieldName();
+	boolean isPageRefresh();
 
-	public abstract String getValidateFieldValue();
+	PageStorage getPageStorage();
 
-	public abstract String getValidateFieldId();
+	SharedPageStorage getSharedPageStorage();
 
-	public abstract boolean isPageRefresh();
+	ReturnDef getReturnDef();
 
-	public abstract WindowInstance getWindowInstance();
+	void setWinlet(WinletDef def, Object winlet);
 
-	public abstract PageStorage getPageStorage();
+	Object getWinlet();
 
-	public abstract SharedPageStorage getSharedPageStorage();
+	WinletDef getWinletDef();
 
-	public abstract ReturnDef getReturnDef();
+	String getWindowContent(Long wid, String windowUrl,
+			Map<String, String> params, Map<String, Object> attributes)
+			throws Exception;
 
-	public abstract IncludeResult include(WinletDef winlet, String window,
-			Hashtable<String, String> params, String uniqueId) throws Exception;
+	String getWindowUrl(WinletDef winletDef, String window);
 
-	String getTranslateUpdate();
+	boolean noPreload();
 }

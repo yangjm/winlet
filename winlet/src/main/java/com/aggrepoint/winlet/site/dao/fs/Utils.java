@@ -66,6 +66,7 @@ public class Utils {
 	public static void getNameAndOrder(Base base, File file) {
 		try {
 			String name = file.getName();
+			base.setDir(name);
 			int idx = name.indexOf("#");
 			if (idx > 0) {
 				base.setOrder(Integer.parseInt(name.substring(0, idx)));

@@ -253,4 +253,21 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+
+	<tag>
+		<name>run</name>
+		<tagclass>com.aggrepoint.winlet.site.taglib.RunHandlerTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>url</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>preload</name>
+		<tagclass>com.aggrepoint.winlet.site.taglib.PreloadWinletTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+	</tag>
 </taglib>

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.ConfigurableMimeFileTypeMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -105,7 +105,31 @@ public class SiteController {
 		return baos.toByteArray();
 	}
 
-	@RequestMapping("/site/**")
+	static ConfigurableMimeFileTypeMap FILE_TYPE_MAP = new ConfigurableMimeFileTypeMap();
+
+	static Object returnFile(Branch branch, String path) throws IOException {
+		File file = new File(branch.getPath() + path);
+		if ((!file.exists() || file.isDirectory()) && branch.getIndex() != null)
+			file = new File(branch.getPath() + branch.getIndex());
+
+		if (!file.exists() || file.isDirectory())
+			return "/WEB-INF/site/error/pagenotfound.jsp";
+
+		InputStream in = new FileInputStream(file);
+		final HttpHeaders headers = new HttpHeaders();
+		try {
+			headers.setContentType(MediaType.valueOf(FILE_TYPE_MAP
+					.getContentType(file)));
+		} catch (Exception e) {
+			headers.setContentType(MediaType
+					.valueOf("application/octet-stream"));
+		}
+		byte[] bytes = toByteArray(in);
+		in.close();
+		return new ResponseEntity<byte[]>(bytes, headers, HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = "/site/**")
 	public Object site(HttpServletRequest req, HttpServletResponse resp,
 			AccessRuleEngine engine) {
 		String path = req.getServletPath().substring(5);
@@ -120,26 +144,7 @@ public class SiteController {
 				if (path.equals("/cfg.cfg")) // 不允许访问cfg.cfg
 					path = "";
 
-				File file = new File(branch.getPath() + path);
-				if ((!file.exists() || file.isDirectory())
-						&& branch.getIndex() != null)
-					file = new File(branch.getPath() + branch.getIndex());
-
-				if (!file.exists() || file.isDirectory())
-					return "/WEB-INF/site/error/pagenotfound.jsp";
-
-				InputStream in = new FileInputStream(file);
-				final HttpHeaders headers = new HttpHeaders();
-				try {
-					headers.setContentType(MediaType.valueOf(new MimetypesFileTypeMap().getContentType(file)));
-				} catch (Exception e) {
-					headers.setContentType(MediaType
-							.valueOf("application/octet-stream"));
-				}
-				byte[] bytes = toByteArray(in);
-				in.close();
-				return new ResponseEntity<byte[]>(bytes, headers,
-						HttpStatus.CREATED);
+				return returnFile(branch, path);
 			} else {
 				Page page = branch.findPage(path, engine);
 				if (page == null)
@@ -148,10 +153,19 @@ public class SiteController {
 				if (page.getLink() != null)
 					return "redirect:" + page.getLink();
 
-				SiteContext sc = new SiteContext(req, page);
-				req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
+				if (page.isStatic()) {
+					if (path.equals(page.getFullPath() + "cfg.cfg")) // 不允许访问cfg.cfg
+						return "/WEB-INF/site/error/pagenotfound.jsp";
 
-				return "/WEB-INF/site/template/" + page.getTemplate() + ".jsp";
+					return returnFile(branch,
+							path.replace(page.getFullPath(), page.getFullDir()));
+				} else {
+					SiteContext sc = new SiteContext(req, page);
+					req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
+
+					return "/WEB-INF/site/template/" + page.getTemplate()
+							+ ".jsp";
+				}
 			}
 		} catch (Exception e) {
 			return "/WEB-INF/site/error/pagenotfound.jsp";

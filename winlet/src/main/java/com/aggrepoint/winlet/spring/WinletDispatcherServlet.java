@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet.spring;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 
 import com.aggrepoint.dao.UserContext;
@@ -20,6 +23,7 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.PsnRuleEngine;
+import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
@@ -96,8 +100,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		req = new RequestAttributeRecorder(req);
-
+		ContextUtils.setDispatcher(req, this);
 		ContextUtils.setApplicationContext(req, getWebApplicationContext());
 		ContextUtils.setUserEngine(req, userEngine);
 		ContextUtils.setAccessRuleEngine(req, accessRuleEngine);
@@ -115,5 +118,22 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 			for (RequestLogger rl : loggers.values())
 				rl.log(li);
 		}
+	}
+
+	public Map<String, Object> runHandler(HttpServletRequest req,
+			HttpServletResponse resp, String pageUrl, String url)
+			throws Exception {
+		Map<String, String> params = new HashMap<String, String>();
+		if (pageUrl != null)
+			params.put(ReqConst.PARAM_PAGE_URL, pageUrl);
+
+		WinletRequestWrapper wreq = new WinletRequestWrapper(req, null, params,
+				null);
+		wreq.setServletPath(url);
+
+		HandlerExecutionChain mappedHandler = getHandler(wreq);
+		ModelAndView mv = getHandlerAdapter(mappedHandler.getHandler()).handle(
+				wreq, resp, mappedHandler.getHandler());
+		return mv.getModel();
 	}
 }

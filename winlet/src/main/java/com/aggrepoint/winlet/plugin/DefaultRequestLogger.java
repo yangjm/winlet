@@ -30,8 +30,7 @@ public class DefaultRequestLogger implements RequestLogger {
 		SYSTEM_PARAMS = new HashSet<String>();
 		for (String str : new String[] { ReqConst.PARAM_PAGE_PATH,
 				ReqConst.PARAM_PAGE_URL, ReqConst.PARAM_WIN_ACTION,
-				ReqConst.PARAM_WIN_ID, ReqConst.PARAM_WIN_PARAM,
-				ReqConst.PARAM_WIN_VALIDATE_FIELD,
+				ReqConst.PARAM_WIN_PARAM, ReqConst.PARAM_WIN_VALIDATE_FIELD,
 				ReqConst.PARAM_WIN_VALIDATE_FIELD_VALUE })
 			SYSTEM_PARAMS.add(str);
 	}
@@ -54,7 +53,8 @@ public class DefaultRequestLogger implements RequestLogger {
 
 			// request ip
 			sb.append(" | ");
-			sb.append(log.getRequest().getRemoteAddr());
+			String ip = log.getRequest().getHeader("X-Forwarded-For");
+			sb.append(ip == null ? log.getRequest().getRemoteAddr() : ip);
 
 			// reqinfo
 			ReqInfo ri = log.getReqInfo();
@@ -63,8 +63,6 @@ public class DefaultRequestLogger implements RequestLogger {
 			if (ri != null) {
 				sb.append(" | ");
 				sb.append(ri.getPageId());
-				sb.append(" | ");
-				sb.append(ri.getWindowId());
 			}
 
 			// handler object & method

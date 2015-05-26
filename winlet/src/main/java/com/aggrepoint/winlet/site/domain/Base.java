@@ -10,12 +10,21 @@ import org.apache.commons.logging.LogFactory;
 public class Base implements Comparable<Base> {
 	static final Log logger = LogFactory.getLog(Page.class);
 
+	protected String dir;
 	protected int order;
 	protected String name;
 	protected String rule;
 
 	public int compareTo(Base o) {
 		return order - o.order;
+	}
+
+	public String getDir() {
+		return dir;
+	}
+
+	public void setDir(String dir) {
+		this.dir = dir;
 	}
 
 	public int getOrder() {

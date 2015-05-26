@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -620,6 +621,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 						pageList.setTotalCount(((Long) c).intValue());
 					else if (c instanceof BigDecimal)
 						pageList.setTotalCount(((BigDecimal) c).intValue());
+					else if (c instanceof BigInteger)
+						pageList.setTotalCount(((BigInteger) c).intValue());
 					else
 						pageList.setTotalCount((Integer) c);
 				} else {

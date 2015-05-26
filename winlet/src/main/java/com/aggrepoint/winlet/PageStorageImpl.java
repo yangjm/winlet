@@ -19,7 +19,7 @@ public class PageStorageImpl implements PageStorage {
 		HttpSession session = reqInfo.getSession();
 		synchronized (session) {
 			String key = WINLET_SESSION_KEY_PREFIX
-					+ reqInfo.getWindowInstance().getWinlet().toString();
+					+ reqInfo.getWinlet().toString();
 
 			@SuppressWarnings("unchecked")
 			HashMap<String, HashMap<Object, Object>> htByWinlet = (HashMap<String, HashMap<Object, Object>>) session

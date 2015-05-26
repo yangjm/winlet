@@ -5,7 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.util.Calendar;
@@ -749,4 +752,22 @@ public class StringUtils {
 
 		return ht;
 	}
+
+	public static String inputStreamToString(final InputStream is) {
+		final char[] buffer = new char[10240];
+		final StringBuilder out = new StringBuilder();
+		try (Reader in = new InputStreamReader(is, "UTF-8")) {
+			for (;;) {
+				int rsz = in.read(buffer, 0, buffer.length);
+				if (rsz < 0)
+					break;
+				out.append(buffer, 0, rsz);
+			}
+		} catch (UnsupportedEncodingException ex) {
+		} catch (IOException ex) {
+		}
+
+		return out.toString();
+	}
+
 }

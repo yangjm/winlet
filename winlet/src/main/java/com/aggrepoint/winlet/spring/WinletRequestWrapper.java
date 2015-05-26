@@ -24,12 +24,17 @@ import javax.servlet.http.HttpServletRequestWrapper;
 public class WinletRequestWrapper extends HttpServletRequestWrapper {
 	private Map<String, String> headers;
 	private Map<String, String> params;
+	private HashMap<String, Object> attributes = new HashMap<String, Object>();
+	private String servletPath;
 
 	public WinletRequestWrapper(HttpServletRequest request,
-			Map<String, String> headers, Map<String, String> params) {
+			Map<String, String> headers, Map<String, String> params,
+			Map<String, Object> attributes) {
 		super(request);
 		this.headers = headers;
 		this.params = params;
+		if (attributes != null)
+			this.attributes.putAll(attributes);
 	}
 
 	void setParams(Hashtable<String, String> params) {
@@ -40,6 +45,31 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 		this.headers = headers;
 	}
 
+	public Map<String, Object> getSetAttributes() {
+		return attributes;
+	}
+
+	public void setServletPath(String path) {
+		if (path == null)
+			return;
+
+		servletPath = path.startsWith("/") ? path : "/" + path;
+	}
+
+	@Override
+	public String getRequestURI() {
+		if (servletPath == null)
+			return super.getRequestURI();
+
+		return super.getContextPath() + servletPath;
+	}
+
+	@Override
+	public String getServletPath() {
+		return servletPath == null ? super.getServletPath() : servletPath;
+	}
+
+	@Override
 	public String getHeader(String name) {
 		if (headers != null && headers.containsKey(name))
 			return headers.get(name);
@@ -47,6 +77,7 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 		return super.getHeader(name);
 	}
 
+	@Override
 	public String getParameter(String name) {
 		if (params != null && params.containsKey(name))
 			return params.get(name);
@@ -54,6 +85,7 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 		return super.getParameter(name);
 	}
 
+	@Override
 	public Enumeration<String> getParameterNames() {
 		if (params == null || params.size() == 0)
 			return super.getParameterNames();
@@ -68,6 +100,7 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 		return set.elements();
 	}
 
+	@Override
 	public String[] getParameterValues(String name) {
 		if (params != null && params.containsKey(name))
 			return new String[] { params.get(name) };
@@ -75,6 +108,7 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 		return super.getParameterValues(name);
 	}
 
+	@Override
 	public Map<String, String[]> getParameterMap() {
 		if (params == null)
 			return super.getParameterMap();
@@ -86,8 +120,6 @@ public class WinletRequestWrapper extends HttpServletRequestWrapper {
 			map.put(key, new String[] { params.get(key) });
 		return map;
 	}
-
-	HashMap<String, Object> attributes = new HashMap<String, Object>();
 
 	@Override
 	public void setAttribute(String name, Object o) {
