@@ -72,6 +72,8 @@ public class Resolver extends javax.el.ELResolver implements
 		if (base == null) {
 			if (property.equals("r")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
+			} else if (property.equals("reqid")) {
+				val = ContextUtils.getReqInfo().getRequestId();
 			} else if (property.equals("sps")) {
 				val = ContextUtils.getReqInfo().getSharedPageStorage();
 			} else if (property.equals("ps")) {

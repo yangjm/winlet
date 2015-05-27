@@ -41,7 +41,7 @@ import com.aggrepoint.winlet.site.domain.Area;
  * 内容。强制预加载窗口内可以进行post操作，改变窗口本身的状态。
  * 
  * 强制预加载的窗口返回的页面中可以包含<div data-winlet=''>标签，winlet_local.js会在页面初始
- * 化和hash变更时加载这些标签指定的窗口。返回这种标签的强制预加载窗口本身不能进行post操作，因为post
+ * 化和hash变更时加载这些标签指定的窗口。返回这种标签的强制预加载窗口本身不能进行get或者post操作，因为
  * 操作返回的页面中如果再包含这种标签，winlet_local.js不会加以处理。判断预加载的窗口返回的页面中不
  * 能包含这种标签，因为winlet_local.js从服务器端获取了winlet的页面内容后，不会处理页面内容中存在
  * 的<div data-winlet>标签。

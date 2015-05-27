@@ -230,6 +230,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	public static String updateScriptWinletReference(Long wid, String str) {
 		if (wid != null) {
 			str = str.replaceAll("win\\$\\.post\\s*\\(", "win\\$._post(" + wid
+					+ ", null, ");
+			str = str.replaceAll("win\\$\\.embed\\s*\\(", "win\\$._post(" + wid
 					+ ", ");
 			str = str.replaceAll("win\\$\\.winlet\\s*\\(", "win\\$._winlet("
 					+ wid);
@@ -246,7 +248,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 			str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
 					"win\\$._aftersubmit(" + wid + ", ");
 		}
-		
+
 		return str;
 	}
 

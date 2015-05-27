@@ -37,7 +37,7 @@ public class LogInfoImpl implements LogInfo {
 
 		Long rid = (Long) request.getAttribute(REQUEST_ID_KEY);
 		if (rid == null) {
-			rid = REQUEST_ID++;
+			rid = REQUEST_ID == Long.MAX_VALUE ? 0 : REQUEST_ID++;
 			request.setAttribute(REQUEST_ID_KEY, rid);
 		}
 		requestId = rid;
