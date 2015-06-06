@@ -41,6 +41,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private WinletDef winletDef;
 	private Object winlet;
 	private boolean noPreload;
+	private boolean isFromContainer;
 
 	// 待移植
 	public boolean m_bUseAjax = true;
@@ -61,6 +62,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		requestId = REQUEST_ID++;
 
 		noPreload = getParameter(PARAM_NO_PRELOAD, null) != null;
+		isFromContainer = "y".equalsIgnoreCase(getParameter(
+				PARAM_REQ_FROM_CONTAINER, ""));
 
 		pageId = getParameter(PARAM_PAGE_PATH, null);
 		if (pageId == null)
@@ -245,6 +248,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 					+ ", ");
 			str = str.replaceAll("win\\$\\.submit\\s*\\(", "win\\$._submit("
 					+ wid + ", ");
+			str = str.replaceAll("win\\$\\.find\\s*\\(", "win\\$._find("
+					+ wid + ", ");
+			str = str.replaceAll("win\\$\\.wait\\s*\\(", "win\\$._wait("
+					+ wid + ", ");
 			str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
 					"win\\$._aftersubmit(" + wid + ", ");
 		}
@@ -312,5 +319,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public boolean noPreload() {
 		return noPreload;
+	}
+
+	@Override
+	public boolean isFromContainer() {
+		return isFromContainer;
 	}
 }

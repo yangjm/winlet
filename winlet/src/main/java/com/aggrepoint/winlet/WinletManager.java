@@ -19,7 +19,7 @@ public class WinletManager {
 	 *****************************************************************************/
 	static Hashtable<String, Object> WINLETS = new Hashtable<String, Object>();
 
-	static long SEQ_START = 1000;
+	static long SEQ_START = 10000;
 	static long seqId = SEQ_START;
 
 	public static long getSeqId() {

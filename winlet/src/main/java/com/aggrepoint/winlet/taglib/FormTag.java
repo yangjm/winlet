@@ -80,15 +80,17 @@ public class FormTag extends BodyTagSupport implements DynamicAttributes {
 		try {
 			JspWriter out = pageContext.getOut();
 
-			// {Name
-			out.print("<form name=\"");
-			out.print(m_strName);
-			// }
+			out.print("<form");
 
-			out.print("\" id=\"");
-			out.print(m_strName);
-			out.print(ri.getRequestId());
-			out.print("\"");
+			// Name
+			if (m_strName != null) {
+				out.print(" name=\"");
+				out.print(m_strName);
+				out.print("\" id=\"");
+				out.print(m_strName);
+				out.print(ri.getRequestId());
+				out.print("\"");
+			}
 
 			out.print(" action=\"");
 			out.print(ri.getPath());

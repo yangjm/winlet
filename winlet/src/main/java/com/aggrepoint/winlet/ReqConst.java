@@ -28,4 +28,7 @@ public interface ReqConst {
 
 	/** 不要预加载 */
 	public final String PARAM_NO_PRELOAD = "_np";
+
+	/** 从container发起的请求 */
+	public final String PARAM_REQ_FROM_CONTAINER = "_c";
 }

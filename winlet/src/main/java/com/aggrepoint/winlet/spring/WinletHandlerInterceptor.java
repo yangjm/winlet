@@ -207,7 +207,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			}
 
 			if (modelAndView != null) {
-				if (!cache
+				if (!reqInfo.isFromContainer()
+						&& !cache
 						&& (modelAndView.getViewName() == null || ""
 								.equals(modelAndView.getViewName()))
 						&& action != null)

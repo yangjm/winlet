@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 
@@ -397,5 +398,36 @@ public class CollectionUtils {
 		for (Integer v : col)
 			arr[i++] = v.intValue();
 		return arr;
+	}
+
+	/**
+	 * 根据主对象的组件批量加载子对象，然后把子对象分配给各个主对象
+	 * 
+	 * @param list 主对象列表
+	 * @param keyMapper 从主对象获取ID
+	 * @param childCollectionMapper 从主对象获取保存子对象的集合
+	 * @param childLoader 负责批量加载子对象
+	 * @param parentKeyMapper 从子对象中获取主对象ID
+	 * @return
+	 */
+	public static <T, K, C> Collection<T> loadChildren(Collection<T> list,
+			Function<T, K> keyMapper,
+			Function<T, Collection<C>> childCollectionMapper,
+			Function<Collection<K>, Collection<C>> childLoader,
+			Function<C, K> parentKeyMapper) {
+		Stream<C> children = childLoader.apply(
+				list.stream().map(keyMapper).collect(Collectors.toList()))
+				.stream();
+
+		list.forEach(p -> {
+			Collection<C> cc = childCollectionMapper.apply(p);
+			K key = keyMapper.apply(p);
+
+			children.filter(p1 -> parentKeyMapper.apply(p1) == key).forEach(
+					p1 -> {
+						cc.add(p1);
+					});
+		});
+		return list;
 	}
 }

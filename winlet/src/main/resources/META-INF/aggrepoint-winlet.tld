@@ -395,12 +395,13 @@
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
 		<attribute>
-			<name>name</name>
-			<required>true</required>
+			<name>action</name>
+			<!-- get method不需要指定action -->
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>action</name>
+			<name>name</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

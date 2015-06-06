@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpSession;
 
@@ -80,5 +81,15 @@ public class PageStorageImpl implements PageStorage {
 	@Override
 	public void refresh() {
 		winletRefreshSession.clear();
+	}
+
+	@Override
+	public <T> T getAttribute(Object obj, Supplier<T> supplier) {
+		T t = getAttribute(obj);
+		if (t == null) {
+			t = supplier.get();
+			setAttribute(obj, t);
+		}
+		return t;
 	}
 }

@@ -69,4 +69,6 @@ public interface ReqInfo {
 	String getWindowUrl(WinletDef winletDef, String window);
 
 	boolean noPreload();
+
+	boolean isFromContainer();
 }
