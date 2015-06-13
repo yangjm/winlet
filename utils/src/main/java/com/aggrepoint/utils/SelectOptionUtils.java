@@ -90,4 +90,17 @@ public class SelectOptionUtils {
 				});
 		return all;
 	}
+
+	public static <T> List<Option> build(List<T> list,
+			Function<T, Object> keyFunc, Function<T, Object> valueFunc) {
+		return list
+				.stream()
+				.map(p -> {
+					Object key = keyFunc.apply(p);
+					Object value = valueFunc.apply(p);
+					return new Option(key == null ? "" : key.toString(),
+							value == null ? "" : value.toString());
+				}).collect(Collectors.toList());
+	}
+
 }

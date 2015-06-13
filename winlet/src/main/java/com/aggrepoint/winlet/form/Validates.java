@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-abstract @interface Validates {
+public abstract @interface Validates {
 	Validate[] value();
 }
