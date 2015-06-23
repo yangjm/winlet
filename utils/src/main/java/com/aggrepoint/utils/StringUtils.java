@@ -770,4 +770,14 @@ public class StringUtils {
 		return out.toString();
 	}
 
+	public static String less(String str, int maxLen) {
+		if (str == null || str.length() < maxLen)
+			return str;
+
+		str = str.substring(0, maxLen);
+		int idx = str.lastIndexOf(" ");
+		if (idx > 0)
+			return str.substring(0, idx) + " ...";
+		return str + " ...";
+	}
 }

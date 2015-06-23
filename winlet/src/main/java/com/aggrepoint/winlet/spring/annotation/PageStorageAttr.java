@@ -5,12 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 
- * @author Jiangming Yang (yangjm@gmail.com)
- */
 @Target({ ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Storage {
-	String value() default "";
+public @interface PageStorageAttr {
+	String value();
+
+	boolean createIfNotExist() default false;
 }

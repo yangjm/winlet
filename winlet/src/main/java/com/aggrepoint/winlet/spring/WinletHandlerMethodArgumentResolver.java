@@ -24,7 +24,7 @@ import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
-import com.aggrepoint.winlet.spring.annotation.Storage;
+import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
 
 /**
  * 
@@ -48,7 +48,7 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| AccessRuleEngine.class.isAssignableFrom(clz)
 				|| ListProvider.class.isAssignableFrom(clz)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
-				|| parameter.getParameterAnnotation(Storage.class) != null)
+				|| parameter.getParameterAnnotation(PageStorageAttr.class) != null)
 			return true;
 
 		if (clz == Boolean.class || clz == boolean.class)
@@ -63,6 +63,19 @@ public class WinletHandlerMethodArgumentResolver implements
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
 		Class<?> clz = parameter.getParameterType();
+
+		PageStorageAttr attr = parameter
+				.getParameterAnnotation(PageStorageAttr.class);
+		if (attr != null) {
+			PageStorage ps = ContextUtils.getReqInfo().getPageStorage();
+			Object obj = ps.getAttribute(attr.value());
+			if (obj == null && attr.createIfNotExist()) {
+				obj = clz.newInstance();
+				ps.setAttribute(attr.value(), obj);
+			}
+
+			return obj;
+		}
 
 		if (clz == Boolean.class || clz == boolean.class)
 			return ContextUtils.getReqInfo().isPageRefresh();
@@ -120,11 +133,6 @@ public class WinletHandlerMethodArgumentResolver implements
 				value = cfg.def();
 			return value;
 		}
-
-		Storage s = parameter.getParameterAnnotation(Storage.class);
-		if (s != null)
-			return ContextUtils.getReqInfo().getPageStorage()
-					.getAttribute(s.value());
 
 		return null;
 	}

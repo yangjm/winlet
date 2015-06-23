@@ -236,6 +236,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 					+ ", null, ");
 			str = str.replaceAll("win\\$\\.embed\\s*\\(", "win\\$._post(" + wid
 					+ ", ");
+			str = str.replaceAll("win\\$\\.include\\s*\\(", "win\\$._include(" + wid
+					+ ", ");
 			str = str.replaceAll("win\\$\\.winlet\\s*\\(", "win\\$._winlet("
 					+ wid);
 			str = str.replaceAll("win\\$\\.ajax\\s*\\(", "win\\$._ajax(" + wid
