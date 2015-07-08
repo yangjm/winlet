@@ -1,8 +1,10 @@
 package com.aggrepoint.winlet;
 
 import java.beans.FeatureDescriptor;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -15,6 +17,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspFactory;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ArrayNode;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -68,6 +72,10 @@ public class Resolver extends javax.el.ELResolver implements
 	public Object getValue(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		Object val = null;
+
+		if (property == null) {
+			System.out.println();
+		}
 
 		if (base == null) {
 			if (property.equals("r")) {
@@ -143,6 +151,31 @@ public class Resolver extends javax.el.ELResolver implements
 				}
 			} else if (base instanceof HashMapWrapper) {
 				val = ((HashMapWrapper<?, ?>) base).get(property.toString());
+				context.setPropertyResolved(true);
+			} else if (base instanceof JsonNode) {
+				JsonNode node = ((JsonNode) base).get(property.toString());
+				val = node;
+
+				if (node != null) {
+					if (node.isArray() && node instanceof ArrayNode) {
+						List<JsonNode> dst = new ArrayList<JsonNode>();
+						for (Iterator<JsonNode> it = ((ArrayNode) node)
+								.getElements(); it.hasNext();)
+							dst.add(it.next());
+						val = dst;
+					} else if (node.isInt())
+						val = node.asInt();
+					else if (node.isBigDecimal() || node.isDouble()
+							|| node.isFloatingPointNumber())
+						val = node.asDouble();
+					else if (node.isBoolean())
+						val = node.asBoolean();
+					else if (node.isBigInteger() || node.isLong())
+						val = node.asLong();
+					else if (node.isTextual())
+						val = node.asText();
+				}
+
 				context.setPropertyResolved(true);
 			} else {
 				if (AnnotationUtils.findAnnotation(base.getClass(),

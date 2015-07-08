@@ -458,4 +458,25 @@ public class CollectionUtils {
 		});
 		return list;
 	}
+
+	public static <T> Collection<T> sort(Collection<T> list,
+			Function<T, Integer> order) {
+		if (list == null || order == null)
+			return list;
+
+		ArrayList<T> ar = new ArrayList<T>();
+		ar.addAll(list);
+		ar.sort((p1, p2) -> {
+			int order1 = order.apply(p1);
+			int order2 = order.apply(p2);
+			if (order1 > order2)
+				return 1;
+			else if (order1 < order2)
+				return -1;
+			return 0;
+		});
+		list.clear();
+		list.addAll(ar);
+		return list;
+	}
 }

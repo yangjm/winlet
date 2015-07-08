@@ -143,7 +143,7 @@
 			com.aggrepoint.winlet.taglib.ELFunction
 		</function-class>
 		<function-signature>
-			java.lang.String funcDateFormat(java.lang.String, java.util.Date)
+			java.lang.String funcDateFormat(java.lang.String, java.lang.Object)
 		</function-signature>
 	</function>
 

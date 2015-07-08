@@ -30,7 +30,7 @@ public class FormTag extends BodyTagSupport implements DynamicAttributes {
 
 	protected String m_strFocus;
 
-	protected boolean m_bValidate;
+	protected String m_strValidate;
 
 	protected Object m_objResetRef;
 
@@ -59,7 +59,7 @@ public class FormTag extends BodyTagSupport implements DynamicAttributes {
 	}
 
 	public void setValidate(String val) {
-		m_bValidate = "yes".equalsIgnoreCase(val);
+		m_strValidate = val;
 	}
 
 	public void setResetref(Object obj) {
@@ -128,8 +128,8 @@ public class FormTag extends BodyTagSupport implements DynamicAttributes {
 			}
 
 			// validate
-			if (m_bValidate)
-				out.print(" data-winlet-validate=\"yes\"");
+			if (m_strValidate != null && !m_strValidate.trim().equals(""))
+				out.print(" data-winlet-validate=\"" + m_strValidate + "\"");
 
 			// hide loading
 			if (m_bHideLoading)

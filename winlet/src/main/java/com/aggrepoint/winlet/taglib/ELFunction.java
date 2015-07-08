@@ -122,8 +122,16 @@ public class ELFunction {
 		return e;
 	}
 
-	public static String funcDateFormat(String fmt, Date date) {
-		if (fmt == null || date == null)
+	public static String funcDateFormat(String fmt, Object val) {
+		if (fmt == null || val == null)
+			return "";
+
+		Date date = null;
+		if (val instanceof Date)
+			date = (Date) val;
+		else if (val instanceof Long)
+			date = new Date((Long) val);
+		else
 			return "";
 
 		Locale locale = ContextUtils.getRequest().getLocale();

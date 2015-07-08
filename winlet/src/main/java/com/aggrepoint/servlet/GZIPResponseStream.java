@@ -28,6 +28,7 @@ public class GZIPResponseStream extends ServletOutputStream {
 		if (closed) {
 			throw new IOException("This output stream has already been closed");
 		}
+
 		gzipstream.finish();
 
 		byte[] bytes = baos.toByteArray();

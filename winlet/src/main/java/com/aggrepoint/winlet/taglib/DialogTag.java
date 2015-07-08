@@ -46,7 +46,7 @@ public class DialogTag extends BodyTagSupport implements DynamicAttributes {
 
 		Writer out = pageContext.getOut();
 		try {
-			out.write("<div id=\"ap_dialog\">");
+			out.write("<div id=\"winlet_dialog\" style=\"display:none\">");
 			out.write(new ObjectMapper().writeValueAsString(obj));
 			out.write("</div>");
 		} catch (IOException e) {

@@ -8,37 +8,18 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import com.aggrepoint.utils.ThreadContext;
-
-public class GZIPResponseWrapper extends HttpServletResponseWrapper {
+public class CORSResponseWrapper extends HttpServletResponseWrapper {
 	protected HttpServletResponse origResponse = null;
 	protected ServletOutputStream stream = null;
 	protected PrintWriter writer = null;
 
-	public GZIPResponseWrapper(HttpServletResponse response) {
+	public CORSResponseWrapper(HttpServletResponse response) {
 		super(response);
 		origResponse = response;
 	}
 
 	public ServletOutputStream createOutputStream() throws IOException {
-		if (ThreadContext.getAttribute(GZIPFilter.THREAD_ATTR_DO_NOT_FILTER) != null)
-			return origResponse.getOutputStream();
-		else {
-			return new GZIPResponseStream(origResponse);
-		}
-	}
-
-	public void finishResponse() {
-		try {
-			if (writer != null) {
-				writer.close();
-			} else {
-				if (stream != null) {
-					stream.close();
-				}
-			}
-		} catch (IOException e) {
-		}
+		return new CORSResponseStream(origResponse);
 	}
 
 	@Override

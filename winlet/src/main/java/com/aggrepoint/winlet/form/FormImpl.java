@@ -83,8 +83,9 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public boolean isValidateForm() {
-		return "yes".equalsIgnoreCase(ri.getParameter(PARAM_WIN_FORM_VALIDATE,
-				"no"));
+		String val = ri.getParameter(PARAM_WIN_FORM_VALIDATE, "no");
+		return "yes".equalsIgnoreCase(val) || "form".equals(val)
+				|| "field".equals(val);
 	}
 
 	public boolean validate(String field) {
@@ -159,6 +160,9 @@ public class FormImpl implements Form, ReqConst {
 				return new String[] { ri.getValidateFieldValue() };
 		} else {
 			String[] val = ri.getRequest().getParameterValues(name);
+
+			if (val == null)
+				return null;
 
 			if (idx == null)
 				return val;
@@ -381,6 +385,9 @@ public class FormImpl implements Form, ReqConst {
 
 	protected void mergeBindingResult(String field,
 			Collection<BindingResult> values) {
+		if (disabledFields.contains(field))
+			return;
+
 		HttpServletRequest request = ContextUtils.getRequest();
 		WebApplicationContext context = RequestContextUtils
 				.getWebApplicationContext(request);
