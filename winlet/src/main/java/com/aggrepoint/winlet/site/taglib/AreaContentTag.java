@@ -11,14 +11,13 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.site.SiteContext;
 import com.aggrepoint.winlet.site.domain.Area;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 栏位

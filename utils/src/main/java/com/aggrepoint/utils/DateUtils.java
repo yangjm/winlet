@@ -71,7 +71,7 @@ public class DateUtils {
 		now.setTime(onDate);
 		dob.setTime(dateOfBirth);
 		if (dob.after(now))
-			return 0;
+			return -1;
 
 		int year1 = now.get(Calendar.YEAR);
 		int year2 = dob.get(Calendar.YEAR);
@@ -89,5 +89,28 @@ public class DateUtils {
 		}
 
 		return age;
+	}
+
+	public static int getGrade(Date gradeDate, int grade, Date onDate) {
+		Calendar calGradeDate = Calendar.getInstance();
+		Calendar calOnDate = Calendar.getInstance();
+
+		calGradeDate.setTime(gradeDate);
+		calOnDate.setTime(onDate);
+
+		int gradeDateYear = calGradeDate.get(Calendar.YEAR);
+		if (calGradeDate.get(Calendar.MONTH) >= 8)
+			gradeDateYear++;
+		int onDateYear = calOnDate.get(Calendar.YEAR);
+		if (calOnDate.get(Calendar.MONTH) >= 8)
+			onDateYear++;
+
+		grade += (onDateYear - gradeDateYear);
+		if (grade < 0)
+			grade = 0;
+		else if (grade > 13) // 0 = JK, 1 = SK, ... 13 = grade 12
+			grade = 13;
+
+		return grade;
 	}
 }

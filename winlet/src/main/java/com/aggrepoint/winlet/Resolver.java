@@ -17,8 +17,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspFactory;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ArrayNode;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -26,6 +24,8 @@ import com.aggrepoint.winlet.spring.WinletDefaultFormattingConversionService;
 import com.aggrepoint.winlet.spring.annotation.Winlet;
 import com.aggrepoint.winlet.utils.BeanProperty;
 import com.aggrepoint.winlet.utils.EncodeUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * 支持在EL中通过w.访问Winlet对象，通过ps.访问Page Storage，通过ret.访问响应码对象，通过win访问taglib功能等
@@ -153,14 +153,19 @@ public class Resolver extends javax.el.ELResolver implements
 				val = ((HashMapWrapper<?, ?>) base).get(property.toString());
 				context.setPropertyResolved(true);
 			} else if (base instanceof JsonNode) {
+				if (property.toString().equals("cellPhone"))
+					System.out.println();
+
 				JsonNode node = ((JsonNode) base).get(property.toString());
 				val = node;
 
 				if (node != null) {
-					if (node.isArray() && node instanceof ArrayNode) {
+					if (node.isNull()) {
+						val = null;
+					} else if (node.isArray() && node instanceof ArrayNode) {
 						List<JsonNode> dst = new ArrayList<JsonNode>();
 						for (Iterator<JsonNode> it = ((ArrayNode) node)
-								.getElements(); it.hasNext();)
+								.elements(); it.hasNext();)
 							dst.add(it.next());
 						val = dst;
 					} else if (node.isInt())

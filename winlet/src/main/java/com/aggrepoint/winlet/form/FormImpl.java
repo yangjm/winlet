@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -31,6 +28,9 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.spring.WinletDefaultFormattingConversionService;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FormImpl implements Form, ReqConst {
 	static final String FORM_DATA_SESSION_KEY = FormImpl.class.getName();

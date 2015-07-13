@@ -18,7 +18,6 @@
 		<javax.servlet.jsp-version>2.1</javax.servlet.jsp-version>
 		<javax.servlet.jstl-version>1.2</javax.servlet.jstl-version>
 		<org.ow2.asm-version>5.0.3</org.ow2.asm-version>
-		<net.sf.json-lib-version>2.4</net.sf.json-lib-version>
 		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
 		<elasticsearch-version>1.4.2</elasticsearch-version>
 
@@ -63,12 +62,6 @@
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm-util</artifactId>
 			<version>${org.ow2.asm-version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.13</version>
 		</dependency>
 
 		<dependency>

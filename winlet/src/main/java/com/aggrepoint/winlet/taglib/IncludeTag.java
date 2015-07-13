@@ -6,14 +6,13 @@ import java.util.Vector;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.WinletManager;
 import com.aggrepoint.winlet.spring.WinletClassLoader;
 import com.aggrepoint.winlet.spring.def.WinletDef;
 import com.aggrepoint.winlet.utils.TypeCast;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
