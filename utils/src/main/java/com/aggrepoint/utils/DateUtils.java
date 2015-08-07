@@ -42,6 +42,9 @@ public class DateUtils {
 	}
 
 	public static Date toGmt(Date dt, TimeZone tz) {
+		if (dt == null)
+			return null;
+
 		if (tz == null)
 			tz = TimeZone.getDefault();
 
@@ -55,6 +58,9 @@ public class DateUtils {
 	}
 
 	public static Date toGmt(Date dt) {
+		if (dt == null)
+			return null;
+
 		return toGmt(dt, null);
 	}
 
