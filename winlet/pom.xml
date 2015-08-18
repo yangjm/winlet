@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.4</version>
+		<version>0.1.5</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -20,8 +20,9 @@
 		<org.ow2.asm-version>5.0.3</org.ow2.asm-version>
 		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
 		<elasticsearch-version>1.4.2</elasticsearch-version>
+		<jackson-version>2.4.2</jackson-version>
 
-		<dao-version>0.1.4</dao-version>
+		<dao-version>0.1.5</dao-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -80,8 +81,7 @@
 		<dependency>
 			<artifactId>jackson-databind</artifactId>
 			<groupId>com.fasterxml.jackson.core</groupId>
-			<version>2.4.2</version>
-			<optional>true</optional>
+			<version>${jackson-version}</version>
 		</dependency>
 	</dependencies>
 </project>

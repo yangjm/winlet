@@ -153,9 +153,6 @@ public class Resolver extends javax.el.ELResolver implements
 				val = ((HashMapWrapper<?, ?>) base).get(property.toString());
 				context.setPropertyResolved(true);
 			} else if (base instanceof JsonNode) {
-				if (property.toString().equals("cellPhone"))
-					System.out.println();
-
 				JsonNode node = ((JsonNode) base).get(property.toString());
 				val = node;
 

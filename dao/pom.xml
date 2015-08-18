@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.4</version>
+		<version>0.1.5</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -22,7 +22,7 @@
 		<validation-api-version>1.1.0.Final</validation-api-version>
 		<spring-data-elasticsearch-version>1.1.0.RELEASE</spring-data-elasticsearch-version>
 
-		<utils-version>0.1.4</utils-version>
+		<utils-version>0.1.5</utils-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
