@@ -220,9 +220,15 @@ public class FormValidator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 
 					boolean noValue[] = new boolean[1];
-					Double val = (Double) BeanProperty.convert(value, DOUBLE,
-							noValue);
-					if (noValue[0]
+					boolean error = false;
+					Double val = 0d;
+					try {
+						val = (Double) BeanProperty.convert(value, DOUBLE,
+								noValue);
+					} catch (Exception e) {
+						error = true;
+					}
+					if (error || noValue[0]
 							|| val <= Double.parseDouble(vecArgs.elementAt(0)))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase(">=")
@@ -231,9 +237,15 @@ public class FormValidator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 
 					boolean noValue[] = new boolean[1];
-					Double val = (Double) BeanProperty.convert(value, DOUBLE,
-							noValue);
-					if (noValue[0]
+					boolean error = false;
+					Double val = 0d;
+					try {
+						val = (Double) BeanProperty.convert(value, DOUBLE,
+								noValue);
+					} catch (Exception e) {
+						error = true;
+					}
+					if (error || noValue[0]
 							|| val < Double.parseDouble(vecArgs.elementAt(0)))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase("<")
@@ -242,9 +254,15 @@ public class FormValidator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 
 					boolean noValue[] = new boolean[1];
-					Double val = (Double) BeanProperty.convert(value, DOUBLE,
-							noValue);
-					if (noValue[0]
+					boolean error = false;
+					Double val = 0d;
+					try {
+						val = (Double) BeanProperty.convert(value, DOUBLE,
+								noValue);
+					} catch (Exception e) {
+						error = true;
+					}
+					if (error || noValue[0]
 							|| val >= Double.parseDouble(vecArgs.elementAt(0)))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase("<=")
@@ -253,9 +271,15 @@ public class FormValidator implements PropertyTypeCode {
 						return new ValidateResult(failSkip, strErrorMsg);
 
 					boolean noValue[] = new boolean[1];
-					Double val = (Double) BeanProperty.convert(value, DOUBLE,
-							noValue);
-					if (noValue[0]
+					boolean error = false;
+					Double val = 0d;
+					try {
+						val = (Double) BeanProperty.convert(value, DOUBLE,
+								noValue);
+					} catch (Exception e) {
+						error = true;
+					}
+					if (error || noValue[0]
 							|| val > Double.parseDouble(vecArgs.elementAt(0)))
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else {

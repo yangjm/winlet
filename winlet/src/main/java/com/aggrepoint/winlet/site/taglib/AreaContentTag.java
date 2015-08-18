@@ -57,7 +57,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * data-winlet-url属性。判断预加载窗口既有data-winlet，也有data-winlet-url。普通顶级窗口
  * 只有data-winlet属性，没有data-winlet-url。服务器端include的子窗口与强制加载窗口类似，
  * 没有data-winlet属性，但是有data-winlet-url属性。按回退按钮导致hash变更时，强制预加载窗口和
- * 被include生成的子窗口都无需被加载，因此他们都没有data-winlet属性。
+ * 被include生成的子窗口都无需被加载，因此他们都没有data-winlet属性。参考Redmine中关于Winlet
+ * 容器的说明。
  * 
  * </pre>
  * 
