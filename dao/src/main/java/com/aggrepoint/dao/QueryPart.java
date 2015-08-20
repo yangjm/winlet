@@ -18,7 +18,7 @@ import com.aggrepoint.dao.annotation.Replace;
 public class QueryPart {
 	static Pattern P_PARAM = Pattern
 			.compile(":([\\w\\d]+(\\___[\\w\\d\\_]+)?(\\[.*\\])?)");
-	static Pattern P_REPLACE = Pattern.compile("^[\\w\\d\\s\\.,]*$");
+	static Pattern P_REPLACE = Pattern.compile("^[\\w\\d\\s\\.,=]*$");
 
 	boolean optional;
 	String part;

@@ -21,6 +21,7 @@ public class Page extends Base {
 	private String path;
 	private String template;
 	private String link;
+	private String title;
 	private boolean skip;
 	private boolean hide;
 	private boolean expand;
@@ -106,6 +107,14 @@ public class Page extends Base {
 
 	public void setLink(String link) {
 		this.link = link;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public boolean isSkip() {

@@ -32,6 +32,7 @@ public class PageDao {
 			page.setRule(cfgs.get("rule"));
 			page.setTemplate(cfgs.get("template"));
 			page.setLink(cfgs.get("link"));
+			page.setTitle(cfgs.get("title"));
 			page.setSkip("".equals(cfgs.get("skip"))
 					|| "true".equalsIgnoreCase(cfgs.get("skip")));
 			page.setHide("".equals(cfgs.get("hide"))

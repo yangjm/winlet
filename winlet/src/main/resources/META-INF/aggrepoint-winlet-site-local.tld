@@ -270,4 +270,10 @@
 		<tagclass>com.aggrepoint.winlet.site.taglib.PreloadWinletTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 	</tag>
+
+	<tag>
+		<name>title</name>
+		<tagclass>com.aggrepoint.winlet.site.taglib.TitleTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+	</tag>
 </taglib>
