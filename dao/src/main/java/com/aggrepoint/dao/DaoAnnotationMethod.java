@@ -18,9 +18,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Column;
+import javax.persistence.EntityManager;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.CacheManager;
@@ -71,7 +73,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	static private KeyGenerator keyGenerator = new DaoCacheKeyGenerator();
 
 	Class<T> clz;
-	SessionFactory factory;
+	EntityManager entityManager;
+	SessionFactory sessionFactory;
 	CacheManager cacheManager;
 	ConversionService cs;
 	Method method;
@@ -100,11 +103,20 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 			this.count = count;
 	};
 
+	private Session getSession() {
+		if (entityManager != null)
+			return entityManager.unwrap(Session.class);
+		if (sessionFactory != null)
+			return sessionFactory.getCurrentSession();
+		return null;
+	}
+
 	public DaoAnnotationMethod(Class<T> clz, Method method, Annotation ann,
-			List<IFunc> funcs, SessionFactory factory,
+			List<IFunc> funcs, EntityManager manager, SessionFactory factory,
 			CacheManager cacheManager, ConversionService cs) {
 		this.clz = clz;
-		this.factory = factory;
+		this.entityManager = manager;
+		this.sessionFactory = factory;
 		this.cacheManager = cacheManager;
 		this.cs = cs;
 		this.method = method;
@@ -606,9 +618,9 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 				}
 
 				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL)
-					queryObject = factory.getCurrentSession().createSQLQuery(q);
+					queryObject = getSession().createSQLQuery(q);
 				else
-					queryObject = factory.getCurrentSession().createQuery(
+					queryObject = getSession().createQuery(
 							q.replaceAll(FETCH, " "));
 
 				for (String param : paramsInUse)
@@ -658,14 +670,12 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 			if (pageList == null || pageList.getTotalCount() != 0) {
 				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
-					SQLQuery q = factory.getCurrentSession().createSQLQuery(
-							query);
+					SQLQuery q = getSession().createSQLQuery(query);
 					queryObject = q;
 					if (entityClass != null)
 						q.addEntity(entityClass);
 				} else
-					queryObject = factory.getCurrentSession()
-							.createQuery(query);
+					queryObject = getSession().createQuery(query);
 
 				for (String param : paramsInUse)
 					DaoBaseMethod.applyNamedParameterToQuery(queryObject,
@@ -715,7 +725,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 			}
 		case TYPE_UPDATE:
 		case TYPE_DELETE: {
-			queryObject = factory.getCurrentSession().createQuery(query);
+			queryObject = getSession().createQuery(query);
 			for (String param : paramsInUse)
 				DaoBaseMethod.applyNamedParameterToQuery(queryObject, param,
 						values.get(param));
@@ -729,7 +739,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		}
 		case TYPE_UPDATE_SQL:
 		case TYPE_DELETE_SQL: {
-			queryObject = factory.getCurrentSession().createSQLQuery(query);
+			queryObject = getSession().createSQLQuery(query);
 			for (String param : paramsInUse)
 				DaoBaseMethod.applyNamedParameterToQuery(queryObject, param,
 						values.get(param));

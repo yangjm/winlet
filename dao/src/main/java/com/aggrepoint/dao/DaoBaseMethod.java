@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -81,12 +83,23 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 					new Class[] { Object.class, ReplicationMode.class },
 					HibernateDao.class } };
 
-	SessionFactory factory;
+	EntityManager entityManager;
+	SessionFactory sessionFactory;
 	int methodId;
 
-	public DaoBaseMethod(Class<T> clz, Method method, SessionFactory factory) {
+	private Session getSession() {
+		if (entityManager != null)
+			return entityManager.unwrap(Session.class);
+		if (sessionFactory != null)
+			return sessionFactory.getCurrentSession();
+		return null;
+	}
+
+	public DaoBaseMethod(Class<T> clz, Method method, EntityManager manager,
+			SessionFactory factory) {
 		this.clz = clz;
-		this.factory = factory;
+		this.entityManager = manager;
+		this.sessionFactory = factory;
 
 		for (Object[] m : methods) {
 			if (!method.getName().equals(m[1]))
@@ -121,8 +134,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	@SuppressWarnings("unchecked")
 	public List<T> find(final String queryString, final Object... values)
 			throws DataAccessException {
-		Query queryObject = factory.getCurrentSession()
-				.createQuery(queryString);
+		Query queryObject = getSession().createQuery(queryString);
 		// SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
@@ -136,8 +148,8 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	public List<T> findByCriteria(final DetachedCriteria criteria,
 			final int firstResult, final int maxResults)
 			throws DataAccessException {
-		Criteria executableCriteria = criteria.getExecutableCriteria(factory
-				.getCurrentSession());
+		Criteria executableCriteria = criteria
+				.getExecutableCriteria(getSession());
 		// SessionFactoryUtils.applyTransactionTimeout(executableCriteria,
 		// factory);
 		if (firstResult >= 0) {
@@ -164,8 +176,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	public List<T> findByNamedParam(final String queryString,
 			final String[] paramNames, final Object[] values)
 			throws DataAccessException {
-		Query queryObject = factory.getCurrentSession()
-				.createQuery(queryString);
+		Query queryObject = getSession().createQuery(queryString);
 		// SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++)
@@ -178,8 +189,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	@SuppressWarnings("unchecked")
 	public List<T> findByNamedQuery(final String queryName,
 			final Object... values) throws DataAccessException {
-		Query queryObject = factory.getCurrentSession()
-				.getNamedQuery(queryName);
+		Query queryObject = getSession().getNamedQuery(queryName);
 		// SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
@@ -193,8 +203,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	public List<T> findByNamedQueryAndNamedParam(final String queryName,
 			final String[] paramNames, final Object[] values)
 			throws DataAccessException {
-		Query queryObject = factory.getCurrentSession()
-				.getNamedQuery(queryName);
+		Query queryObject = getSession().getNamedQuery(queryName);
 		// SessionFactoryUtils.applyTransactionTimeout(queryObject, factory);
 		if (values != null) {
 			for (int i = 0; i < values.length; i++) {
@@ -209,36 +218,36 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 	public Object invoke(Object proxy, Method method, Object[] args) {
 		switch (methodId) {
 		case 101:
-			return factory.getCurrentSession().save(args[0]);
+			return getSession().save(args[0]);
 		case 102:
-			factory.getCurrentSession().saveOrUpdate(args[0]);
+			getSession().saveOrUpdate(args[0]);
 			return null;
 		case 103:
-			return factory.getCurrentSession().get(clz, (Serializable) args[0]);
+			return getSession().get(clz, (Serializable) args[0]);
 		case 104:
-			Criteria criteria = factory.getCurrentSession().createCriteria(clz);
+			Criteria criteria = getSession().createCriteria(clz);
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			// SessionFactoryUtils.applyTransactionTimeout(criteria, factory);
 			return criteria.list();
 		case 105:
-			factory.getCurrentSession().update(args[0]);
+			getSession().update(args[0]);
 			return null;
 		case 106:
-			factory.getCurrentSession().delete(args[0]);
+			getSession().delete(args[0]);
 			return null;
 		case 107:
-			Session session = factory.getCurrentSession();
+			Session session = getSession();
 			for (T t : (Collection<T>) args[0])
 				session.delete(t);
 			return null;
 
 		case 1:
-			factory.getCurrentSession().clear();
+			getSession().clear();
 			return null;
 		case 2:
-			return factory.getCurrentSession().contains(args[0]);
+			return getSession().contains(args[0]);
 		case 3:
-			factory.getCurrentSession().evict(args[0]);
+			getSession().evict(args[0]);
 			return null;
 		case 4:
 			return find((String) args[0], (Object[]) null);
@@ -270,22 +279,21 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 			return findByNamedQueryAndNamedParam((String) args[0],
 					(String[]) args[1], (Object[]) args[2]);
 		case 16:
-			factory.getCurrentSession().flush();
+			getSession().flush();
 			return null;
 		case 17:
-			factory.getCurrentSession().load(args[0], (Serializable) args[1]);
+			getSession().load(args[0], (Serializable) args[1]);
 			return null;
 		case 18:
-			return factory.getCurrentSession().merge(args[0]);
+			return getSession().merge(args[0]);
 		case 19:
-			factory.getCurrentSession().persist(args[0]);
+			getSession().persist(args[0]);
 			return null;
 		case 20:
-			factory.getCurrentSession().refresh(args[0]);
+			getSession().refresh(args[0]);
 			return null;
 		case 21:
-			factory.getCurrentSession().replicate(args[0],
-					(ReplicationMode) args[1]);
+			getSession().replicate(args[0], (ReplicationMode) args[1]);
 			return null;
 		}
 

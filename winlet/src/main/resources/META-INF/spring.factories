@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.aggrepoint.winlet.spring.boot.WinletAutoConfiguration
+
+org.springframework.context.ApplicationContextInitializer=\
+com.aggrepoint.winlet.spring.boot.WinletContextInitializer

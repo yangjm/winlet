@@ -57,7 +57,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		// URI。如果不封装，或者封装类不从HttpServletRequestWrapper派生，则ReqInfoImpl中request.getRequestURI()可以正常工作。为了避免这个问题，这里直接将requestURI取出保存。
 		requestPath = request.getRequestURI();
 		int idx = requestPath.indexOf("/", 1);
-		requestPath = requestPath.substring(idx);
+		if (idx > 0)
+			requestPath = requestPath.substring(idx);
 
 		requestId = REQUEST_ID++;
 
@@ -236,8 +237,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 					+ ", null, ");
 			str = str.replaceAll("win\\$\\.embed\\s*\\(", "win\\$._post(" + wid
 					+ ", ");
-			str = str.replaceAll("win\\$\\.include\\s*\\(", "win\\$._include(" + wid
-					+ ", ");
+			str = str.replaceAll("win\\$\\.include\\s*\\(", "win\\$._include("
+					+ wid + ", ");
 			str = str.replaceAll("win\\$\\.winlet\\s*\\(", "win\\$._winlet("
 					+ wid);
 			str = str.replaceAll("win\\$\\.ajax\\s*\\(", "win\\$._ajax(" + wid
@@ -250,10 +251,10 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 					+ ", ");
 			str = str.replaceAll("win\\$\\.submit\\s*\\(", "win\\$._submit("
 					+ wid + ", ");
-			str = str.replaceAll("win\\$\\.find\\s*\\(", "win\\$._find("
-					+ wid + ", ");
-			str = str.replaceAll("win\\$\\.wait\\s*\\(", "win\\$._wait("
-					+ wid + ", ");
+			str = str.replaceAll("win\\$\\.find\\s*\\(", "win\\$._find(" + wid
+					+ ", ");
+			str = str.replaceAll("win\\$\\.wait\\s*\\(", "win\\$._wait(" + wid
+					+ ", ");
 			str = str.replaceAll("win\\$\\.aftersubmit\\s*\\(",
 					"win\\$._aftersubmit(" + wid + ", ");
 		}

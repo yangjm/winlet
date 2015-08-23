@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.SessionFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.convert.ConversionService;
@@ -28,7 +30,8 @@ import com.aggrepoint.dao.annotation.Updates;
 public class DaoInvocationHandler<T> implements InvocationHandler, Serializable {
 	private static final long serialVersionUID = 1L;
 
-	SessionFactory factory;
+	EntityManager entityManager;
+	SessionFactory sessionFactory;
 	CacheManager cacheManager;
 	Class<T> clz;
 	Hashtable<Method, ArrayList<DaoMethod<T>>> htDaoMethods = new Hashtable<Method, ArrayList<DaoMethod<T>>>();
@@ -43,10 +46,12 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 		arr.add(daoMethod);
 	}
 
-	public DaoInvocationHandler(SessionFactory factory,
-			CacheManager cacheManager, ConversionService cs,
-			Class<?> daoInterface, Class<T> clz, List<IFunc> funcs) {
-		this.factory = factory;
+	public DaoInvocationHandler(EntityManager entityManager,
+			SessionFactory factory, CacheManager cacheManager,
+			ConversionService cs, Class<?> daoInterface, Class<T> clz,
+			List<IFunc> funcs) {
+		this.entityManager = entityManager;
+		this.sessionFactory = factory;
 		this.cacheManager = cacheManager;
 		this.clz = clz;
 
@@ -56,7 +61,7 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 			for (Method m : DaoService.class.getMethods()) {
 				if (method.equals(m)) {
 					addDaoMethod(method, new DaoBaseMethod<T>(clz, method,
-							factory));
+							entityManager, sessionFactory));
 					found = true;
 					break;
 				}
@@ -66,7 +71,7 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 				for (Method m : HibernateDao.class.getMethods()) {
 					if (method.equals(m)) {
 						addDaoMethod(method, new DaoBaseMethod<T>(clz, method,
-								factory));
+								entityManager, sessionFactory));
 						found = true;
 						break;
 					}
@@ -78,25 +83,26 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 					if (t == Find.class || t == Cache.class
 							|| t == Update.class || t == Delete.class) {
 						addDaoMethod(method, new DaoAnnotationMethod<T>(clz,
-								method, ann, funcs, factory, cacheManager, cs));
+								method, ann, funcs, entityManager,
+								sessionFactory, cacheManager, cs));
 						found = true;
 					} else if (t == Finds.class) {
 						for (Annotation a : ((Finds) ann).value())
 							addDaoMethod(method, new DaoAnnotationMethod<T>(
-									clz, method, a, funcs, factory,
-									cacheManager, cs));
+									clz, method, a, funcs, entityManager,
+									sessionFactory, cacheManager, cs));
 						found = true;
 					} else if (t == Updates.class) {
 						for (Annotation a : ((Updates) ann).value())
 							addDaoMethod(method, new DaoAnnotationMethod<T>(
-									clz, method, a, funcs, factory,
-									cacheManager, cs));
+									clz, method, a, funcs, entityManager,
+									sessionFactory, cacheManager, cs));
 						found = true;
 					} else if (t == Deletes.class) {
 						for (Annotation a : ((Deletes) ann).value())
 							addDaoMethod(method, new DaoAnnotationMethod<T>(
-									clz, method, a, funcs, factory,
-									cacheManager, cs));
+									clz, method, a, funcs, entityManager,
+									sessionFactory, cacheManager, cs));
 						found = true;
 					}
 				}

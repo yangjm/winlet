@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -25,14 +28,18 @@ import org.springframework.core.type.filter.TypeFilter;
  * 
  */
 public class DaoScanner extends ClassPathBeanDefinitionScanner {
-	List<IFunc> functions;
+	private List<IFunc> functions;
+	private EntityManager entityManager;
+	private SessionFactory sessionFactory;
 
 	public DaoScanner(BeanDefinitionRegistry registry,
 			ResourceLoader resourceLoader, BeanNameGenerator beanNameGenerator,
-			List<IFunc> funcs) {
+			List<IFunc> funcs, EntityManager manager, SessionFactory factory) {
 		super(registry, false);
 
 		functions = funcs;
+		entityManager = manager;
+		sessionFactory = factory;
 		setResourceLoader(resourceLoader);
 		setBeanNameGenerator(beanNameGenerator);
 
@@ -84,6 +91,10 @@ public class DaoScanner extends ClassPathBeanDefinitionScanner {
 				definition.getPropertyValues().add("daoInterface",
 						definition.getBeanClassName());
 				definition.getPropertyValues().add("funcs", functions);
+				definition.getPropertyValues().add("entityManager",
+						entityManager);
+				definition.getPropertyValues().add("sessionFactory",
+						sessionFactory);
 				definition.setBeanClass(DaoFactoryBean.class);
 
 				definition
@@ -94,14 +105,23 @@ public class DaoScanner extends ClassPathBeanDefinitionScanner {
 		return beanDefinitions;
 	}
 
+	static final String DAO_SERVICE_NAME = DaoService.class.getName();
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected boolean isCandidateComponent(
 			AnnotatedBeanDefinition beanDefinition) {
-		return (beanDefinition.getMetadata().isInterface() && beanDefinition
-				.getMetadata().isIndependent());
+		if (!beanDefinition.getMetadata().isInterface()
+				|| !beanDefinition.getMetadata().isIndependent())
+			return false;
+
+		String[] intfs = beanDefinition.getMetadata().getInterfaceNames();
+		if (intfs == null || intfs.length != 1)
+			return false;
+
+		return DAO_SERVICE_NAME.equals(intfs[0]);
 	}
 
 	/**

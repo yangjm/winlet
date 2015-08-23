@@ -11,6 +11,7 @@ import org.springframework.dao.DataAccessException;
  * @author Jiangming Yang (yangjm@gmail.com)
  * 
  */
+@Dao
 public interface DaoService<T> {
 	default Serializable create(T entity) throws DataAccessException {
 		return null;

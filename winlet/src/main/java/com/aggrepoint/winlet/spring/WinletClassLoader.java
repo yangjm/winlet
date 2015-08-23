@@ -45,11 +45,14 @@ public class WinletClassLoader extends ClassLoader {
 		Winlet winlet = AnnotationUtils.findAnnotation(clz, Winlet.class);
 		boolean process = winlet != null;
 		if (!process) {
-			for (Method m : clz.getMethods()) {
-				process = AnnotationUtils.findAnnotation(m, Action.class) != null
-						|| AnnotationUtils.findAnnotation(m, Window.class) != null;
-				if (process)
-					break;
+			try {
+				for (Method m : clz.getMethods()) {
+					process = AnnotationUtils.findAnnotation(m, Action.class) != null
+							|| AnnotationUtils.findAnnotation(m, Window.class) != null;
+					if (process)
+						break;
+				}
+			} catch (NoClassDefFoundError e) {
 			}
 		}
 

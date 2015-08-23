@@ -5,6 +5,9 @@ import static org.springframework.util.Assert.notNull;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
+import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
@@ -33,6 +36,8 @@ public class DaoScannerConfigurer implements
 		ApplicationContextAware, BeanNameAware {
 	private String basePackage;
 	private ApplicationContext applicationContext;
+	private EntityManager entityManager;
+	private SessionFactory sessionFactory;
 
 	private String beanName;
 
@@ -48,6 +53,22 @@ public class DaoScannerConfigurer implements
 
 	public void setBasePackage(String basePackage) {
 		this.basePackage = basePackage;
+	}
+
+	public EntityManager getEntityManager() {
+		return entityManager;
+	}
+
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 	@Override
@@ -103,8 +124,8 @@ public class DaoScannerConfigurer implements
 		if (this.processPropertyPlaceHolders)
 			processPropertyPlaceHolders();
 
-		DaoScanner scanner = new DaoScanner(registry,
-				applicationContext, nameGenerator, functions);
+		DaoScanner scanner = new DaoScanner(registry, applicationContext,
+				nameGenerator, functions, entityManager, sessionFactory);
 		scanner.scan(StringUtils.tokenizeToStringArray(this.basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
 	}

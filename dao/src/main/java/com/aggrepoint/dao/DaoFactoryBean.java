@@ -8,11 +8,15 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -22,7 +26,9 @@ import org.springframework.dao.support.DaoSupport;
 
 /**
  * 不能注入SessionFactory，不能在checkDaoConfig时获取SessionFactory，
- * 因为会造成嵌套加载其他扫描Dao对象的情况，对象数量多时会引起堆栈溢出
+ * 因为会造成嵌套加载其他扫描Dao对象的情况，对象数量多时会引起堆栈溢出。
+ * 
+ * 需要支持多个数据源时，可以明确指定entityManager或sessionFactory参数，指向负责
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
@@ -32,6 +38,8 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 
 	private static ConversionService conversionService;
 	private ApplicationContext ctx;
+	private EntityManager entityManager;
+	private SessionFactory sessionFactory;
 	private Class<T> daoInterface;
 	private T proxy;
 	private Class<K> domainClz;
@@ -40,6 +48,14 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
 		ctx = applicationContext;
+	}
+
+	public void setEntityManager(EntityManager manager) {
+		entityManager = manager;
+	}
+
+	public void setSessionFactory(SessionFactory factory) {
+		sessionFactory = factory;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,6 +122,25 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 		return conversionService;
 	}
 
+	private EntityManager getEntityManager() {
+		if (entityManager == null)
+			try {
+				entityManager = ctx.getBean(EntityManagerFactory.class)
+						.createEntityManager();
+			} catch (NoSuchBeanDefinitionException e) {
+			}
+		return entityManager;
+	}
+
+	private SessionFactory getSessionFactory() {
+		if (sessionFactory == null)
+			try {
+				sessionFactory = ctx.getBean(SessionFactory.class);
+			} catch (NoSuchBeanDefinitionException e) {
+			}
+		return sessionFactory;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -125,11 +160,10 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 					}
 				}
 
-				proxy = (T) Proxy.newProxyInstance(
-						daoInterface.getClassLoader(),
-						new Class[] { daoInterface },
-						new DaoInvocationHandler<K>(ctx
-								.getBean(SessionFactory.class), cm,
+				proxy = (T) Proxy.newProxyInstance(daoInterface
+						.getClassLoader(), new Class[] { daoInterface },
+						new DaoInvocationHandler<K>(getEntityManager(),
+								getSessionFactory(), cm,
 								getConversionService(), daoInterface,
 								domainClz, funcs));
 			} catch (Throwable t) {
