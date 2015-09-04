@@ -86,6 +86,10 @@ public class Resolver extends javax.el.ELResolver implements
 				val = ContextUtils.getReqInfo().getSharedPageStorage();
 			} else if (property.equals("ps")) {
 				val = ContextUtils.getReqInfo().getPageStorage();
+			} else if (property.equals("prule")) {
+				val = ContextUtils.getPsnRuleEngine(ContextUtils.getRequest());
+			} else if (property.equals("arule")) {
+				val = ContextUtils.getAccessRuleEngine(ContextUtils.getRequest());
 			} else if (property.equals("u")) {
 				val = ContextUtils.getUser(ContextUtils.getRequest());
 			} else if (property.equals("c")) { // config provider

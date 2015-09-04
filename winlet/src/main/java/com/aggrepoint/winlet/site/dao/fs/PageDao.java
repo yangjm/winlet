@@ -31,6 +31,8 @@ public class PageDao {
 				page.setName(page.getPath());
 			page.setRule(cfgs.get("rule"));
 			page.setTemplate(cfgs.get("template"));
+			page.setTemplatePrefixes(BranchDao.parseTemplatePrefix(cfgs
+					.get("template-prefix")));
 			page.setLink(cfgs.get("link"));
 			page.setTitle(cfgs.get("title"));
 			page.setSkip("".equals(cfgs.get("skip"))

@@ -198,11 +198,12 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					return;
 				}
 
-				if (!"".equals(modelAndView.getViewName())
-						&& modelAndView.getViewName().indexOf("/") == -1) {
-					modelAndView.setViewName(def.getViewPath() + "/"
-							+ modelAndView.getViewName());
-					return;
+				if (!"".equals(modelAndView.getViewName())) {
+					if (modelAndView.getViewName().indexOf("/") != 0) {
+						modelAndView.setViewName(def.getViewPath() + "/"
+								+ modelAndView.getViewName());
+						return;
+					}
 				}
 			}
 

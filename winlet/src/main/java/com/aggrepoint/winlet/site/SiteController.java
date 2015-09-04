@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
 import com.aggrepoint.winlet.Context;
+import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.site.domain.Branch;
 import com.aggrepoint.winlet.site.domain.Page;
 
@@ -131,7 +132,7 @@ public class SiteController {
 
 	@RequestMapping(value = "/site/**")
 	public Object site(HttpServletRequest req, HttpServletResponse resp,
-			AccessRuleEngine engine) {
+			AccessRuleEngine engine, PsnRuleEngine psnEngine) {
 		String path = req.getServletPath().substring(5);
 
 		try {
@@ -163,7 +164,8 @@ public class SiteController {
 					SiteContext sc = new SiteContext(req, page);
 					req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
 
-					return "/WEB-INF/site/template/" + page.getTemplate()
+					return "/WEB-INF/site/template/"
+							+ page.getPsnTemplate(psnEngine)
 							+ ".jsp";
 				}
 			}

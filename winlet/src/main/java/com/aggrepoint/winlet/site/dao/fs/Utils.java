@@ -41,13 +41,18 @@ public class Utils {
 							new InputStreamReader(new FileInputStream(f),
 									"UTF-8"));
 					String line = lnr.readLine();
+
 					while (line != null) {
-						int idx = line.indexOf(":");
-						if (idx > 0)
-							cfgs.put(line.substring(0, idx).trim(), line
-									.substring(idx + 1).trim());
-						else
-							cfgs.put(line, "");
+						line = line.trim();
+
+						if (!line.equals("") && !line.startsWith("#")) {
+							int idx = line.indexOf(":");
+							if (idx > 0)
+								cfgs.put(line.substring(0, idx).trim(), line
+										.substring(idx + 1).trim());
+							else
+								cfgs.put(line, "");
+						}
 						line = lnr.readLine();
 					}
 					lnr.close();

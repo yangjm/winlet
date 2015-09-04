@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.PsnRuleEngine;
 
 /**
  * 
@@ -20,6 +21,7 @@ public class Page extends Base {
 	private Branch branch;
 	private String path;
 	private String template;
+	private Hashtable<String, String> templatePrefixes;
 	private String link;
 	private String title;
 	private boolean skip;
@@ -34,7 +36,8 @@ public class Page extends Base {
 	private String fullPath;
 	private String fullDir;
 
-	public void init(Page p, List<Area> cascade, String tmpl) {
+	public void init(Page p, List<Area> cascade, String tmpl,
+			Hashtable<String, String> prefix) {
 		Collections.sort(pages);
 
 		branch = p.branch;
@@ -55,6 +58,8 @@ public class Page extends Base {
 
 		if (template == null)
 			template = tmpl;
+		if (templatePrefixes == null)
+			templatePrefixes = prefix;
 
 		areasByName.clear();
 		for (Area area : areas) {
@@ -67,7 +72,7 @@ public class Page extends Base {
 		}
 
 		for (Page pg : pages)
-			pg.init(this, c2, template);
+			pg.init(this, c2, template, templatePrefixes);
 	}
 
 	public Branch getBranch() {
@@ -93,12 +98,33 @@ public class Page extends Base {
 		this.fullDir = dir;
 	}
 
+	public String getPsnTemplate(PsnRuleEngine psnEngine) throws Exception {
+		if (templatePrefixes == null)
+			return template;
+
+		for (String rule : templatePrefixes.keySet())
+			if (psnEngine.eval(rule))
+				return templatePrefixes.get(rule) + template;
+
+		logger.warn("No matching tempalte prefix found for page" + fullPath
+				+ ", use default template.");
+		return template;
+	}
+
 	public String getTemplate() {
 		return template;
 	}
 
 	public void setTemplate(String template) {
 		this.template = template;
+	}
+
+	public Hashtable<String, String> getTemplatePrefixes() {
+		return templatePrefixes;
+	}
+
+	public void setTemplatePrefixes(Hashtable<String, String> templatePrefixes) {
+		this.templatePrefixes = templatePrefixes;
 	}
 
 	public String getLink() {

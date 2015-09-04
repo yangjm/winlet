@@ -2,6 +2,7 @@ package com.aggrepoint.winlet.site.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
@@ -14,6 +15,7 @@ public class Branch extends Base {
 	private String path;
 	private boolean isStatic;
 	private String template;
+	private Hashtable<String, String> templatePrefixes;
 	/** 仅用于static branch，当用户给定的URL没有对应的文件存在则使用index对应的文件 */
 	private String index;
 	private List<Area> areas = new ArrayList<Area>();
@@ -36,7 +38,7 @@ public class Branch extends Base {
 		Collections.sort(rootPage.getPages());
 
 		for (Page p : rootPage.getPages())
-			p.init(rootPage, areas, template);
+			p.init(rootPage, areas, template, templatePrefixes);
 	}
 
 	public String getPath() {
@@ -61,6 +63,14 @@ public class Branch extends Base {
 
 	public void setTemplate(String template) {
 		this.template = template;
+	}
+
+	public Hashtable<String, String> getTemplatePrefixes() {
+		return templatePrefixes;
+	}
+
+	public void setTemplatePrefixes(Hashtable<String, String> templatePrefixes) {
+		this.templatePrefixes = templatePrefixes;
 	}
 
 	public String getIndex() {
