@@ -15,6 +15,8 @@ public interface ReqConst {
 	public final String PARAM_WIN_FORM_FIELDS = "_ff";
 	public final String PARAM_WIN_FORM_DISABLED_FIELD = "_fd";
 
+	public final String PARAM_ESCAPED_HASH = "_escaped_fragment_";
+
 	/**
 	 * 与_a一样，_r的值可以包含_w和_wv的值，用!分隔
 	 */

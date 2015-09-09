@@ -10,6 +10,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfoImpl;
@@ -22,7 +23,6 @@ import com.aggrepoint.winlet.spring.annotation.Window;
 import com.aggrepoint.winlet.spring.def.ControllerMethodDef;
 import com.aggrepoint.winlet.spring.def.ReturnDef;
 import com.aggrepoint.winlet.spring.def.WinletDef;
-import com.aggrepoint.winlet.utils.StringUtils;
 
 /**
  * <pre>

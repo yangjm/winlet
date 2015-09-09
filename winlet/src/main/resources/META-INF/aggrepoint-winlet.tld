@@ -38,6 +38,16 @@
 	</function>
 
 	<function>
+		<name>less</name>
+		<function-class>
+			com.aggrepoint.winlet.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String less(java.lang.String, java.lang.Integer)
+		</function-signature>
+	</function>
+
+	<function>
 		<name>htmlencode</name>
 		<function-class>
 			com.aggrepoint.winlet.taglib.ELFunction

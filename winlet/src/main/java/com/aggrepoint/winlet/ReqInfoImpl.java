@@ -1,11 +1,16 @@
 package com.aggrepoint.winlet;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.spring.WinletRequestWrapper;
@@ -42,9 +47,14 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private Object winlet;
 	private boolean noPreload;
 	private boolean isFromContainer;
-
-	// 待移植
-	public boolean m_bUseAjax = true;
+	/** 搜索引擎用_escaped_fargment_参数请求时为true */
+	private boolean hashEscaped;
+	/** 当hashEscaped = true时：hash中的参数 */
+	private HashMap<String, HashMap<String, String>> hashParams;
+	/** 当hashEscaped = true时：hash中顶层页面的URL */
+	private String topPageUrl;
+	/** 当hashEscaped = true时：hash中顶层页面的参数 */
+	private HashMap<String, String> topPageParams;
 
 	public ReqInfoImpl(HttpServletRequest request, String path) {
 		this.request = request;
@@ -89,7 +99,120 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 		form = new FormImpl(this);
 
+		parseEscapedHash(getParameter(PARAM_ESCAPED_HASH, null));
+
 		ContextUtils.setReqInfo(this);
+	}
+
+	private HashMap<String, String> getHashParams(String group,
+			boolean createIfNotExist) {
+		if (hashParams == null) {
+			if (!createIfNotExist)
+				return null;
+
+			hashParams = new HashMap<String, HashMap<String, String>>();
+		}
+
+		if (!hashParams.containsKey(group)) {
+			if (!createIfNotExist)
+				return null;
+
+			hashParams.put(group, new HashMap<String, String>());
+		}
+
+		return hashParams.get(group);
+	}
+
+	// 普通winlet参数的名称，例如：3[page]
+	static final Pattern P_GROUP_PARAM = Pattern
+			.compile("^(\\w)\\[([^\\]]+)\\]$");
+	// 页面url，例如_p[1][u]
+	static final Pattern P_PAGE_URL = Pattern
+			.compile("^_p\\[(\\d+)\\]\\[u\\]$");
+	// 页面参数，例如_p[1][p][programId]
+	static final Pattern P_PAGE_PARAMETER = Pattern
+			.compile("^_p\\[(\\d+)\\]\\[p\\]\\[([^\\]]+)\\]$");
+
+	/**
+	 * Example of hash value:
+	 * 
+	 * <pre>
+	 * type=10&_p%5B0%5D%5Bu%5D=11&_p%5B0%5D%5Bp%5D%5BprogramId%5D=14402&addr=Toronto
+	 * 3%5Bpage%5D=3&type=10&addr=L4C+9H5
+	 * </pre>
+	 * 
+	 * @param hash
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private boolean parseEscapedHash(String hash) {
+		if (StringUtils.isEmpty(hash))
+			return false;
+
+		hashEscaped = true;
+		int maxPage = -1;
+
+		try {
+			for (String str : hash.split("&")) {
+				int idx = str.indexOf("=");
+				if (idx <= 0)
+					continue;
+
+				String name = URLDecoder.decode(str.substring(0, idx), "UTF-8");
+				String value = URLDecoder.decode(str.substring(idx + 1),
+						"UTF-8");
+
+				if (name.indexOf("[") == -1) {
+					getHashParams("root", true).put(name, value);
+					continue;
+				}
+
+				Matcher m = P_GROUP_PARAM.matcher(name);
+				if (m.find()) {
+					getHashParams(m.group(1), true).put(m.group(2), value);
+					continue;
+				}
+
+				m = P_PAGE_URL.matcher(name);
+				if (m.find()) {
+					int page = Integer.parseInt(m.group(1));
+
+					if (page > maxPage)
+						topPageParams = null;
+
+					if (page >= maxPage) {
+						maxPage = page;
+						topPageUrl = value;
+						continue;
+					}
+				}
+
+				m = P_PAGE_PARAMETER.matcher(name);
+				if (m.find()) {
+					int page = Integer.parseInt(m.group(1));
+
+					if (page > maxPage) {
+						topPageUrl = null;
+						topPageParams = null;
+					}
+
+					if (page >= maxPage) {
+						if (topPageParams == null)
+							topPageParams = new HashMap<String, String>();
+						topPageParams.put(m.group(2), value);
+						continue;
+					}
+				}
+
+				// 不支持的参数，忽略不处理
+				System.err.println("Unsupported escaped hash parameter name: "
+						+ name + ", value: " + value);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return true;
 	}
 
 	@Override
@@ -327,5 +450,24 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public boolean isFromContainer() {
 		return isFromContainer;
+	}
+
+	public boolean isHashEscaped() {
+		return hashEscaped;
+	}
+
+	public HashMap<String, String> getHashParams(String group) {
+		if (group == null || hashParams == null
+				|| !hashParams.containsKey(group))
+			return null;
+		return hashParams.get(group);
+	}
+
+	public String getTopPageUrl() {
+		return topPageUrl;
+	}
+
+	public HashMap<String, String> getTopPageParams() {
+		return topPageParams;
 	}
 }

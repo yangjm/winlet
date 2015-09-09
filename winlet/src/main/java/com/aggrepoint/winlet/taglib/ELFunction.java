@@ -19,13 +19,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.Resolver;
 import com.aggrepoint.winlet.UrlConstructor;
 import com.aggrepoint.winlet.utils.BeanProperty;
 import com.aggrepoint.winlet.utils.EncodeUtils;
-import com.aggrepoint.winlet.utils.StringUtils;
 
 /**
  * 
@@ -49,6 +49,12 @@ public class ELFunction {
 
 	public static String bom() {
 		return strBOM;
+	}
+
+	public static String less(String str, Integer len) {
+		if (str == null)
+			return "";
+		return StringUtils.less(str, len);
 	}
 
 	public static String htmlEncode(String str) {
