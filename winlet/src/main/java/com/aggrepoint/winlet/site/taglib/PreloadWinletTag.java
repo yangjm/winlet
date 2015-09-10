@@ -277,11 +277,9 @@ public class PreloadWinletTag extends BodyTagSupport {
 					sb.append("<meta name=\"").append(key)
 							.append("\" content=\"")
 							.append(metaByName.get(key)).append("\"/>");
-					String replace = "<meta\\s+name\\s*=\\s*\"\\s*"
+					content = content.replaceAll("<meta\\s+name\\s*=\\s*\"\\s*"
 							+ Matcher.quoteReplacement(key)
-							+ "\\s*\"\\s+content\\s*=\\s*\"[^\"]*\"[^>]*>";
-					System.out.println(replace);
-					content = content.replaceAll(replace, "");
+							+ "\\s*\"\\s+content\\s*=\\s*\"[^\"]*\"[^>]*>", "");
 				}
 				for (String key : metaByProperty.keySet()) {
 					sb.append("<meta property=\"").append(key)

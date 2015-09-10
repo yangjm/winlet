@@ -99,7 +99,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 		form = new FormImpl(this);
 
-		parseEscapedHash(getParameter(PARAM_ESCAPED_HASH, null));
+		parseEscapedHash(getParameter(PARAM_ESCAPED_FRAGMENT, null));
 
 		ContextUtils.setReqInfo(this);
 	}
