@@ -82,6 +82,8 @@ public class PreloadWinletTag extends BodyTagSupport {
 			.compile("<meta\\s+name\\s*=\\s*\"([^\"]+)\"\\s+content\\s*=\\s*\"([^\"]+)\"[^>]*>");
 	static Pattern META_BY_PROPERTY = Pattern
 			.compile("<meta\\s+property\\s*=\\s*\"([^\"]+)\"\\s+content\\s*=\\s*\"([^\"]+)\"[^>]*>");
+	static Pattern CANONICAL_LINK = Pattern
+			.compile("<link[^>]*\\s+rel\\s*=\\s*\"\\s*canonical\\s*\"[^>]*>");
 
 	static Pattern HASH_GROUP_URL = Pattern.compile("^/?\\w+/\\w+/");
 	static Pattern BODY = Pattern.compile("(<body[^>]*>).*</body>",
@@ -270,9 +272,20 @@ public class PreloadWinletTag extends BodyTagSupport {
 			}
 
 			// 页面中必须存在</head>标签，设置的meta data才会被处理
-			if ((metaByName.size() > 0 || metaByProperty.size() > 0)
-					&& content.indexOf("</head>") > 0) {
+			if (content.indexOf("</head>") > 0) {
 				StringBuffer sb = new StringBuffer();
+
+				if (metaByName.get("canonical") != null) { // 明确指定了canonical url
+					content = CANONICAL_LINK.matcher(content).replaceAll("");
+					sb.append("<link href=\"" + metaByName.get("canonical")
+							+ "\" rel=\"canonical\" />");
+				} else if (metaByProperty.get("og:url") != null) {
+					if (!CANONICAL_LINK.matcher(content).find())// 设置了og:url，页面中原来没有canonical
+																// link，添加上
+						sb.append("<link href=\"" + metaByName.get("canonical")
+								+ "\" rel=\"canonical\" />");
+				}
+
 				for (String key : metaByName.keySet()) {
 					sb.append("<meta name=\"").append(key)
 							.append("\" content=\"")
