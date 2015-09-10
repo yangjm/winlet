@@ -84,7 +84,8 @@ public class PreloadWinletTag extends BodyTagSupport {
 			.compile("<meta\\s+property\\s*=\\s*\"([^\"]+)\"\\s+content\\s*=\\s*\"([^\"]+)\"[^>]*>");
 
 	static Pattern HASH_GROUP_URL = Pattern.compile("^/?\\w+/\\w+/");
-	static Pattern BODY = Pattern.compile("<body[^>]*>");
+	static Pattern BODY = Pattern.compile("(<body[^>]*>).*</body>",
+			Pattern.DOTALL);
 
 	public static String preloadWinlet(ReqInfo reqInfo, String content,
 			boolean wholeBody) throws Exception {
@@ -103,163 +104,164 @@ public class PreloadWinletTag extends BodyTagSupport {
 						"<div data-winlet=\"$1\">$2</div>");
 		}
 
-		HashMap<String, String> hashGroups = new HashMap<String, String>();
-		Function<String, String> getHashGroupKey = p -> {
-			Matcher m = HASH_GROUP_URL.matcher(p);
-			if (m.find())
-				p = m.group();
-			return p;
-		};
-		Function<String, String> getHashGroup = p -> {
-			p = getHashGroupKey.apply(p);
-			if (!hashGroups.containsKey(p))
-				hashGroups.put(p, Integer.toString(hashGroups.size() + 1));
-			return hashGroups.get(p);
-		};
-
 		HashMap<String, String> metaByName = new HashMap<String, String>();
 		HashMap<String, String> metaByProperty = new HashMap<String, String>();
 
-		while (true) {
-			Matcher m = pattern.matcher(content);
-			if (!m.find())
-				break;
+		if (wholeBody && ri.isHashEscaped() && ri.getTopPageUrl() != null) {
+			// 只加载top page
+			// 页面中必须有<body>，top page内容才会执行和插入到返回的页面中
+			Matcher m = BODY.matcher(content);
+			if (m.find()) {
+				HashMap<String, String> reqParams = new HashMap<String, String>();
+				reqParams.put(ReqConst.PARAM_PAGE_PATH, ri.getPageId());
+				reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
+				if (ri.getTopPageParams() != null)
+					reqParams.putAll(ri.getTopPageParams());
+				String str = ri.getWindowContent(WinletManager.getSeqId(),
+						ri.getTopPageUrl(), reqParams, null);
 
-			boolean forced = false;
+				// { 提取meta
+				while (true) {
+					Matcher mm = META_BY_NAME.matcher(str);
+					if (!mm.find())
+						break;
 
-			if (ri.isHashEscaped())
-				forced = true;
-			else
-				forced = m.group(7).equals("data-preload-forced");
-
-			String params = null;
-
-			HashMap<String, String> reqParams = new HashMap<String, String>();
-			if (m.group(4) != null) {
-				StringTokenizer st = new StringTokenizer(m.group(4), "&");
-				while (st.hasMoreElements()) {
-					String s = st.nextToken();
-					int idx = s.indexOf("=");
-					if (idx >= 0)
-						reqParams
-								.put(s.substring(0, idx), s.substring(idx + 1));
-				}
-			}
-			if (reqParams.size() > 0)
-				params = new ObjectMapper().writeValueAsString(reqParams);
-
-			reqParams.put(ReqConst.PARAM_PAGE_PATH, ri.getPageId());
-			reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
-
-			long wid = WinletManager.getSeqId();
-
-			String settings = m.group(5);
-			if (settings == null)
-				settings = "";
-
-			if (ri.isHashEscaped()) { // 把hash中的参数带上
-				if (settings.indexOf("root:yes") > 0
-						&& !hashGroups.containsKey("root")) {
-					hashGroups.put(
-							getHashGroupKey.apply(ri.getRequest()
-									.getContextPath() + m.group(2)), "root");
-				}
-
-				HashMap<String, String> hashParams = ri
-						.getHashParams(getHashGroup.apply(ri.getRequest()
-								.getContextPath() + m.group(2)));
-				if (hashParams != null)
-					reqParams.putAll(hashParams);
-			}
-
-			String str = ri.getWindowContent(wid, m.group(2), reqParams, null);
-
-			// { 提取meta
-			while (true) {
-				Matcher mm = META_BY_NAME.matcher(str);
-				if (!mm.find())
-					break;
-
-				if (!metaByName.containsKey(mm.group(1).trim()))
 					metaByName.put(mm.group(1).trim(), mm.group(2));
-				str = mm.replaceFirst("");
+					str = mm.replaceFirst("");
+				}
+
+				while (true) {
+					Matcher mm = META_BY_PROPERTY.matcher(str);
+					if (!mm.find())
+						break;
+
+					metaByProperty.put(mm.group(1).trim(), mm.group(2));
+					str = mm.replaceFirst("");
+				}
+				// }
+
+				str = m.group(1) + str + "</body>";
+				content = m.replaceFirst(Matcher.quoteReplacement(str));
 			}
+		} else {
+			HashMap<String, String> hashGroups = new HashMap<String, String>();
+			Function<String, String> getHashGroupKey = p -> {
+				Matcher m = HASH_GROUP_URL.matcher(p);
+				if (m.find())
+					p = m.group();
+				return p;
+			};
+			Function<String, String> getHashGroup = p -> {
+				p = getHashGroupKey.apply(p);
+				if (!hashGroups.containsKey(p))
+					hashGroups.put(p, Integer.toString(hashGroups.size() + 1));
+				return hashGroups.get(p);
+			};
 
 			while (true) {
-				Matcher mm = META_BY_PROPERTY.matcher(str);
-				if (!mm.find())
+				Matcher m = pattern.matcher(content);
+				if (!m.find())
 					break;
 
-				if (!metaByProperty.containsKey(mm.group(1).trim()))
-					metaByProperty.put(mm.group(1).trim(), mm.group(2));
-				str = mm.replaceFirst("");
-			}
-			// }
+				boolean forced = false;
 
-			StringBuffer sb = new StringBuffer();
+				if (ri.isHashEscaped())
+					forced = true;
+				else
+					forced = m.group(7).equals("data-preload-forced");
 
-			sb.append("<div data-winlet-id=\"").append(wid).append("\"");
+				String params = null;
 
-			if (!forced)
-				sb.append(" data-winlet=\"")
+				HashMap<String, String> reqParams = new HashMap<String, String>();
+				if (m.group(4) != null) {
+					StringTokenizer st = new StringTokenizer(m.group(4), "&");
+					while (st.hasMoreElements()) {
+						String s = st.nextToken();
+						int idx = s.indexOf("=");
+						if (idx >= 0)
+							reqParams.put(s.substring(0, idx),
+									s.substring(idx + 1));
+					}
+				}
+				if (reqParams.size() > 0)
+					params = new ObjectMapper().writeValueAsString(reqParams);
+
+				reqParams.put(ReqConst.PARAM_PAGE_PATH, ri.getPageId());
+				reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
+
+				long wid = WinletManager.getSeqId();
+
+				String settings = m.group(5);
+				if (settings == null)
+					settings = "";
+
+				if (ri.isHashEscaped()) { // 把hash中的参数带上
+					if (settings.indexOf("root:yes") > 0
+							&& !hashGroups.containsKey("root")) {
+						hashGroups
+								.put(getHashGroupKey.apply(ri.getRequest()
+										.getContextPath() + m.group(2)), "root");
+					}
+
+					HashMap<String, String> hashParams = ri
+							.getHashParams(getHashGroup.apply(ri.getRequest()
+									.getContextPath() + m.group(2)));
+					if (hashParams != null)
+						reqParams.putAll(hashParams);
+				}
+
+				String str = ri.getWindowContent(wid, m.group(2), reqParams,
+						null);
+
+				// { 提取meta
+				while (true) {
+					Matcher mm = META_BY_NAME.matcher(str);
+					if (!mm.find())
+						break;
+
+					if (!metaByName.containsKey(mm.group(1).trim()))
+						metaByName.put(mm.group(1).trim(), mm.group(2));
+					str = mm.replaceFirst("");
+				}
+
+				while (true) {
+					Matcher mm = META_BY_PROPERTY.matcher(str);
+					if (!mm.find())
+						break;
+
+					if (!metaByProperty.containsKey(mm.group(1).trim()))
+						metaByProperty.put(mm.group(1).trim(), mm.group(2));
+					str = mm.replaceFirst("");
+				}
+				// }
+
+				StringBuffer sb = new StringBuffer();
+
+				sb.append("<div data-winlet-id=\"").append(wid).append("\"");
+
+				if (!forced)
+					sb.append(" data-winlet=\"")
+							.append(ri.getRequest().getContextPath())
+							.append(m.group(2)).append(settings).append("\"");
+
+				sb.append(" data-winlet-url=\"")
 						.append(ri.getRequest().getContextPath())
-						.append(m.group(2)).append(settings).append("\"");
+						.append(m.group(2)).append("\"");
 
-			sb.append(" data-winlet-url=\"")
-					.append(ri.getRequest().getContextPath())
-					.append(m.group(2)).append("\"");
+				if (params != null)
+					sb.append(" data-winlet-params=\"")
+							.append(params.replaceAll("\"", "&quot;"))
+							.append("\"");
 
-			if (params != null)
-				sb.append(" data-winlet-params=\"")
-						.append(params.replaceAll("\"", "&quot;")).append("\"");
+				// TODO: settings处理
 
-			// TODO: settings处理
-
-			sb.append(">").append(str).append("</div>");
-			content = m.replaceFirst(Matcher.quoteReplacement(sb.toString()));
+				sb.append(">").append(str).append("</div>");
+				content = m
+						.replaceFirst(Matcher.quoteReplacement(sb.toString()));
+			}
 		}
 
 		if (wholeBody) {
-			// 页面中必须有<body>，top page内容才会执行和插入到返回的页面中
-			if (ri.isHashEscaped() && ri.getTopPageUrl() != null) {
-				Matcher m = BODY.matcher(content);
-				if (m.find()) {
-					String find = m.group();
-
-					HashMap<String, String> reqParams = new HashMap<String, String>();
-					reqParams.put(ReqConst.PARAM_PAGE_PATH, ri.getPageId());
-					reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
-					if (ri.getTopPageParams() != null)
-						reqParams.putAll(ri.getTopPageParams());
-					String str = ri.getWindowContent(WinletManager.getSeqId(),
-							ri.getTopPageUrl(), reqParams, null);
-
-					// { 提取meta
-					while (true) {
-						Matcher mm = META_BY_NAME.matcher(str);
-						if (!mm.find())
-							break;
-
-						metaByName.put(mm.group(1).trim(), mm.group(2));
-						str = mm.replaceFirst("");
-					}
-
-					while (true) {
-						Matcher mm = META_BY_PROPERTY.matcher(str);
-						if (!mm.find())
-							break;
-
-						metaByProperty.put(mm.group(1).trim(), mm.group(2));
-						str = mm.replaceFirst("");
-					}
-					// }
-
-					int idx = content.indexOf(find) + find.length();
-					content = content.substring(0, idx) + str
-							+ content.substring(idx);
-				}
-			}
-
 			// 页面中必须有<title>...</title>标签，设置的title才会生效
 			if (metaByName.get("title") != null) {
 				content = content.replaceAll("<title>[^<]*</title>", "<title>"
