@@ -2,10 +2,12 @@ package com.aggrepoint.winlet.site.taglib;
 
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.tagext.BodyContent;
@@ -15,7 +17,9 @@ import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.ReqInfoImpl;
+import com.aggrepoint.winlet.StaticUrlProvider;
 import com.aggrepoint.winlet.WinletManager;
+import com.aggrepoint.winlet.site.SiteController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -89,7 +93,7 @@ public class PreloadWinletTag extends BodyTagSupport {
 	static Pattern BODY = Pattern.compile("(<body[^>]*>).*</body>",
 			Pattern.DOTALL);
 
-	public static String preloadWinlet(ReqInfo reqInfo, String content,
+	static public String preloadWinlet(ReqInfo reqInfo, String content,
 			boolean wholeBody) throws Exception {
 		ReqInfoImpl ri = (ReqInfoImpl) reqInfo;
 
@@ -108,6 +112,57 @@ public class PreloadWinletTag extends BodyTagSupport {
 
 		HashMap<String, String> metaByName = new HashMap<String, String>();
 		HashMap<String, String> metaByProperty = new HashMap<String, String>();
+		HttpServletRequest request = reqInfo.getRequest();
+		String pagePath = (String) request
+				.getAttribute(SiteController.PAGE_PATH);
+		String rootUrl = request.getScheme()
+				+ "://"
+				+ request.getServerName()
+				+ ("http".equals(request.getScheme())
+						&& request.getServerPort() == 80
+						|| "https".equals(request.getScheme())
+						&& request.getServerPort() == 443 ? "" : ":"
+						+ request.getServerPort())
+				+ (pagePath == null ? "" : pagePath);
+
+		Consumer<StaticUrlProvider> processUrlProvider = urlProvider -> {
+			if (urlProvider != null) {
+				if (urlProvider.getNameMetas() != null)
+					for (String key : urlProvider.getNameMetas().keySet())
+						if (!metaByName.containsKey(key)) {
+							String value = urlProvider.getNameMetas().get(key);
+							if (key.equals("canonical")) { // 把canonical路径补充完整
+								if (pagePath == null)
+									value = null;
+								else if (value.startsWith("/"))
+									value = rootUrl + value.substring(1);
+								else
+									value = rootUrl + value;
+							}
+
+							if (value != null)
+								metaByName.put(key, value);
+						}
+
+				if (urlProvider.getPropertyMetas() != null)
+					for (String key : urlProvider.getPropertyMetas().keySet())
+						if (!metaByProperty.containsKey(key)) {
+							String value = urlProvider.getPropertyMetas().get(
+									key);
+							if (key.equals("og:url")) { // 把og:url路径补充完整
+								if (pagePath == null)
+									value = null;
+								else if (value.startsWith("/"))
+									value = rootUrl + value.substring(1);
+								else
+									value = rootUrl + value;
+							}
+
+							if (value != null)
+								metaByProperty.put(key, value);
+						}
+			}
+		};
 
 		if (wholeBody && ri.isHashEscaped() && ri.getTopPageUrl() != null) {
 			// 只加载top page
@@ -119,8 +174,10 @@ public class PreloadWinletTag extends BodyTagSupport {
 				reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
 				if (ri.getTopPageParams() != null)
 					reqParams.putAll(ri.getTopPageParams());
-				String str = ri.getWindowContent(WinletManager.getSeqId(),
-						ri.getTopPageUrl(), reqParams, null);
+				String str = ri
+						.getWindowContent(WinletManager.getSeqId(),
+								ri.getTopPageUrl(), reqParams, null,
+								processUrlProvider);
 
 				// { 提取meta
 				while (true) {
@@ -213,7 +270,7 @@ public class PreloadWinletTag extends BodyTagSupport {
 				}
 
 				String str = ri.getWindowContent(wid, m.group(2), reqParams,
-						null);
+						null, processUrlProvider);
 
 				// { 提取meta
 				while (true) {
@@ -266,8 +323,8 @@ public class PreloadWinletTag extends BodyTagSupport {
 		if (wholeBody) {
 			// 页面中必须有<title>...</title>标签，设置的title才会生效
 			if (metaByName.get("title") != null) {
-				content = content.replaceAll("<title>[^<]*</title>", "<title>"
-						+ metaByName.get("title") + "</title>");
+				content = content.replaceAll("<title>([^<]*)</title>",
+						"<title>" + metaByName.get("title") + "</title>");
 				metaByName.remove("title");
 			}
 

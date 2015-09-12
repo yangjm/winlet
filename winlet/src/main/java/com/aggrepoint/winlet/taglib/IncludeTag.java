@@ -77,7 +77,7 @@ public class IncludeTag extends BodyTagSupport {
 				String windowUrl = ri.getWindowUrl(winletDef, win);
 				long wid = WinletManager.getSeqId();
 				String response = ri.getWindowContent(wid, windowUrl, m_params,
-						null);
+						null, null);
 
 				StringBuffer sb = new StringBuffer();
 				sb.append(

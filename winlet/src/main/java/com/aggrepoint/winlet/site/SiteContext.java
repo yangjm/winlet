@@ -17,8 +17,8 @@ public class SiteContext {
 	private Page page;
 	private UrlConstructor uc;
 
-	public SiteContext(HttpServletRequest req, Page p) {
-		uc = new UrlConstructor(req);
+	public SiteContext(HttpServletRequest req, Page p, String urlPrefix) {
+		uc = new UrlConstructor(req, urlPrefix);
 		page = p;
 	}
 

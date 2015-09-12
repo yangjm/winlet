@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -63,8 +64,8 @@ public interface ReqInfo {
 	WinletDef getWinletDef();
 
 	String getWindowContent(Long wid, String windowUrl,
-			Map<String, String> params, Map<String, Object> attributes)
-			throws Exception;
+			Map<String, String> params, Map<String, Object> attributes,
+			Consumer<StaticUrlProvider> returnProvider) throws Exception;
 
 	String getWindowUrl(WinletDef winletDef, String window);
 

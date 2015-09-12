@@ -1,10 +1,9 @@
 package com.aggrepoint.winlet.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import com.aggrepoint.winlet.UrlConstructor;
+import com.aggrepoint.winlet.site.SiteContext;
 
 /**
  * 构造页面的URL
@@ -26,9 +25,10 @@ public class PathUrlTag extends TagSupport {
 
 	public int doStartTag() throws JspException {
 		try {
-			pageContext.getOut().print(
-					new UrlConstructor((HttpServletRequest) pageContext
-							.getRequest()).getPageUrl(m_strPath));
+			SiteContext sc = (SiteContext) pageContext.getRequest()
+					.getAttribute(SiteContext.SITE_CONTEXT_KEY);
+
+			pageContext.getOut().print(sc.getPageUrl(m_strPath));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new JspException(e.getMessage());

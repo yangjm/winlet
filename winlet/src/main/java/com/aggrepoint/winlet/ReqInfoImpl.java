@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -387,8 +388,8 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 	@Override
 	public String getWindowContent(Long wid, String windowUrl,
-			Map<String, String> params, Map<String, Object> attributes)
-			throws Exception {
+			Map<String, String> params, Map<String, Object> attributes,
+			Consumer<StaticUrlProvider> returnProvider) throws Exception {
 		LogInfoImpl log = ContextUtils.getLogInfo(request);
 
 		HashMap<String, String> reqParams = new HashMap<String, String>();
@@ -407,13 +408,16 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		// 因此ADK无法正确判断被include的资源。使用forward则不存在这个问题。因为已经
 		// 使用了responseWrapper，因此用forward也是可行的。
 		try {
+			WinletRequestWrapper wrapper = new WinletRequestWrapper(request,
+					null, reqParams, attributes);
 			// 避免被包含的功能改变当前LogInfo
 			ContextUtils.setLogInfo(request, null);
-			request.getServletContext()
-					.getRequestDispatcher(windowUrl)
-					.forward(
-							new WinletRequestWrapper(request, null, reqParams,
-									attributes), response);
+			request.getServletContext().getRequestDispatcher(windowUrl)
+					.forward(wrapper, response);
+
+			if (returnProvider != null)
+				returnProvider.accept((StaticUrlProvider) wrapper
+						.getAttribute(StaticUrlProvider.REQ_ATTR_KEY));
 		} finally {
 			// 恢复当前请求的ReqInfo
 			ContextUtils.setReqInfo(this);

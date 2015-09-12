@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.ConfigurableMimeFileTypeMap;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
@@ -42,6 +43,8 @@ public class SiteController {
 	static FileSystemCfgLoader loader;
 	/** 分支配置 */
 	static ArrayList<Branch> branches;
+
+	public static final String PAGE_PATH = "PAGE_PATH";
 
 	private static void updateBranches() {
 		if (context == null)
@@ -130,9 +133,16 @@ public class SiteController {
 		return new ResponseEntity<byte[]>(bytes, headers, HttpStatus.CREATED);
 	}
 
+	/**
+	 * urlPrefix - 前段HTTP服务器或者反向代理添加的URL前段，例如/portal/site/home
+	 */
 	@RequestMapping(value = "/site/**")
-	public Object site(HttpServletRequest req, HttpServletResponse resp,
-			AccessRuleEngine engine, PsnRuleEngine psnEngine) {
+	public Object site(
+			HttpServletRequest req,
+			HttpServletResponse resp,
+			AccessRuleEngine engine,
+			PsnRuleEngine psnEngine,
+			@RequestHeader(value = "X-Url-Prefix", required = false) String urlPrefix) {
 		String path = req.getServletPath().substring(5);
 
 		try {
@@ -161,12 +171,13 @@ public class SiteController {
 					return returnFile(branch,
 							path.replace(page.getFullPath(), page.getFullDir()));
 				} else {
-					SiteContext sc = new SiteContext(req, page);
+					SiteContext sc = new SiteContext(req, page, urlPrefix);
 					req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
+					req.setAttribute(PAGE_PATH,
+							sc.getPageUrl(page.getFullPath()));
 
 					return "/WEB-INF/site/template/"
-							+ page.getPsnTemplate(psnEngine)
-							+ ".jsp";
+							+ page.getPsnTemplate(psnEngine) + ".jsp";
 				}
 			}
 		} catch (Exception e) {

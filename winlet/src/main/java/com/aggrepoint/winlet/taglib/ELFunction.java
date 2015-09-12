@@ -23,7 +23,8 @@ import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.Resolver;
-import com.aggrepoint.winlet.UrlConstructor;
+import com.aggrepoint.winlet.StaticUrlProvider;
+import com.aggrepoint.winlet.site.SiteController;
 import com.aggrepoint.winlet.utils.BeanProperty;
 import com.aggrepoint.winlet.utils.EncodeUtils;
 
@@ -398,11 +399,6 @@ public class ELFunction {
 			return req.getContextPath() + "/" + param;
 	}
 
-	public static String funcPageUrl(String param) {
-		ReqInfo reqInfo = ContextUtils.getReqInfo();
-		return new UrlConstructor(reqInfo.getRequest()).getPageUrl(param);
-	}
-
 	public static int funcToInt(Object val) {
 		if (val instanceof Double)
 			return ((Double) val).intValue();
@@ -415,6 +411,26 @@ public class ELFunction {
 		if (val instanceof Short)
 			return ((Short) val).intValue();
 		return 0;
+	}
+
+	/**
+	 * 生成静态链接
+	 */
+	public static String href(String param, String value) {
+		HttpServletRequest req = ContextUtils.getRequest();
+		String pagePath = (String) req.getAttribute(SiteController.PAGE_PATH);
+		if (pagePath == null)
+			return "javascript:void(0)";
+		StaticUrlProvider urlProvider = (StaticUrlProvider) req
+				.getAttribute(StaticUrlProvider.REQ_ATTR_KEY);
+		if (urlProvider == null)
+			return "javascript:void(0)";
+		String url = urlProvider.getUrl(param, value);
+		if (url == null)
+			return pagePath;
+		if (url.startsWith("/"))
+			return pagePath + url.substring(1);
+		return pagePath + url;
 	}
 
 	// public static String resurl(String param, boolean isStatic) {
