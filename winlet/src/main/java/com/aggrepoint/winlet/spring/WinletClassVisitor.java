@@ -18,7 +18,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  * 1) 若类上定义了Scope或RequestMapping注解，则将其去除
  * 2) 为类添加Scope("winlet")注解
  * 2) 为类添加RequestMapping注解
- * 3) 若方法上定义了@RequestMapping注解，则将注解去除
+ * !! 3) 若方法上定义了@RequestMapping注解，则将注解去除 !! - 20150917 不去除 － Winlet中也可以直接定义@RequestMapping方法
  * 4) 若@Window注解没有指明value，则将其方法名替换为value
  * 5) 对于所有@Window注解，创建对应的RequestMapping注解
  * 6) 若Action注解没有指明value，则将其方法名替换为value
@@ -102,9 +102,6 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 			@Override
 			public AnnotationVisitor visitAnnotation(String desc,
 					boolean visible) {
-				if (DESC_REQUEST_MAPPING.equals(desc))
-					return null;
-
 				if (DESC_WINDOW.equals(desc)) {
 					hasWindow = true;
 

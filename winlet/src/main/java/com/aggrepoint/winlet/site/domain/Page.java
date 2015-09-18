@@ -2,6 +2,7 @@ package com.aggrepoint.winlet.site.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class Page extends Base {
 	private int level;
 	private String fullPath;
 	private String fullDir;
+
+	protected HashMap<String, String> data;
 
 	public void init(Page p, List<Area> cascade, String tmpl,
 			Hashtable<String, String> prefix) {
@@ -283,5 +286,19 @@ public class Page extends Base {
 			return this;
 
 		return list.get(0).findNotSkip(re);
+	}
+
+	public HashMap<String, String> getDataMap() {
+		if (data == null)
+			data = new HashMap<String, String>();
+		return data;
+	}
+
+	public void addData(String name, String value) {
+		getDataMap().put(name, value);
+	}
+
+	public String getData(String name) {
+		return getDataMap().get(name);
 	}
 }

@@ -57,14 +57,18 @@ public class WinletRequestMappingHandlerMapping extends
 			clz = classMap.get(hm);
 
 		if (clz != null) { // This is a Winlet
-			if (req.getActionId() == null) {
+			if (req.getActionId() == null) { // 没有指定Action
+				Window annotation = AnnotationUtils.findAnnotation(
+						hm.getMethod(), Window.class);
+				if (annotation == null) // 不是@Window方法
+					return hm;
+
 				WinletDef def = WinletDef.getDef(clz);
 				Object winlet = WinletManager.getWinlet(Context.get(), def);
 				req.setWinlet(def, winlet);
 
 				return new HandlerMethod(winlet, def.getWindow(
-						AnnotationUtils.findAnnotation(hm.getMethod(),
-								Window.class).value()).getMethod());
+						annotation.value()).getMethod());
 			} else {
 				int idx = req.getActionId().indexOf(".");
 				if (idx > 0) {

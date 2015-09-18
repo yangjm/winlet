@@ -45,6 +45,7 @@ public class SiteController {
 	static ArrayList<Branch> branches;
 
 	public static final String PAGE_PATH = "PAGE_PATH";
+	public static final String PAGE_DATA = "PAGE_DATA";
 
 	private static void updateBranches() {
 		if (context == null)
@@ -175,6 +176,7 @@ public class SiteController {
 					req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
 					req.setAttribute(PAGE_PATH,
 							sc.getPageUrl(page.getFullPath()));
+					req.setAttribute(PAGE_DATA, page.getDataMap());
 
 					return "/WEB-INF/site/template/"
 							+ page.getPsnTemplate(psnEngine) + ".jsp";

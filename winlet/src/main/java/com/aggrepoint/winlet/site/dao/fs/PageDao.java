@@ -26,6 +26,11 @@ public class PageDao {
 			Utils.getNameAndOrder(page, dir);
 			page.setPath(page.getName());
 			Hashtable<String, String> cfgs = Utils.loadCfg(dir);
+
+			for (String str : cfgs.keySet())
+				if (str.startsWith("data."))
+					page.addData(str.substring(5), cfgs.get(str));
+
 			page.setName(cfgs.get("name"));
 			if (page.getName() == null)
 				page.setName(page.getPath());
