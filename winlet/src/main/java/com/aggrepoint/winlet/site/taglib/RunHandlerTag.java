@@ -48,7 +48,8 @@ public class RunHandlerTag extends TagSupport {
 				// 恢复当前请求的LogInfo
 				ContextUtils.setLogInfo(req, log);
 			}
-
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 

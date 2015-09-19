@@ -113,6 +113,8 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 
 		try {
 			super.service(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			li.complete();
 			for (RequestLogger rl : loggers.values())
