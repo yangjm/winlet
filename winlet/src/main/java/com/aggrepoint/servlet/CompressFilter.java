@@ -41,7 +41,8 @@ public class CompressFilter implements Filter {
 						"This output stream has already been closed");
 			}
 
-			if (response.getContentType().startsWith("text/html")) {
+			String contentType = response.getContentType();
+			if (contentType != null && contentType.startsWith("text/html")) {
 				String html = baos.toString();
 				HtmlCompressor compressor = new HtmlCompressor();
 				compressor.setCompressJavaScript(true);
