@@ -55,6 +55,7 @@ public class ELFunction {
 	public static String less(String str, Integer len) {
 		if (str == null)
 			return "";
+		str = str.replaceAll("<.+?>", "").replace("\n", "").replace("\r", "");
 		return StringUtils.less(str, len);
 	}
 

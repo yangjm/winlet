@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -20,6 +23,11 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 
 public class CompressFilter implements Filter {
+	static final Pattern JSON_LD = Pattern
+			.compile(
+					"<script\\s+type\\s*=\\s*([\"'])\\s*application/ld\\+json\\s*\\1\\s*>(.*?)</script>",
+					Pattern.DOTALL);
+
 	private static class CompressResponseStream extends ServletOutputStream {
 		private ByteArrayOutputStream baos = null;
 		private boolean closed = false;
@@ -44,10 +52,43 @@ public class CompressFilter implements Filter {
 			String contentType = response.getContentType();
 			if (contentType != null && contentType.startsWith("text/html")) {
 				String html = baos.toString();
+
+				// { extract JSON-LD before compression, HtmlCompressor cannot
+				// handle them
+				ArrayList<String> jsonLd = new ArrayList<String>();
+
+				while (true) {
+					Matcher m = JSON_LD.matcher(html);
+					if (!m.find())
+						break;
+
+					jsonLd.add(m.group(2).replace("\n", "").replace("\r", ""));
+					html = m.replaceFirst("");
+				}
+				// }
+
 				HtmlCompressor compressor = new HtmlCompressor();
 				compressor.setCompressJavaScript(true);
 				compressor.setCompressCss(true);
-				output.write(compressor.compress(html).getBytes());
+				html = compressor.compress(html);
+
+				// insert JSON-LD back to before </head> or </body>
+				if (jsonLd.size() > 0) {
+					StringBuffer sb = new StringBuffer();
+					for (String str : jsonLd)
+						sb.append("<script type=\"application/ld+json\">")
+								.append(str).append("</script>");
+
+					String lower = html.toLowerCase();
+					int idx = lower.indexOf("</head>");
+					if (idx <= 0)
+						idx = lower.indexOf("</body>");
+					if (idx > 0)
+						html = html.substring(0, idx) + sb.toString()
+								+ html.substring(idx);
+				}
+
+				output.write(html.getBytes());
 			} else
 				output.write(baos.toByteArray());
 
