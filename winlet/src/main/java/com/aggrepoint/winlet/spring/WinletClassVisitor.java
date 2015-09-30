@@ -43,7 +43,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 	boolean hasAction = false;
 
 	public WinletClassVisitor(ClassVisitor inner) {
-		super(ASM4, inner);
+		super(ASM5, inner);
 	}
 
 	public boolean isWinlet() {
@@ -57,7 +57,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 			return null;
 		} else if (DESC_WINLET.equals(desc)) {
 			// 处理@Winlet注解
-			return new AnnotationVisitor(ASM4,
+			return new AnnotationVisitor(ASM5,
 					cv.visitAnnotation(desc, visible)) {
 				public void visit(String name, Object value) {
 					super.visit(name, value);
@@ -97,7 +97,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 			String signature, String[] exceptions) {
 		final String methodName = name;
 
-		return new MethodVisitor(ASM4, super.visitMethod(access, name, desc,
+		return new MethodVisitor(ASM5, super.visitMethod(access, name, desc,
 				signature, exceptions)) {
 			@Override
 			public AnnotationVisitor visitAnnotation(String desc,
@@ -110,7 +110,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 					final AnnotationVisitor theAv = mv.visitAnnotation(
 							DESC_REQUEST_MAPPING, visible);
 
-					return new AnnotationVisitor(ASM4) {
+					return new AnnotationVisitor(ASM5) {
 						String value = methodName;
 
 						/**
@@ -143,7 +143,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 					hasAction = true;
 
 					// 当@Action没有指定value()时，取方法的名称作为value()的值
-					return new AnnotationVisitor(ASM4, mv.visitAnnotation(desc,
+					return new AnnotationVisitor(ASM5, mv.visitAnnotation(desc,
 							visible)) {
 						boolean visited = false;
 
