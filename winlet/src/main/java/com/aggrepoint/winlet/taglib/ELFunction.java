@@ -69,7 +69,10 @@ public class ELFunction {
 
 	public static String textAreaEncode(String str) {
 		try {
-			return StringUtils.toHTML(str, true);
+			if (str == null)
+				return "";
+			return str.replace("&#xd;&#xa;", "<br>").replace("&#xd;", "<br>")
+					.replace("&#xa;", "<br>");
 		} catch (Exception e) {
 			return str;
 		}

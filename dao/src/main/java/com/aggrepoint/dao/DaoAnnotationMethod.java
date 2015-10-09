@@ -617,9 +617,11 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 								+ ch.getFrom();
 				}
 
-				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL)
+				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
+					// 把更改同步到数据库，使SQL语句可以访问
+					getSession().flush();
 					queryObject = getSession().createSQLQuery(q);
-				else
+				} else
 					queryObject = getSession().createQuery(
 							q.replaceAll(FETCH, " "));
 
@@ -670,6 +672,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 			if (pageList == null || pageList.getTotalCount() != 0) {
 				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
+					// 把更改同步到数据库，使SQL语句可以访问
+					getSession().flush();
 					SQLQuery q = getSession().createSQLQuery(query);
 					queryObject = q;
 					if (entityClass != null)
@@ -739,6 +743,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		}
 		case TYPE_UPDATE_SQL:
 		case TYPE_DELETE_SQL: {
+			// 把更改同步到数据库，使SQL语句可以访问
+			getSession().flush();
 			queryObject = getSession().createSQLQuery(query);
 			for (String param : paramsInUse)
 				DaoBaseMethod.applyNamedParameterToQuery(queryObject, param,
