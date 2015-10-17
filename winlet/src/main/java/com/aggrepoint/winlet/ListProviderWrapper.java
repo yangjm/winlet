@@ -7,7 +7,7 @@ public class ListProviderWrapper implements ListProvider {
 	ListProvider wrapped;
 	int type;
 
-	protected ListProviderWrapper(int type, ListProvider wrapped) {
+	public ListProviderWrapper(int type, ListProvider wrapped) {
 		this.type = type;
 		this.wrapped = wrapped;
 	}

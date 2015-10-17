@@ -10,7 +10,7 @@
 	<function>
 		<name>bom</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String bom()
@@ -20,7 +20,7 @@
 	<function>
 		<name>reqattr</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcReqAttr(java.lang.String)
@@ -30,7 +30,7 @@
 	<function>
 		<name>frontattr</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcFrontAttr(java.lang.String)
@@ -40,7 +40,7 @@
 	<function>
 		<name>less</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String less(java.lang.String, java.lang.Integer)
@@ -50,7 +50,7 @@
 	<function>
 		<name>htmlencode</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String htmlEncode(java.lang.String)
@@ -60,7 +60,7 @@
 	<function>
 		<name>textareaencode</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String textAreaEncode(java.lang.String)
@@ -70,7 +70,7 @@
 	<function>
 		<name>wmlencode</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String wmlEncode(java.lang.String)
@@ -80,7 +80,7 @@
 	<function>
 		<name>urlencode</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String urlEncode(java.lang.String)
@@ -90,7 +90,7 @@
 	<function>
 		<name>jsonencode</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String jsonEncode(java.lang.String)
@@ -100,7 +100,7 @@
 	<function>
 		<name>markup</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcMarkup()
@@ -110,7 +110,7 @@
 	<function>
 		<name>encodens</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcEncodeNameSpace(java.lang.String)
@@ -120,7 +120,7 @@
 	<function>
 		<name>if</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcIf(java.lang.Boolean, java.lang.String)
@@ -130,7 +130,7 @@
 	<function>
 		<name>ifelse</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcIfElse(java.lang.Boolean, java.lang.String, java.lang.String)
@@ -140,7 +140,7 @@
 	<function>
 		<name>text</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcText(java.lang.String)
@@ -150,7 +150,7 @@
 	<function>
 		<name>fmt</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcDateFormat(java.lang.String, java.lang.Object)
@@ -160,7 +160,7 @@
 	<function>
 		<name>decfmt</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String
@@ -171,7 +171,7 @@
 	<function>
 		<name>pct</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcPercent(java.lang.Double, java.lang.Double)
@@ -181,7 +181,7 @@
 	<function>
 		<name>changepct</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String
@@ -192,7 +192,7 @@
 	<function>
 		<name>get</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcGet(java.lang.Object, java.lang.String)
@@ -202,7 +202,7 @@
 	<function>
 		<name>set</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcSet(java.lang.Object, java.lang.String, java.lang.Object)
@@ -212,7 +212,7 @@
 	<function>
 		<name>listGet</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcListGet(java.util.List, java.lang.Integer)
@@ -222,7 +222,7 @@
 	<function>
 		<name>exec</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec(java.lang.Object, java.lang.String)
@@ -232,7 +232,7 @@
 	<function>
 		<name>exec1</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec1(java.lang.Object, java.lang.String, java.lang.Object)
@@ -242,7 +242,7 @@
 	<function>
 		<name>exec2</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec2(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object)
@@ -252,7 +252,7 @@
 	<function>
 		<name>exec3</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec3(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)
@@ -262,7 +262,7 @@
 	<function>
 		<name>exec4</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec4(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
@@ -272,7 +272,7 @@
 	<function>
 		<name>exec5</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object funcExec5(java.lang.Object, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
@@ -282,7 +282,7 @@
 	<function>
 		<name>contains</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Boolean contains(java.lang.Object, java.lang.Object)
@@ -292,7 +292,7 @@
 	<function>
 		<name>res</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcResurl(java.lang.String)
@@ -302,7 +302,7 @@
 	<function>
 		<name>w</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Object m(java.lang.String)
@@ -311,7 +311,7 @@
 
 	<function>
 		<name>funcdef</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String funcdef(java.lang.String)
@@ -320,7 +320,7 @@
 
 	<function>
 		<name>func</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String func(java.lang.String)
@@ -329,7 +329,7 @@
 
 	<function>
 		<name>access</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Boolean access(java.lang.String)
@@ -338,7 +338,7 @@
 
 	<function>
 		<name>psn</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Boolean psn(java.lang.String)
@@ -347,7 +347,7 @@
 
 	<function>
 		<name>cfg</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String cfg(java.lang.String)
@@ -356,7 +356,7 @@
 
 	<function>
 		<name>cfgdef</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String cfgdef(java.lang.String, java.lang.String)
@@ -365,7 +365,7 @@
 
 	<function>
 		<name>toint</name>
-		<function-class>com.aggrepoint.winlet.taglib.ELFunction
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			int funcToInt(java.lang.Object)
@@ -375,7 +375,7 @@
 	<function>
 		<name>href</name>
 		<function-class>
-			com.aggrepoint.winlet.taglib.ELFunction
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String href(java.lang.String, java.lang.String)
@@ -384,7 +384,7 @@
 
 	<tag>
 		<name>form</name>
-		<tagclass>com.aggrepoint.winlet.taglib.FormTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.FormTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
 		<attribute>
@@ -432,7 +432,7 @@
 
 	<tag>
 		<name>element</name>
-		<tagclass>com.aggrepoint.winlet.taglib.Element
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.Element
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
@@ -445,7 +445,7 @@
 
 	<tag>
 		<name>attr</name>
-		<tagclass>com.aggrepoint.winlet.taglib.ElementAttribute
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.ElementAttribute
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
@@ -467,7 +467,7 @@
 
 	<tag>
 		<name>access</name>
-		<tagclass>com.aggrepoint.winlet.taglib.AccessRuleTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.AccessRuleTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>rule</name>
@@ -478,7 +478,7 @@
 
 	<tag>
 		<name>psn</name>
-		<tagclass>com.aggrepoint.winlet.taglib.PsnRuleTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.PsnRuleTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>rule</name>
@@ -489,9 +489,9 @@
 
 	<tag>
 		<name>include</name>
-		<tagclass>com.aggrepoint.winlet.taglib.IncludeTag
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.IncludeTag
 		</tagclass>
-		<teiclass>com.aggrepoint.winlet.taglib.IncludeTei
+		<teiclass>com.aggrepoint.winlet.jsp.taglib.IncludeTei
 		</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
@@ -518,7 +518,7 @@
 
 	<tag>
 		<name>param</name>
-		<tagclass>com.aggrepoint.winlet.taglib.IncludeParamTag
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.IncludeParamTag
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
@@ -535,7 +535,7 @@
 
 	<tag>
 		<name>dialog</name>
-		<tagclass>com.aggrepoint.winlet.taglib.DialogTag
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.DialogTag
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
@@ -543,7 +543,7 @@
 
 	<tag>
 		<name>button</name>
-		<tagclass>com.aggrepoint.winlet.taglib.DialogButtonTag
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.DialogButtonTag
 		</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<dynamic-attributes>true</dynamic-attributes>
@@ -551,9 +551,9 @@
 
 	<tag>
 		<name>set</name>
-		<tagclass>com.aggrepoint.winlet.taglib.SetTag
+		<tagclass>com.aggrepoint.winlet.jsp.taglib.SetTag
 		</tagclass>
-		<teiclass>com.aggrepoint.winlet.taglib.SetTei
+		<teiclass>com.aggrepoint.winlet.jsp.taglib.SetTei
 		</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>

@@ -9,8 +9,8 @@
 
 	<tag>
 		<name>page</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PageTag</tagclass>
-		<teiclass>com.aggrepoint.winlet.site.taglib.PageTei</teiclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PageTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.jsp.site.taglib.PageTei</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -31,7 +31,7 @@
 
 	<tag>
 		<name>name</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PageNameTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PageNameTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>page</name>
@@ -52,7 +52,7 @@
 
 	<tag>
 		<name>url</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PageUrlTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PageUrlTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>page</name>
@@ -68,7 +68,7 @@
 
 	<tag>
 		<name>pageurl</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PathUrlTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PathUrlTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>page</name>
@@ -79,8 +79,8 @@
 
 	<tag>
 		<name>subcount</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.SubCountTag</tagclass>
-		<teiclass>com.aggrepoint.winlet.site.taglib.SubCountTei</teiclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.SubCountTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.jsp.site.taglib.SubCountTei</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -101,7 +101,7 @@
 
 	<tag>
 		<name>area</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.AreaContentTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.AreaContentTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -117,8 +117,8 @@
 
 	<tag>
 		<name>tree</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.TreeTag</tagclass>
-		<teiclass>com.aggrepoint.winlet.site.taglib.TreeTei</teiclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.TreeTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.jsp.site.taglib.TreeTei</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -144,7 +144,7 @@
 
 	<tag>
 		<name>if</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.IfTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.IfTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>page</name>
@@ -175,7 +175,7 @@
 
 	<tag>
 		<name>when</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.WhenTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.WhenTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>page</name>
@@ -196,8 +196,8 @@
 
 	<tag>
 		<name>eval</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.EveluateTag</tagclass>
-		<teiclass>com.aggrepoint.winlet.site.taglib.EveluateTei</teiclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.EveluateTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.jsp.site.taglib.EveluateTei</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -223,8 +223,8 @@
 
 	<tag>
 		<name>path</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PathTag</tagclass>
-		<teiclass>com.aggrepoint.winlet.site.taglib.PathTei</teiclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PathTag</tagclass>
+		<teiclass>com.aggrepoint.winlet.jsp.site.taglib.PathTei</teiclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -245,7 +245,7 @@
 
 	<tag>
 		<name>res</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.ResUrlTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.ResUrlTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>
@@ -256,7 +256,7 @@
 
 	<tag>
 		<name>run</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.RunHandlerTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.RunHandlerTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>url</name>
@@ -267,13 +267,13 @@
 
 	<tag>
 		<name>preload</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.PreloadWinletTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PreloadWinletTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 	</tag>
 
 	<tag>
 		<name>title</name>
-		<tagclass>com.aggrepoint.winlet.site.taglib.TitleTag</tagclass>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.TitleTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 	</tag>
 </taglib>

@@ -4,7 +4,6 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.aggrepoint.winlet.spring.annotation.Action;
@@ -15,8 +14,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
  * 对使用了@Winlet注解的类进行以下处理：
  * 
  * <pre>
- * 1) 若类上定义了Scope或RequestMapping注解，则将其去除
- * 2) 为类添加Scope("winlet")注解
+ * 1) 若类上定义了RequestMapping注解，则将其去除
  * 2) 为类添加RequestMapping注解
  * !! 3) 若方法上定义了@RequestMapping注解，则将注解去除 !! - 20150917 不去除 － Winlet中也可以直接定义@RequestMapping方法
  * 4) 若@Window注解没有指明value，则将其方法名替换为value
@@ -36,7 +34,6 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 	final String DESC_ACTION = getClassDesc(Action.class);
 	final String DESC_WINDOW = getClassDesc(Window.class);
 	final String DESC_REQUEST_MAPPING = getClassDesc(RequestMapping.class);
-	final String DESC_SCOPE = getClassDesc(Scope.class);
 
 	String winletPath = "";
 	boolean hasWindow = false;
@@ -52,8 +49,8 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 
 	@Override
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-		if (DESC_SCOPE.equals(desc) || DESC_REQUEST_MAPPING.equals(desc)) {
-			// 若类上使用了@Scope或@RequestMapping注解，将其去除
+		if (DESC_REQUEST_MAPPING.equals(desc)) {
+			// 若类上使用了@RequestMapping注解，将其去除
 			return null;
 		} else if (DESC_WINLET.equals(desc)) {
 			// 处理@Winlet注解
@@ -72,11 +69,6 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 
 					if (!isWinlet())
 						return;
-
-					// 加入@Scope注解
-					AnnotationVisitor av = cv.visitAnnotation(DESC_SCOPE, true);
-					av.visit("value", WinletXmlApplicationContext.SCOPE_WINLET);
-					av.visitEnd();
 
 					// 加入@RequestMapping注解
 					av = cv.visitAnnotation(DESC_REQUEST_MAPPING, true);

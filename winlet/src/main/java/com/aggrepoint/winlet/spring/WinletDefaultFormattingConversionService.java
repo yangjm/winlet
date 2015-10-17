@@ -3,6 +3,7 @@ package com.aggrepoint.winlet.spring;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConfigurablePropertyAccessor;
@@ -60,13 +61,16 @@ public class WinletDefaultFormattingConversionService extends
 	static HashMap<String, Boolean> cache = new HashMap<String, Boolean>();
 
 	public static WinletDefaultFormattingConversionService get() {
-		ConversionService cs = ContextUtils.getApplicationContext(
-				ContextUtils.getRequest()).getBean(ConversionService.class);
+		Map<String, ConversionService> css = ContextUtils
+				.getApplicationContext(ContextUtils.getRequest())
+				.getBeansOfType(ConversionService.class);
 
-		if (cs == null)
+		if (css == null || css.size() == 0)
 			return null;
-		if (cs instanceof WinletDefaultFormattingConversionService)
-			return (WinletDefaultFormattingConversionService) cs;
+
+		for (ConversionService cs : css.values())
+			if (cs instanceof WinletDefaultFormattingConversionService)
+				return (WinletDefaultFormattingConversionService) cs;
 		return null;
 	}
 
@@ -77,7 +81,8 @@ public class WinletDefaultFormattingConversionService extends
 	 * @param prop
 	 * @return
 	 */
-	public static boolean canFormat(ConfigurablePropertyAccessor bw, Object obj, String prop) {
+	public static boolean canFormat(ConfigurablePropertyAccessor bw,
+			Object obj, String prop) {
 		String key = obj.getClass().getName() + "_" + prop;
 
 		if (!cache.containsKey(key)) {
@@ -109,7 +114,8 @@ public class WinletDefaultFormattingConversionService extends
 	 * @param prop
 	 * @return
 	 */
-	public static String format(ConfigurablePropertyAccessor bw, Object obj, String prop) {
+	public static String format(ConfigurablePropertyAccessor bw, Object obj,
+			String prop) {
 		String key = obj.getClass().getName() + "_" + prop;
 
 		if (!cache.containsKey(key))

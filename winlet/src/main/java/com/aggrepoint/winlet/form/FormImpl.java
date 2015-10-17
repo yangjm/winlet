@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class FormImpl implements Form, ReqConst {
 	static final String FORM_DATA_SESSION_KEY = FormImpl.class.getName();
 
-	private ArrayList<ServletRequestDataBinder> binders = new ArrayList<ServletRequestDataBinder>();
+	private ArrayList<WebDataBinder> binders = new ArrayList<WebDataBinder>();
 	private ReqInfo ri;
 	private ArrayList<String> fields = new ArrayList<String>();
 	private HashSet<String> groupNames = new HashSet<String>();
@@ -379,7 +379,7 @@ public class FormImpl implements Form, ReqConst {
 	 * 
 	 * @param binder
 	 */
-	public void addBinder(ServletRequestDataBinder binder) {
+	public void addBinder(WebDataBinder binder) {
 		binders.add(binder);
 	}
 

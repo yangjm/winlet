@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.6-SNAPSHOT</version>
+		<version>0.1.6</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
 	<artifactId>winlet</artifactId>
 	<name>AggrePoint Framework - Winlet</name>
-	<description>A web application framework based on Spring MVC for building lightweight portlet style web applications</description>
+	<description>A web application framework based on Spring MVC for building component based web applications</description>
 
 	<properties>
 		<javax.servlet-version>3.1.0</javax.servlet-version>
@@ -19,12 +19,11 @@
 		<javax.servlet.jstl-version>1.2</javax.servlet.jstl-version>
 		<org.ow2.asm-version>5.0.4</org.ow2.asm-version>
 		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
-		<elasticsearch-version>1.4.2</elasticsearch-version>
 		<jackson-version>2.4.2</jackson-version>
 		<htmlcompressor-version>1.5.2</htmlcompressor-version>
 		<yuicompressor-version>2.4.8</yuicompressor-version>
 
-		<dao-version>0.1.6-SNAPSHOT</dao-version>
+		<dao-version>0.1.6</dao-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -71,13 +70,12 @@
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
 			<version>${org.owasp.esapi-version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>${elasticsearch-version}</version>
-			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<artifactId>servlet-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -92,6 +90,7 @@
 			<version>${htmlcompressor-version}</version>
 		</dependency>
 
+		<!-- used by htmlcompressor -->
 		<dependency>
 			<groupId>com.yahoo.platform.yui</groupId>
 			<artifactId>yuicompressor</artifactId>

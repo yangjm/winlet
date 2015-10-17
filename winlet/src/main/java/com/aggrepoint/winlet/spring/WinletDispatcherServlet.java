@@ -5,15 +5,20 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspApplicationContext;
+import javax.servlet.jsp.JspFactory;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import com.aggrepoint.dao.UserContext;
 import com.aggrepoint.winlet.AccessRuleEngine;
@@ -26,14 +31,16 @@ import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqConst;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
+import com.aggrepoint.winlet.form.FormImpl;
+import com.aggrepoint.winlet.jsp.Resolver;
 import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
 import com.aggrepoint.winlet.plugin.DefaultListProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
+import com.aggrepoint.winlet.plugin.DefaultRequestLogger;
 import com.aggrepoint.winlet.plugin.DefaultUserEngine;
 
 /**
- * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class WinletDispatcherServlet extends DispatcherServlet {
@@ -55,6 +62,10 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		Context.set(context);
 
 		loggers = context.getBeansOfType(RequestLogger.class);
+		if (loggers.size() == 0)
+			loggers.put(DefaultRequestLogger.class.getName(),
+					new DefaultRequestLogger());
+
 		try {
 			userEngine = context.getBean(UserEngine.class);
 		} catch (Exception e) {
@@ -89,6 +100,28 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		}
 		if (listProvider == null)
 			listProvider = new DefaultListProvider();
+
+		// { 启用Resolver
+		ServletContext ctx = this.getServletContext();
+
+		JspApplicationContext jspContext = JspFactory.getDefaultFactory()
+				.getJspApplicationContext(ctx);
+		jspContext.addELResolver(new Resolver());
+		// }
+
+		// { 把Spring MVC的Binding Errors合并到Form中
+		RequestMappingHandlerAdapter adapter = context
+				.getBean(RequestMappingHandlerAdapter.class);
+		if (adapter != null) {
+			WebBindingInitializer initializer = adapter
+					.getWebBindingInitializer();
+			adapter.setWebBindingInitializer((binder, request) -> {
+				initializer.initBinder(binder, request);
+				((FormImpl) ContextUtils.getReqInfo().getForm())
+						.addBinder(binder);
+			});
+		}
+		// }
 	}
 
 	protected View resolveViewName(String viewName, Map<String, Object> model,

@@ -200,8 +200,13 @@ public class ServiceClassLoader extends ClassLoader {
 							boolean found = false;
 							for (CtMethod m : ds.getDeclaredMethods())
 								if (sameSignature(m, method)) {
-									CtMethod newmethod = CtNewMethod.copy(m,
-											ctclass, null);
+									CtMethod newmethod = null;
+									try {
+										newmethod = CtNewMethod.copy(m,
+												ctclass, null);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
 
 									// { Change method implementation to call
 									// dao method

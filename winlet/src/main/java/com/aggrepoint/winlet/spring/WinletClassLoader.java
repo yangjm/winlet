@@ -8,7 +8,6 @@ import java.util.Map;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.io.Resource;
 
 import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.spring.annotation.Window;
@@ -78,29 +77,6 @@ public class WinletClassLoader extends ClassLoader {
 
 		classMap.put(clz, ret);
 		return ret;
-	}
-
-	public Resource convert(Resource res) {
-		if (!res.getFilename().endsWith(".class"))
-			return res;
-
-		try {
-			ClassReader cr = new ClassReader(res.getInputStream());
-
-			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-			WinletClassVisitor wcv = new WinletClassVisitor(cw);
-			cr.accept(wcv, 0);
-
-			if (!wcv.isWinlet())
-				return res;
-
-			byte[] b = cw.toByteArray();
-
-			return new WinletResource(res, b);
-		} catch (Exception e) {
-		}
-
-		return res;
 	}
 
 	public static Class<?> getWinletClassByPath(String path) {
