@@ -30,7 +30,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * MD5加密
+	 * MD5
 	 * 
 	 * @param str
 	 * @return
@@ -63,7 +63,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * MD5加密，并将结果反转以防破解
+	 * MD5，并将结果反转以防破解
 	 * 
 	 * @param str
 	 * @return

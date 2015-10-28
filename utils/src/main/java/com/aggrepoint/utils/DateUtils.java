@@ -109,6 +109,29 @@ public class DateUtils {
 		return age;
 	}
 
+	public static int getMonth(Date dateOfBirth, Date onDate) {
+		Calendar now = Calendar.getInstance();
+		Calendar dob = Calendar.getInstance();
+
+		now.setTime(onDate);
+		dob.setTime(dateOfBirth);
+		if (dob.after(now))
+			return -1;
+
+		int year1 = now.get(Calendar.YEAR);
+		int year2 = dob.get(Calendar.YEAR);
+		int month1 = now.get(Calendar.MONTH);
+		int month2 = dob.get(Calendar.MONTH);
+		int day1 = now.get(Calendar.DAY_OF_MONTH);
+		int day2 = dob.get(Calendar.DAY_OF_MONTH);
+
+		int months = (year1 - year2) * 12 + month1 - month2;
+		if (day2 > day1)
+			months--;
+
+		return months;
+	}
+
 	public static int getGrade(Date gradeDate, int grade, Date onDate) {
 		Calendar calGradeDate = Calendar.getInstance();
 		Calendar calOnDate = Calendar.getInstance();
