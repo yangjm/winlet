@@ -43,17 +43,33 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		<attribute>
-			<name>menu</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
 	</tag>
 
 	<tag>
 		<name>url</name>
 		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PageUrlTag</tagclass>
 		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>page</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>level</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>data</name>
+		<tagclass>com.aggrepoint.winlet.jsp.site.taglib.PageDataTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<attribute>
 			<name>page</name>
 			<required>false</required>

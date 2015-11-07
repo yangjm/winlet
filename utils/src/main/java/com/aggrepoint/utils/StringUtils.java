@@ -677,10 +677,67 @@ public class StringUtils {
 		return str1.equals(str2);
 	}
 
+	/**
+	 * 首字母大写
+	 */
 	public static String capitalize(String str) {
 		if (str == null || str.equals(""))
 			return str;
 		return str.substring(0, 1).toUpperCase() + str.substring(1);
+	}
+
+	/**
+	 * 每个word的首字母都大写
+	 */
+	public static String capitalizeWords(String str) {
+		if (str == null || str.equals(""))
+			return str;
+
+		String[] words = str.split("[\\s\\r\\n\\t]+");
+		if (words == null || words.length == 0)
+			return "";
+
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < words.length; i++) {
+			if (i > 0)
+				sb.append(" ");
+			sb.append(capitalize(words[i]));
+		}
+
+		return sb.toString();
+	}
+
+	public static String join(String[] arr, String join, boolean trim,
+			boolean excludeEmpty, boolean capitalizedWord) {
+		if (arr == null)
+			return null;
+
+		StringBuffer sb = new StringBuffer();
+		boolean first = true;
+		for (String s : arr) {
+			if (trim)
+				s = s.trim();
+			if (excludeEmpty && isEmpty(s))
+				continue;
+			if (!first)
+				sb.append(join);
+			sb.append(capitalizedWord ? capitalizeWords(s) : s);
+			first = false;
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 把str按splitRegexp进行拆分后，用join作为连接拼接在一起
+	 */
+	public static String canonicalize(String str, String splitRegexp,
+			String join, boolean trim, boolean excludeEmpty,
+			boolean capitalizeWord) {
+		if (str == null)
+			return null;
+
+		return join(str.split(splitRegexp), join, trim, excludeEmpty,
+				capitalizeWord);
 	}
 
 	public static String appendUrl(String str1, String str2) {
@@ -779,5 +836,13 @@ public class StringUtils {
 		if (idx > 0)
 			return str.substring(0, idx) + " ...";
 		return str + " ...";
+	}
+
+	public static Integer toInteger(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
