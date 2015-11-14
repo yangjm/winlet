@@ -125,6 +125,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>attrs</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>clear</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>

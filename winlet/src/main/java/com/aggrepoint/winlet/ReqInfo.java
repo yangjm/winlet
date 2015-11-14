@@ -72,4 +72,6 @@ public interface ReqInfo {
 	boolean noPreload();
 
 	boolean isFromContainer();
+
+	boolean isFirstInclude();
 }

@@ -40,6 +40,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String validateFieldValue;
 	private String validateFieldId;
 	private boolean pageRefresh;
+	private boolean firstInclude;
 	private Form form;
 	private PageStorage ps;
 	private SharedPageStorage sps;
@@ -90,6 +91,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 			pageRefresh = "yes".equalsIgnoreCase(getParameter(
 					PARAM_PAGE_REFRESH, ""));
 		}
+
+		firstInclude = "yes".equalsIgnoreCase(getParameter(PARAM_FIRST_INCLUDE,
+				""));
 
 		validateFieldName = getParameter(PARAM_WIN_VALIDATE_FIELD, null);
 		if (validateFieldName != null) {
@@ -321,6 +325,11 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		return pageRefresh;
 	}
 
+	@Override
+	public boolean isFirstInclude() {
+		return firstInclude;
+	}
+	
 	@Override
 	public PageStorage getPageStorage() {
 		if (ps == null)

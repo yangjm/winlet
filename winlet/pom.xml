@@ -22,6 +22,7 @@
 		<jackson-version>2.4.2</jackson-version>
 		<htmlcompressor-version>1.5.2</htmlcompressor-version>
 		<yuicompressor-version>2.4.8</yuicompressor-version>
+		<freemarker-version>2.3.20</freemarker-version>
 
 		<dao-version>0.1.7-SNAPSHOT</dao-version>
 
@@ -76,6 +77,12 @@
 					<groupId>javax.servlet</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker-version}</version>
 		</dependency>
 
 		<dependency>
