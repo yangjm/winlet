@@ -178,8 +178,10 @@ public class SiteController {
 					req.setAttribute(PAGE_PATH,
 							sc.getPageUrl(page.getFullPath()));
 					req.setAttribute(PAGE_DATA, page.getDataMap());
-					if (page.isExpand() && !page.getFullPath().equals(path))
-						req.setAttribute(PATH_EXPAND, path.substring(page.getFullPath().length()));
+					if (page.isExpand() && !page.getFullPath().equals(path)
+							&& path.startsWith(page.getFullPath()))
+						req.setAttribute(PATH_EXPAND,
+								path.substring(page.getFullPath().length()));
 
 					return "/WEB-INF/site/template/"
 							+ page.getPsnTemplate(psnEngine) + ".jsp";
