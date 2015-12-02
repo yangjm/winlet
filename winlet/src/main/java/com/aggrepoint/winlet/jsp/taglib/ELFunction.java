@@ -67,6 +67,14 @@ public class ELFunction {
 		}
 	}
 
+	public static String attrEncode(String str) {
+		try {
+			return EncodeUtils.attr(str);
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
 	public static String textAreaEncode(String str) {
 		try {
 			if (str == null)

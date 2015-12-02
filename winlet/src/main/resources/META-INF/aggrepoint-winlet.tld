@@ -58,6 +58,16 @@
 	</function>
 
 	<function>
+		<name>attrencode</name>
+		<function-class>
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String attrEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
 		<name>textareaencode</name>
 		<function-class>
 			com.aggrepoint.winlet.jsp.taglib.ELFunction
