@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -35,6 +36,16 @@ public class CollectionUtils {
 			return false;
 		then.accept(t);
 		return true;
+	}
+
+	public static <T, K> List<K> toList(Collection<T> entities,
+			Function<T, K> mapper) {
+		return entities.stream().map(mapper).collect(Collectors.toList());
+	}
+
+	public static <T, K> Set<K> toSet(Collection<T> entities,
+			Function<T, K> mapper) {
+		return entities.stream().map(mapper).collect(Collectors.toSet());
 	}
 
 	public static <T, K, M extends Map<K, T>> M toMap(Collection<T> entities,
@@ -141,6 +152,46 @@ public class CollectionUtils {
 	public static <T, K, V> HashMap<K, HashSet<V>> group(T[] entities,
 			Function<T, K> keyMapper, Function<T, V> valueMapper) {
 		return group(Arrays.asList(entities), keyMapper, valueMapper);
+	}
+
+	/**
+	 * Grouping into 2 levels
+	 * 
+	 * @param entities
+	 * @param keyMapper1
+	 * @param keyMapper2
+	 * @param valueMapper
+	 * @param collectionFactory
+	 * @return
+	 */
+	public static <T, K, V, P, C extends Collection<V>> HashMap<K, HashMap<P, C>> groupTwice(
+			Collection<T> entities, Function<T, K> keyMapper1,
+			Function<T, P> keyMapper2, Function<T, V> valueMapper,
+			Supplier<C> collectionFactory) {
+		return entities.stream().collect(
+				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
+						.groupingBy(keyMapper2, HashMap::new, Collectors
+								.mapping(valueMapper, Collectors
+										.toCollection(collectionFactory)))));
+	}
+
+	/**
+	 * Similar to grouping into 2 levels except each unit is not a Collection
+	 * but a single object
+	 * 
+	 * @param entities
+	 * @param keyMapper1
+	 * @param keyMapper2
+	 * @param valueMapper
+	 * @return
+	 */
+	public static <T, K, V, P> HashMap<K, HashMap<P, V>> matrix(
+			Collection<T> entities, Function<T, K> keyMapper1,
+			Function<T, P> keyMapper2, Function<T, V> valueMapper) {
+		return entities.stream().collect(
+				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
+						.toMap(keyMapper2, valueMapper, (a, b) -> a,
+								HashMap::new)));
 	}
 
 	/**
