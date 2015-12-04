@@ -89,7 +89,8 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public boolean validate(String field) {
-		return fields.contains(field) || groupNames.contains(field);
+		return !ri.isValidateField() // 不是单字段校验，对所有字段都校验
+				|| fields.contains(field) || groupNames.contains(field);
 	}
 
 	public void recordChange(Change change) {
@@ -390,7 +391,7 @@ public class FormImpl implements Form, ReqConst {
 
 		HttpServletRequest request = ContextUtils.getRequest();
 		WebApplicationContext context = RequestContextUtils
-				.getWebApplicationContext(request);
+				.findWebApplicationContext(request);
 		Locale locale = RequestContextUtils.getLocale(request);
 
 		for (BindingResult val : values) {
