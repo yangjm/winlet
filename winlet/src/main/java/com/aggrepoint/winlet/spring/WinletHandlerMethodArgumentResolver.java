@@ -58,6 +58,15 @@ public class WinletHandlerMethodArgumentResolver implements
 		return false;
 	}
 
+	Object checkClass(Object val, Class<?> expected, Exception e)
+			throws Exception {
+		if (expected.isAssignableFrom(val.getClass()))
+			return val;
+		if (e == null)
+			return null;
+		throw e;
+	}
+
 	@Override
 	public Object resolveArgument(MethodParameter parameter,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
@@ -108,22 +117,23 @@ public class WinletHandlerMethodArgumentResolver implements
 		HttpServletRequest req = ContextUtils.getRequest();
 
 		if (UserProfile.class.isAssignableFrom(clz))
-			return ContextUtils.getUserEngine(req).getUser(req);
+			return checkClass(ContextUtils.getUserEngine(req).getUser(req),
+					clz, null);
 
 		if (UserEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getUserEngine(req);
+			return checkClass(ContextUtils.getUserEngine(req), clz, null);
 
 		if (ConfigProvider.class.isAssignableFrom(clz))
-			return ContextUtils.getConfigProvider(req);
+			return checkClass(ContextUtils.getConfigProvider(req), clz, null);
 
 		if (AccessRuleEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getAccessRuleEngine(req);
+			return checkClass(ContextUtils.getAccessRuleEngine(req), clz, null);
 
 		if (PsnRuleEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getPsnRuleEngine(req);
+			return checkClass(ContextUtils.getPsnRuleEngine(req), clz, null);
 
 		if (ListProvider.class.isAssignableFrom(clz))
-			return ContextUtils.getListProvider(req);
+			return checkClass(ContextUtils.getListProvider(req), clz, null);
 
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
 		if (cfg != null) {

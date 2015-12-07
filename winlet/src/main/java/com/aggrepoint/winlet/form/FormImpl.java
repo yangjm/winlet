@@ -41,6 +41,10 @@ public class FormImpl implements Form, ReqConst {
 	private HashSet<String> groupNames = new HashSet<String>();
 	private Hashtable<String, Vector<String>> fieldValues = new Hashtable<String, Vector<String>>();
 	private Hashtable<String, ArrayList<String>> fieldErrors = new Hashtable<String, ArrayList<String>>();
+	/** bindingErrorCount的值为在全表单校验时BindingError的计数，不管这些Error是否有对应Form中的Field。 */
+	/** 通过程序代码提交表单请求时，请求中可能不带表单字段名称列表，即使数据有错误，fieldErrors也可能为空。 */
+	/** 一般情况下要确保bindingErrorCount也不为0才可以视为表单数据校验通过。 */
+	private int bindingErrorCount;
 	private HashSet<String> disabledFields;
 	private Vector<Change> vecChanges = new Vector<Change>();
 
@@ -229,7 +233,7 @@ public class FormImpl implements Form, ReqConst {
 	public boolean hasError() {
 		processBinders();
 
-		return fieldErrors.size() > 0;
+		return fieldErrors.size() > 0 || bindingErrorCount > 0;
 	}
 
 	@Override
@@ -430,7 +434,10 @@ public class FormImpl implements Form, ReqConst {
 		if (ri.isValidateField()) {
 			mergeBindingResult(ri.getValidateFieldName(), values);
 		} else {
-			fields.forEach(p -> mergeBindingResult(p, values));
+			if (values != null) {
+				values.forEach(p -> bindingErrorCount += p.getErrorCount());
+				fields.forEach(p -> mergeBindingResult(p, values));
+			}
 		}
 	}
 
