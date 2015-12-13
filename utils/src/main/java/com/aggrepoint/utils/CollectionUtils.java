@@ -470,46 +470,6 @@ public class CollectionUtils {
 		return arr;
 	}
 
-	/**
-	 * 根据主对象的组件批量加载子对象，然后把子对象分配给各个主对象
-	 * 
-	 * @param list
-	 *            主对象列表
-	 * @param keyMapper
-	 *            从主对象获取ID
-	 * @param childCollectionMapper
-	 *            从主对象获取保存子对象的集合
-	 * @param childLoader
-	 *            负责批量加载子对象
-	 * @param parentKeyMapper
-	 *            从子对象中获取主对象ID
-	 * @return
-	 */
-	public static <T, K, C> Collection<T> loadChildren(Collection<T> list,
-			Function<T, K> keyMapper,
-			Function<T, Collection<C>> childCollectionMapper,
-			Function<Collection<K>, Collection<C>> childLoader,
-			Function<C, K> parentKeyMapper) {
-		if (list == null || list.size() == 0)
-			return list;
-
-		Collection<C> cs = childLoader.apply(list.stream().map(keyMapper)
-				.collect(Collectors.toList()));
-		if (cs == null || cs.size() == 0)
-			return list;
-
-		list.forEach(p -> {
-			Collection<C> cc = childCollectionMapper.apply(p);
-			K key = keyMapper.apply(p);
-
-			cs.stream().filter(p1 -> parentKeyMapper.apply(p1) == key)
-					.forEach(p1 -> {
-						cc.add(p1);
-					});
-		});
-		return list;
-	}
-
 	public static <T> Collection<T> sort(Collection<T> list,
 			Function<T, Number> order, boolean asc) {
 		if (list == null || order == null)
@@ -534,5 +494,30 @@ public class CollectionUtils {
 	public static <T> Collection<T> sort(Collection<T> list,
 			Function<T, Number> order) {
 		return sort(list, order, true);
+	}
+
+	/**
+	 * 用于为Collection中的父对象加载子对象。子对象加载应以父对象的key的集合为条件，父对象中应该有一个集合用于存放子对象。
+	 * 
+	 * 例如父对象Parent有属性id和集合childs，子对象Child有属性parentId。假设
+	 * loader.load()可以根据parentId加载子对象集合，对于类型为List<Parent>的parents：
+	 * 
+	 * <pre>
+	 * loadChild(parents, Parent::getId, Parent::getChilds, ids -&gt; loader.load(ids),
+	 * 		Child::getParentId);
+	 * </pre>
+	 */
+	public static <T, K, C> void loadChildren(Collection<T> list,
+			Function<T, K> keyMapper,
+			Function<T, Collection<C>> childCollectionMapper,
+			Function<Collection<K>, Collection<C>> loader,
+			Function<C, K> childKeyMapper) {
+		if (list == null || list.size() == 0)
+			return;
+
+		HashMap<K, T> map = toHashMap(list, keyMapper);
+		loader.apply(map.keySet()).forEach(
+				p -> childCollectionMapper.apply(
+						map.get(childKeyMapper.apply(p))).add(p));
 	}
 }

@@ -75,6 +75,14 @@ public class ELFunction {
 		}
 	}
 
+	public static String jsEncode(String str) {
+		try {
+			return EncodeUtils.js(str);
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
 	public static String textAreaEncode(String str) {
 		try {
 			if (str == null)
