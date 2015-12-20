@@ -95,6 +95,21 @@ public interface Form {
 	 */
 	public void setEnabled(String field);
 
+
+	/**
+	 * 显示表单中的元素。
+	 * 
+	 * @param field
+	 */
+	public void show(String selector);
+
+	/**
+	 * 不显示表单中的元素。
+	 * 
+	 * @param field
+	 */
+	public void hide(String selector);
+
 	/**
 	 * 获取当前所有处于禁用状态的字段。
 	 * 

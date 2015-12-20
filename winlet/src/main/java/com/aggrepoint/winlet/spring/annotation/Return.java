@@ -22,6 +22,9 @@ public @interface Return {
 
 	String update() default "";
 
+	/** 用于容器窗口中执行的Action，值为window表示把返回的页面内容用于更新Container所属的Winlet，而不只是容器窗口。暂不支持其它值 */
+	String target() default "";
+
 	boolean dialog() default false;
 
 	boolean cache() default false;

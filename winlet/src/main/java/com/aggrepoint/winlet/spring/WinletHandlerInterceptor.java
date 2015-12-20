@@ -163,6 +163,11 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 								rd.getUpdate());
 					}
 
+					if (rd.getTarget() != null) {
+						response.setHeader(RespHeaderConst.HEADER_TARGET,
+								rd.getTarget());
+					}
+
 					if (rd.cache()) {
 						response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
 						cache = true;

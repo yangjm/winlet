@@ -289,6 +289,20 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public void show(String selector) {
+		processBinders();
+
+		recordChange(new ChangeShow(selector));
+	}
+
+	@Override
+	public void hide(String selector) {
+		processBinders();
+
+		recordChange(new ChangeHide(selector));
+	}
+
+	@Override
 	public String[] getDisabledFields() {
 		processBinders();
 
