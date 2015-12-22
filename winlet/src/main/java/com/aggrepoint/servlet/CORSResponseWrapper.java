@@ -18,6 +18,11 @@ public class CORSResponseWrapper extends HttpServletResponseWrapper {
 		origResponse = response;
 	}
 
+	public void close() throws IOException {
+		if (stream == null) // 没有输出过任何内容，需要主动触发CORSResponseStream中winlet_header的处理
+			new CORSResponseStream(origResponse).close();
+	}
+
 	public ServletOutputStream createOutputStream() throws IOException {
 		return new CORSResponseStream(origResponse);
 	}
