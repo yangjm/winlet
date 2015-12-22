@@ -57,6 +57,7 @@ public interface Form {
 	 * @return
 	 */
 	public boolean hasError();
+	boolean hasError(boolean fieldErrorsOnly);
 
 	/**
 	 * 获取字段上当前存在的所有校验错误

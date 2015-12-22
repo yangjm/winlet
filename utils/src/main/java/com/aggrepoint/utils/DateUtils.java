@@ -154,4 +154,32 @@ public class DateUtils {
 
 		return grade;
 	}
+
+	public static String getAgeDisplay(Date dateOfBirth) {
+		if (dateOfBirth == null)
+			return "";
+
+		Date now = new Date();
+
+		int year = getAge(dateOfBirth, now);
+		int month = getMonth(dateOfBirth, now) % 12;
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(year);
+		if (year > 1)
+			sb.append(" yrs ");
+		else
+			sb.append(" yr ");
+
+		if (month == 0)
+			return sb.toString();
+
+		if (month > 1)
+			sb.append(month).append(" mos");
+		else
+			sb.append(month).append(" mo");
+
+		return sb.toString();
+
+	}
 }

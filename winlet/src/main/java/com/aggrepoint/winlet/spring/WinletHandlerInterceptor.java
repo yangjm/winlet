@@ -181,7 +181,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
 						if (!viewName.startsWith(Const.REDIRECT)
-								&& form.isValidateForm() && form.hasError()) { // 表单校验出错
+								&& form.isValidateForm() && form.hasError(true)) { // 表单校验出错
 							response.getOutputStream().write(
 									(WINLET_FORM_RESP + StringUtils
 											.fixJson(form.getJsonChanges()))
