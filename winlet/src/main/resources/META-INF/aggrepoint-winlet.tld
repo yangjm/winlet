@@ -88,6 +88,16 @@
 	</function>
 
 	<function>
+		<name>textareaeditencode</name>
+		<function-class>
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String textAreaEditEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
 		<name>wmlencode</name>
 		<function-class>
 			com.aggrepoint.winlet.jsp.taglib.ELFunction

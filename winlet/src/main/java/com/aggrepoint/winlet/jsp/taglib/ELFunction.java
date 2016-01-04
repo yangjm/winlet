@@ -94,6 +94,16 @@ public class ELFunction {
 		}
 	}
 
+	public static String textAreaEditEncode(String str) {
+		try {
+			if (str == null)
+				return "";
+			return str.replace("<br>", "&#xd;&#xa;");
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
 	public static String wmlEncode(String str) {
 		try {
 			return StringUtils.toWML(str);

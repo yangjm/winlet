@@ -537,25 +537,25 @@ public class BeanProperty implements PropertyTypeCode {
 				if (val.equals(""))
 					bNoValue = true;
 				else
-					val = new Integer((String) val);
+					val = new Integer(((String) val).replaceAll(",", ""));
 				break;
 			case LONG:
 				if (val.equals(""))
 					bNoValue = true;
 				else
-					val = new Long((String) val);
+					val = new Long(((String) val).replaceAll(",", ""));
 				break;
 			case FLOAT:
 				if (val.equals(""))
 					bNoValue = true;
 				else
-					val = new Float((String) val);
+					val = new Float(((String) val).replaceAll(",", ""));
 				break;
 			case DOUBLE:
 				if (val.equals(""))
 					bNoValue = true;
 				else
-					val = new Double((String) val);
+					val = new Double(((String) val).replaceAll(",", ""));
 				break;
 			case BOOLEAN:
 				if (val.equals(""))

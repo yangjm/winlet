@@ -43,14 +43,22 @@ public class DateUtils {
 		return cal.getTime();
 	}
 
-	public static Date prevDate(Date dt) {
+	public static Date dateAdd(Date dt, int n) {
 		if (dt == null)
 			return null;
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dt);
-		cal.add(Calendar.DAY_OF_YEAR, -1);
+		cal.add(Calendar.DAY_OF_YEAR, n);
 		return cal.getTime();
+	}
+
+	public static Date prevDate(Date dt) {
+		return dateAdd(dt, -1);
+	}
+
+	public static Date nextDate(Date dt) {
+		return dateAdd(dt, 1);
 	}
 
 	public static Date toGmt(Date dt, TimeZone tz) {

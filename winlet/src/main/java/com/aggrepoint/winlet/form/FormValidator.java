@@ -206,13 +206,16 @@ public class FormValidator implements PropertyTypeCode {
 					if (value == null)
 						return new ValidateResult(failSkip, strErrorMsg);
 
-					if (!INT.matcher(value.toString()).find())
+					if (!INT.matcher(value.toString().replaceAll(",", ""))
+							.find())
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase("float")) { // 浮点数
 					if (value == null)
 						return new ValidateResult(failSkip, strErrorMsg);
 
-					if (!FLOAT.matcher(value.toString()).find())
+					// 接受,在数字中
+					if (!FLOAT.matcher(value.toString().replaceAll(",", ""))
+							.find())
 						return new ValidateResult(failSkip, strErrorMsg);
 				} else if (strId.equalsIgnoreCase(">")
 						|| strId.equalsIgnoreCase("gt")) { // 大于
