@@ -28,6 +28,8 @@ public class IncludeTag extends BodyTagSupport {
 
 	WinletDef winletDef;
 
+	boolean root;
+
 	Hashtable<String, String> m_params;
 
 	public void setVar(String var) {
@@ -45,6 +47,10 @@ public class IncludeTag extends BodyTagSupport {
 	public void setWinlet(String winlet) {
 		Class<?> clz = WinletClassLoader.getWinletClassByPath(winlet);
 		this.winletDef = WinletDef.getDef(clz);
+	}
+
+	public void setRoot(String isRoot) {
+		root = "yes".equalsIgnoreCase(isRoot);
 	}
 
 	@Override
@@ -91,6 +97,8 @@ public class IncludeTag extends BodyTagSupport {
 							.append(new ObjectMapper().writeValueAsString(
 									m_params).replaceAll("\"", "&quot;"))
 							.append("\"");
+				if (root)
+					sb.append(" data-winlet-settings=\"{&quot;root&quot;:&quot;yes&quot;}\"");
 				sb.append(">");
 				sb.append(response);
 				sb.append("</div>");
