@@ -74,4 +74,8 @@ public interface ReqInfo {
 	boolean isFromContainer();
 
 	boolean isFirstInclude();
+
+	String getRemoteDomain();
+
+	boolean isCrossDomain();
 }

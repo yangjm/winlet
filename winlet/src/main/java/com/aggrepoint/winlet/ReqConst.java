@@ -35,4 +35,7 @@ public interface ReqConst {
 
 	/** 从container发起的请求 */
 	public final String PARAM_REQ_FROM_CONTAINER = "_c";
+
+	/** 跨域请求中，Winlet来源的域名 */
+	public final String PARAM_WINLET_DOMAIN_NAME = "_dn";
 }
