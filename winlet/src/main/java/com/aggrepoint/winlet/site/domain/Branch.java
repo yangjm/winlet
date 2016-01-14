@@ -94,7 +94,7 @@ public class Branch extends Base {
 	}
 
 	public Page getHome(AccessRuleEngine re) {
-		List<Page> pages = rootPage.getPages(re, true, true);
+		List<Page> pages = rootPage.getPages(re, true, true, false);
 
 		if (pages.size() == 0)
 			return null;

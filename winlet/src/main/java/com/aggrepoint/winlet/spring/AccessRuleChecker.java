@@ -52,35 +52,42 @@ public class AccessRuleChecker {
 		return ruleEngine;
 	}
 
-	public static AccessRule evalRule(Class<?> c) {
-		AccessRule rule = getRule(c);
-		try {
-			if (rule == null || rule.value() == null || "".equals(rule.value()))
-				return null;
+	public static AccessRule evalRule(AccessRule rule) throws Exception {
+		if (rule == null || rule.value() == null || "".equals(rule.value()))
+			return null;
 
-			return getRuleEngine().eval(rule.value()) ? null : rule;
-		} catch (Exception e) {
-			logger.error("Error evaluating access rule \"" + rule.value()
-					+ "\" defined on class " + c.getName() + "\"", e);
-			return rule;
-		}
+		return getRuleEngine().eval(rule.value()) ? null : rule;
 	}
 
-	public static AccessRule evalRule(Method m) {
+	/**
+	 * 如果方法上有定义规则，方法上的规则会覆盖类上定义的规则
+	 */
+	public static AccessRule evalRule(Class<?> c, Method m) {
 		AccessRule rule = getRule(m);
+		if (rule != null) {
+			try {
+				return evalRule(rule);
+			} catch (Exception e) {
+				logger.error("Error evaluating access rule \"" + rule.value()
+						+ "\" defined on method \"" + m.getName()
+						+ "\" of class \"" + m.getDeclaringClass().getName()
+						+ "\"", e);
+				return rule;
 
-		try {
-			if (rule == null || rule.value() == null || "".equals(rule.value()))
-				return null;
-
-			return getRuleEngine().eval(rule.value()) ? null : rule;
-		} catch (Exception e) {
-			logger.error(
-					"Error evaluating access rule \"" + rule.value()
-							+ "\" defined on method \"" + m.getName()
-							+ "\" of class \""
-							+ m.getDeclaringClass().getName() + "\"", e);
-			return rule;
+			}
 		}
+
+		rule = getRule(c);
+		if (rule != null) {
+			try {
+				return evalRule(rule);
+			} catch (Exception e) {
+				logger.error("Error evaluating access rule \"" + rule.value()
+						+ "\" defined on class " + c.getName() + "\"", e);
+				return rule;
+			}
+		}
+
+		return null;
 	}
 }

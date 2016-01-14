@@ -35,6 +35,7 @@ public class PageDao {
 			if (page.getName() == null)
 				page.setName(page.getPath());
 			page.setRule(cfgs.get("rule"));
+			page.setExpandRule(cfgs.get("expand-rule"));
 			page.setTemplate(cfgs.get("template"));
 			page.setTemplatePrefixes(BranchDao.parseTemplatePrefix(cfgs
 					.get("template-prefix")));

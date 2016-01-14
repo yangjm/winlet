@@ -247,6 +247,17 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public boolean hasError(String field) {
+		processBinders();
+
+		ArrayList<String> errors = fieldErrors.get(field);
+		if (errors == null || errors.size() == 0)
+			return false;
+
+		return true;
+	}
+
+	@Override
 	public String[] getErrors(String field) {
 		processBinders();
 

@@ -56,8 +56,11 @@ public interface Form {
 	 * 
 	 * @return
 	 */
-	public boolean hasError();
+	boolean hasError();
+
 	boolean hasError(boolean fieldErrorsOnly);
+
+	boolean hasError(String field);
 
 	/**
 	 * 获取字段上当前存在的所有校验错误
@@ -95,7 +98,6 @@ public interface Form {
 	 * @param field
 	 */
 	public void setEnabled(String field);
-
 
 	/**
 	 * 显示表单中的元素。

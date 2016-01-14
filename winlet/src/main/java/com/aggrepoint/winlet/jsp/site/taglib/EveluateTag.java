@@ -11,9 +11,9 @@ import com.aggrepoint.winlet.site.domain.Page;
 
 /**
  * 
- *         <ae:eval type="focus" page="page0" name="bbbb"/> <% if
- *         (bbbb.booleanValue()) { %>aaa<% } else { %>bbb<% } %>
- *         
+ * <ae:eval type="focus" page="page0" name="bbbb"/> <% if (bbbb.booleanValue())
+ * { %>aaa<% } else { %>bbb<% } %>
+ * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class EveluateTag extends TagSupport {
@@ -65,7 +65,7 @@ public class EveluateTag extends TagSupport {
 			Page page = Utils.getPage(this, pageContext, m_strPage, m_iLevel);
 
 			if (m_strType.equals("hassub")) { // 判断指定的页是否包含子页面
-				if (page.getPages(re, false, true).size() > 0)
+				if (page.getPages(re, false, true, false).size() > 0)
 					bResult = true;
 			} else if (m_strType.equals("current")) { // 判断指定的页是否当前页
 				if (currentPage == page)
@@ -89,6 +89,12 @@ public class EveluateTag extends TagSupport {
 				if (tt != null)
 					if (!tt.hasNext())
 						bResult = true;
+			} else if (m_strType.equals("canaccess")) { // 是否可以访问当前页。用于处理只能扩展访问但不能直接访问的页面
+				if (page.getRule() == null
+						|| ContextUtils.getAccessRuleEngine(
+								(HttpServletRequest) pageContext.getRequest())
+								.eval(page.getRule()))
+					bResult = true;
 			}
 
 			pageContext.setAttribute(m_strName, new Boolean(bResult));

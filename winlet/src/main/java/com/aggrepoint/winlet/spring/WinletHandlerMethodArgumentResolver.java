@@ -22,6 +22,7 @@ import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
+import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
@@ -52,7 +53,8 @@ public class WinletHandlerMethodArgumentResolver implements
 			return true;
 
 		if (clz == Boolean.class || clz == boolean.class)
-			if (parameter.getParameterAnnotation(PageRefresh.class) != null)
+			if (parameter.getParameterAnnotation(PageRefresh.class) != null
+					|| parameter.getParameterAnnotation(AccessRule.class) != null)
 				return true;
 
 		return false;
@@ -86,8 +88,16 @@ public class WinletHandlerMethodArgumentResolver implements
 			return obj;
 		}
 
-		if (clz == Boolean.class || clz == boolean.class)
-			return ContextUtils.getReqInfo().isPageRefresh();
+		if (clz == Boolean.class || clz == boolean.class) {
+			if (parameter.getParameterAnnotation(PageRefresh.class) != null)
+				return ContextUtils.getReqInfo().isPageRefresh();
+			AccessRule rule = parameter
+					.getParameterAnnotation(AccessRule.class);
+			if (rule != null)
+				return ContextUtils.getAccessRuleEngine(
+						ContextUtils.getRequest()).eval(rule.value());
+			return false;
+		}
 
 		if (clz.isAssignableFrom(Validation.class))
 			return new ValidationImpl(ContextUtils.getReqInfo());

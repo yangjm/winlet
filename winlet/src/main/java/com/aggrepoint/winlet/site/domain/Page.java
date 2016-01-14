@@ -28,6 +28,8 @@ public class Page extends Base {
 	private boolean skip;
 	private boolean hide;
 	private boolean expand;
+	/** 扩展访问规则 */
+	private String expandRule;
 	private boolean isStatic;
 	private List<Area> areas = new ArrayList<Area>();
 	private Hashtable<String, List<Area>> areasByName = new Hashtable<String, List<Area>>();
@@ -170,6 +172,14 @@ public class Page extends Base {
 		this.expand = expand;
 	}
 
+	public String getExpandRule() {
+		return expandRule;
+	}
+
+	public void setExpandRule(String expandRule) {
+		this.expandRule = expandRule;
+	}
+
 	public boolean isStatic() {
 		return isStatic;
 	}
@@ -215,7 +225,7 @@ public class Page extends Base {
 	}
 
 	public List<Page> getPages(AccessRuleEngine re, boolean includeHide,
-			boolean constainsNotSkip) {
+			boolean constainsNotSkip, boolean includeExpand) {
 		if (pages.size() == 0)
 			return pages;
 
@@ -225,11 +235,14 @@ public class Page extends Base {
 				continue;
 
 			try {
-				if (p.getRule() == null || re.eval(p.getRule()))
+				if (p.getRule() == null || re.eval(p.getRule())
+						|| includeExpand && p.getExpandRule() != null
+						&& re.eval(p.getExpandRule()))
 					if (!constainsNotSkip || p.containsNotSkip(re))
 						list.add(p);
 			} catch (Exception e) {
 				logger.error("Error evaluating rule \"" + p.getRule()
+						+ "\" or \"" + p.getExpandRule()
 						+ "\" defined on page \"" + p.getFullPath() + "\".", e);
 			}
 		}
@@ -258,13 +271,24 @@ public class Page extends Base {
 	}
 
 	public Page findPage(String path, AccessRuleEngine re) {
-		if (path.equals(fullPath))
-			return this;
+		if (path.equals(fullPath)) {
+			// 非扩展匹配，确认符合非扩展匹配规则
+			// getPage()返回的页面有可能是符合扩展匹配但不符合非扩展匹配，所以需要检查
+			try {
+				if (rule == null || re.eval(rule))
+					return this;
+			} catch (Exception e) {
+				logger.error("Error evaluating rule \"" + rule
+						+ "\" defined on page \"" + getFullPath() + "\".", e);
+			}
+
+			return null;
+		}
 
 		if (!path.startsWith(fullPath))
 			return null;
 
-		List<Page> list = getPages(re, true, true);
+		List<Page> list = getPages(re, true, true, true);
 		for (Page p : list) {
 			Page f = p.findPage(path, re);
 			if (f != null)
@@ -272,7 +296,16 @@ public class Page extends Base {
 		}
 
 		if (isExpand())
-			return this;
+			try {
+				if (expandRule == null || re.eval(expandRule)) {
+					// 扩展匹配，确认符合扩展匹配规则
+					// getPage()返回的页面有可能是符合非扩展匹配但不符合扩展匹配，所以需要检查
+					return this;
+				}
+			} catch (Exception e) {
+				logger.error("Error evaluating rule \"" + expandRule
+						+ "\" defined on page \"" + getFullPath() + "\".", e);
+			}
 
 		return null;
 	}
@@ -281,7 +314,7 @@ public class Page extends Base {
 		if (!skip)
 			return this;
 
-		List<Page> list = getPages(re, true, true);
+		List<Page> list = getPages(re, true, true, false);
 		if (list.size() == 0)
 			return this;
 

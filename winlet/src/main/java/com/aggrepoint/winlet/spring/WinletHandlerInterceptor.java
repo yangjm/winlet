@@ -46,9 +46,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType());
-			if (rule == null)
-				rule = AccessRuleChecker.evalRule(hm.getMethod());
+			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType(),
+					hm.getMethod());
 			if (rule != null) {
 				if (rule.exception() == Unspecified.class)
 					return false;
@@ -108,6 +107,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 				return;
 			}
+
+			ContextUtils.setHandlerMethod(request, hm);
 
 			Window win = null;
 			Action action = null;
