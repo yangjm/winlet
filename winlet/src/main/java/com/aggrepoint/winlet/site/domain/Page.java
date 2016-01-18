@@ -5,11 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.aggrepoint.utils.TwoValues;
 import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
 
 /**
@@ -38,6 +41,8 @@ public class Page extends Base {
 	private int level;
 	private String fullPath;
 	private String fullDir;
+	/** key为area name，twovalues中第一个值为规则，第二个值为如果符合规则要映射到的area name */
+	private Map<String, List<TwoValues<String, String>>> areaMap = new HashMap<String, List<TwoValues<String, String>>>();
 
 	protected HashMap<String, String> data;
 
@@ -191,11 +196,35 @@ public class Page extends Base {
 	}
 
 	public List<Area> getAreas(String name) {
+		List<TwoValues<String, String>> list = areaMap.get(name);
+		if (list != null) {
+			PsnRuleEngine engine = ContextUtils.getPsnRuleEngine(ContextUtils
+					.getRequest());
+			for (TwoValues<String, String> map : list)
+				try {
+					if (engine.eval(map.getOne())) {
+						name = map.getTwo();
+						break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+		}
+
 		return areasByName.get(name);
 	}
 
 	public List<Area> getAreas() {
 		return areas;
+	}
+
+	public void addAreaMap(String from, String to, String rule) {
+		List<TwoValues<String, String>> list = areaMap.get(from);
+		if (list == null) {
+			list = new ArrayList<TwoValues<String, String>>();
+			areaMap.put(from, list);
+		}
+		list.add(new TwoValues<String, String>(rule, to));
 	}
 
 	public void addArea(Area area) {
