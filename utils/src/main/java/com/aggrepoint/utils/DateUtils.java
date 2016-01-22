@@ -43,7 +43,7 @@ public class DateUtils {
 		return cal.getTime();
 	}
 
-	public static Date dateAdd(Date dt, int n) {
+	public static Date addDay(Date dt, int n) {
 		if (dt == null)
 			return null;
 
@@ -53,12 +53,22 @@ public class DateUtils {
 		return cal.getTime();
 	}
 
+	public static Date addMonth(Date dt, int n) {
+		if (dt == null)
+			return null;
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt);
+		cal.add(Calendar.MONTH, n);
+		return cal.getTime();
+	}
+
 	public static Date prevDate(Date dt) {
-		return dateAdd(dt, -1);
+		return addDay(dt, -1);
 	}
 
 	public static Date nextDate(Date dt) {
-		return dateAdd(dt, 1);
+		return addDay(dt, 1);
 	}
 
 	public static Date toGmt(Date dt, TimeZone tz) {
