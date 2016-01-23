@@ -85,6 +85,8 @@ public interface Form {
 	 */
 	public void clearError(String field);
 
+	public void clearErrors();
+
 	/**
 	 * 将指定字段的状态改为禁用。
 	 * 

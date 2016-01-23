@@ -543,6 +543,19 @@ public class StringUtils {
 	}
 
 	/**
+	 * Jackson生成的JSON字符串中，如果值里面有<>，直接将JSON写入页面中会造成错误，需要进行转码
+	 * 应该用于所有会被直接写入页面中供页面里JS代码使用的JSON字符串
+	 * 
+	 * @return
+	 */
+	public static String escapeAngleBracketsInJson(String json) {
+		if (json == null)
+			return null;
+
+		return json.replaceAll("<", "\\\\<").replaceAll(">", "\\\\>");
+	}
+
+	/**
 	 * 将以yyyy-MM-dd形式的字符串转换为Calendar对象
 	 * 
 	 * @param time

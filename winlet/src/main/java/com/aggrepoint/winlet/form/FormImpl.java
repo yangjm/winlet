@@ -284,6 +284,14 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public void clearErrors() {
+		processBinders();
+
+		fieldErrors.clear();
+		vecChanges.clear();
+	}
+
+	@Override
 	public void clearError(String field) {
 		processBinders();
 
