@@ -496,4 +496,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	public HashMap<String, String> getTopPageParams() {
 		return topPageParams;
 	}
+
+	@Override
+	public String getContextPath() {
+		return request.getContextPath();
+	}
 }

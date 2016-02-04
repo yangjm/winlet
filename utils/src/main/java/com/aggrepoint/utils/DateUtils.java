@@ -150,24 +150,61 @@ public class DateUtils {
 		return months;
 	}
 
-	public static int getGrade(Date gradeDate, int grade, Date onDate) {
-		Calendar calGradeDate = Calendar.getInstance();
+	static int GRADE_YEAR = 0;
+	static long GRADE_YEAR_VALID_TO = 0;
+
+	public static synchronized int getCurrentGradeYear() {
+		if (System.currentTimeMillis() > GRADE_YEAR_VALID_TO) {
+			Calendar cal = Calendar.getInstance();
+			GRADE_YEAR = cal.get(Calendar.YEAR);
+			if (cal.get(Calendar.MONTH) <= Calendar.JUNE)
+				GRADE_YEAR--;
+			GRADE_YEAR_VALID_TO = System.currentTimeMillis() + 60 * 1000l;
+		}
+		return GRADE_YEAR;
+	}
+
+	public static int getGradeYear(Date date) {
+		if (date == null)
+			return getCurrentGradeYear();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		int gradeYear = cal.get(Calendar.YEAR);
+		if (cal.get(Calendar.MONTH) <= Calendar.JUNE)
+			gradeYear--;
+		return gradeYear;
+	}
+
+	/**
+	 * 学生在year年的9月份是grade年级，计算他在onDate是几年级
+	 */
+	public static int getGrade(int year, int grade, Date onDate) {
 		Calendar calOnDate = Calendar.getInstance();
-
-		calGradeDate.setTime(gradeDate);
 		calOnDate.setTime(onDate);
-
-		int gradeDateYear = calGradeDate.get(Calendar.YEAR);
-		if (calGradeDate.get(Calendar.MONTH) >= 8)
-			gradeDateYear++;
 		int onDateYear = calOnDate.get(Calendar.YEAR);
-		if (calOnDate.get(Calendar.MONTH) >= 8)
-			onDateYear++;
+		if (calOnDate.get(Calendar.MONTH) < Calendar.SEPTEMBER)
+			onDateYear--;
 
-		grade += (onDateYear - gradeDateYear);
+		grade += (onDateYear - year);
 		if (grade < 0)
 			grade = 0;
 		else if (grade > 13) // 0 = JK, 1 = SK, ... 13 = grade 12
+			grade = 13;
+
+		return grade;
+	}
+
+	/**
+	 * 学生在year年的9月份是grade年级，计算他在onYear的9月份是几年级
+	 */
+	public static Integer getGrade(Integer year, Integer grade, Integer onYear) {
+		if (year == null || grade == null || onYear == null)
+			return null;
+
+		grade += onYear - year;
+		if (grade < 0)
+			grade = 0;
+		else if (grade > 13)
 			grade = 13;
 
 		return grade;

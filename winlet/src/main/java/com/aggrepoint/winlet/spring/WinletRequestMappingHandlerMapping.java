@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -57,7 +58,7 @@ public class WinletRequestMappingHandlerMapping extends
 			clz = classMap.get(hm);
 
 		if (clz != null) { // This is a Winlet
-			if (req.getActionId() == null) { // 没有指定Action
+			if (StringUtils.isEmpty(req.getActionId())) { // 没有指定Action
 				Window annotation = AnnotationUtils.findAnnotation(
 						hm.getMethod(), Window.class);
 				if (annotation == null) // 不是@Window方法

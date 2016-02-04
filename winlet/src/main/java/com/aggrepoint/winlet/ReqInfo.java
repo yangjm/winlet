@@ -78,4 +78,6 @@ public interface ReqInfo {
 	String getRemoteDomain();
 
 	boolean isCrossDomain();
+
+	public String getContextPath();
 }

@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 /**
  * 字符串处理工具方法
@@ -802,6 +803,15 @@ public class StringUtils {
 
 	public static boolean notEmpty(String str) {
 		return str != null && !str.trim().equals("");
+	}
+
+	static final Pattern EMAIL = Pattern
+			.compile("^[\\w-]+@([\\w-]+\\.)+[\\w-]+$");
+
+	public static boolean isEmail(String str) {
+		if (str == null)
+			return false;
+		return EMAIL.matcher(str.trim()).find();
 	}
 
 	public static Hashtable<String, String> getHashParamsFromUrl(String url) {
