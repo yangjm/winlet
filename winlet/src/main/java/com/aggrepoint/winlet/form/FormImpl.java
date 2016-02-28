@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -494,5 +495,23 @@ public class FormImpl implements Form, ReqConst {
 	@Override
 	public boolean hasField(String field) {
 		return fields.contains(field);
+	}
+
+	@Override
+	public void verify(String field, Function<String, Boolean> v, String error) {
+		if (!validate(field))
+			return;
+
+		if (!v.apply(getValue(field)))
+			addError(field, error);
+	}
+
+	@Override
+	public void errorIf(String field, Function<String, Boolean> v, String error) {
+		if (!validate(field))
+			return;
+
+		if (v.apply(getValue(field)))
+			addError(field, error);
 	}
 }

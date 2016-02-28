@@ -1,5 +1,7 @@
 package com.aggrepoint.winlet.form;
 
+import java.util.function.Function;
+
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
@@ -21,6 +23,24 @@ public interface Form {
 	 * @return
 	 */
 	public boolean validate(String field);
+
+	/**
+	 * 对字段field进行校验
+	 * 
+	 * @param field
+	 * @param 参数是字段值，返回true表示校验通过，false表示校验失败
+	 * @param error 如果校验失败，使用的错误信息
+	 */
+	public void verify(String field, Function<String, Boolean> v, String error);
+
+	/**
+	 * 对字段field进行校验
+	 * 
+	 * @param field
+	 * @param 参数是字段值，返回false表示校验通过，true表示校验失败
+	 * @param error 如果校验失败，使用的错误信息
+	 */
+	public void errorIf(String field, Function<String, Boolean> v, String error);
 
 	/**
 	 * 获取字段field的值。
