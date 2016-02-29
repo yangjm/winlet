@@ -805,13 +805,22 @@ public class StringUtils {
 		return str != null && !str.trim().equals("");
 	}
 
+	// 这个Pattern太严格。没有找到简单的pattern，放松检查，只要在中间包含一个@就可以
 	static final Pattern EMAIL = Pattern
 			.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$");
 
 	public static boolean isEmail(String str) {
 		if (str == null)
 			return false;
-		return EMAIL.matcher(str.trim()).find();
+		str = str.trim();
+		int len = str.length();
+		int idx = str.indexOf("@");
+		if (idx <= 0 || idx == len - 1)
+			return false;
+		if (str.indexOf("@", idx + 1) > 0)
+			return false;
+
+		return true;
 	}
 
 	public static Hashtable<String, String> getHashParamsFromUrl(String url) {
