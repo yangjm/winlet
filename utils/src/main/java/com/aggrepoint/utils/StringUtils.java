@@ -806,7 +806,7 @@ public class StringUtils {
 	}
 
 	static final Pattern EMAIL = Pattern
-			.compile("^[\\w-]+@([\\w-]+\\.)+[\\w-]+$");
+			.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]+$");
 
 	public static boolean isEmail(String str) {
 		if (str == null)
