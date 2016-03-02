@@ -2,9 +2,15 @@ package com.aggrepoint.winlet.spring;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.MethodParameter;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
@@ -78,14 +84,45 @@ public class WinletHandlerMethodArgumentResolver implements
 		PageStorageAttr attr = parameter
 				.getParameterAnnotation(PageStorageAttr.class);
 		if (attr != null) {
-			PageStorage ps = ContextUtils.getReqInfo().getPageStorage();
-			Object obj = ps.getAttribute(attr.value());
-			if (obj == null && attr.createIfNotExist()) {
-				obj = clz.newInstance();
-				ps.setAttribute(attr.value(), obj);
+			Object arg = null;
+
+			if (!StringUtils.isEmpty(attr.reqparam())) { // 有定义请求参数，从请求参数中取值
+				arg = webRequest.getParameter(attr.reqparam());
+				if (StringUtils.isEmpty(arg))
+					arg = null;
 			}
 
-			return obj;
+			PageStorage ps = ContextUtils.getReqInfo().getPageStorage();
+
+			if (arg == null) // 没有定义请求参数，或请求参数中没有值，从PageStorage中取
+				arg = ps.getAttribute(attr.value());
+
+			// 转换为参数所需格式。参考了AbstractNamedValueMethodArgumentResolver.resolveArgument中的实现
+			if (binderFactory != null) {
+				Class<?> paramType = parameter.getParameterType();
+				WebDataBinder binder = binderFactory.createBinder(webRequest,
+						null, parameter.getParameterName());
+				try {
+					arg = binder.convertIfNecessary(arg, paramType, parameter);
+				} catch (ConversionNotSupportedException ex) {
+					throw new MethodArgumentConversionNotSupportedException(
+							arg, ex.getRequiredType(),
+							parameter.getParameterName(), parameter,
+							ex.getCause());
+				} catch (TypeMismatchException ex) {
+					throw new MethodArgumentTypeMismatchException(arg,
+							ex.getRequiredType(), parameter.getParameterName(),
+							parameter, ex.getCause());
+
+				}
+			}
+
+			if (arg == null && attr.createIfNotExist())
+				arg = clz.newInstance();
+
+			ps.setAttribute(attr.value(), arg);
+
+			return arg;
 		}
 
 		if (clz == Boolean.class || clz == boolean.class) {

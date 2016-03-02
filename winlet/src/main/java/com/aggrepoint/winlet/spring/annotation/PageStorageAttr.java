@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 public @interface PageStorageAttr {
 	String value();
 
+	/** 请求参数名称 */
+	String reqparam() default "";
+
 	boolean createIfNotExist() default false;
 }
