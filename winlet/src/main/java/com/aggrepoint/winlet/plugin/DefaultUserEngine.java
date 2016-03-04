@@ -49,8 +49,9 @@ public class DefaultUserEngine implements UserEngine {
 	public void setUser(HttpServletRequest req, UserProfile user) {
 		if (user == null) {
 			HttpSession session = req.getSession(false);
-			if (session != null)
-				session.removeAttribute(SESSION_KEY);
+			if (session != null) {
+				session.invalidate();
+			}
 		} else {
 			// start new session to prevent session fixation
 			HttpSession session = req.getSession(false);
