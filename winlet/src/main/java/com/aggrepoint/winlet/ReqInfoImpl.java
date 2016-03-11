@@ -501,4 +501,9 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	public String getContextPath() {
 		return request.getContextPath();
 	}
+
+	@Override
+	public boolean isWinInclude() {
+		return request instanceof WinletRequestWrapper;
+	}
 }

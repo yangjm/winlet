@@ -59,10 +59,17 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				return true;
 			Action action = AnnotationUtils.findAnnotation(hm.getMethod(),
 					Action.class); // 不是Action
-			if (action == null)
-				return true;
 
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
+			if (action == null) {
+				if (ri.isFromContainer() && !ri.isWinInclude()) {
+					// container中只允许调用action，不能调用window
+					// action的JSP include其他window是可以的
+					return false;
+				}
+				return true;
+			}
+
 			FormImpl form = ((FormImpl) ri.getForm());
 			form.validate(ri, hm.getBean(), hm.getMethod());
 		}

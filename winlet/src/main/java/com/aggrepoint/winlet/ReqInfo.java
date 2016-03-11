@@ -80,4 +80,7 @@ public interface ReqInfo {
 	boolean isCrossDomain();
 
 	public String getContextPath();
+
+	/** 当前请求是否由win:include引起 */
+	boolean isWinInclude();
 }
