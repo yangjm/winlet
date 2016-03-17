@@ -214,8 +214,9 @@ public class Resolver extends javax.el.ELResolver {
 					val = WinletDefaultFormattingConversionService.format(base,
 							property.toString());
 					context.setPropertyResolved(true);
-				} else if (AnnotationUtils.findAnnotation(base.getClass(),
-						Entity.class) != null
+				} else if ((AnnotationUtils.findAnnotation(base.getClass(),
+						Entity.class) != null || AnnotationUtils
+						.findAnnotation(base.getClass(), EncodeString.class) != null)
 						&& String.class.equals(getPropType(base,
 								property.toString()))) {
 					// 如果是Entity的属性并且类型为字符串则加上encoding，并且将换行转换为<br>

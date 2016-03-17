@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.method.HandlerMethod;
 
 import com.aggrepoint.winlet.spring.WinletDispatcherServlet;
 
@@ -30,9 +31,10 @@ public class ContextUtils {
 			.getName() + ".REQUEST_CONFIG_PROVIDER";
 	private static String REQUEST_LIST_PROVIDER = ContextUtils.class.getName()
 			+ ".REQUEST_LIST_PROVIDER";
+	private static String REQUEST_HANDLER_METHOD = ContextUtils.class.getName()
+			+ ".REQUEST_HANDLER_METHOD";
 	private static String REQUEST_LOGINFO_KEY = LogInfoImpl.class.getName()
 			+ ".REQUEST_LOGINFO_KEY";
-
 	private static String REQUEST_DISPATCHER = LogInfoImpl.class.getName()
 			+ ".REQUEST_DISPATCHER_KEY";
 
@@ -168,6 +170,15 @@ public class ContextUtils {
 	public static void setListProvider(HttpServletRequest request,
 			ListProvider provider) {
 		request.setAttribute(REQUEST_LIST_PROVIDER, provider);
+	}
+
+	public static HandlerMethod getHandlerMethod(HttpServletRequest request) {
+		return (HandlerMethod) request.getAttribute(REQUEST_HANDLER_METHOD);
+	}
+
+	public static void setHandlerMethod(HttpServletRequest request,
+			HandlerMethod hm) {
+		request.setAttribute(REQUEST_HANDLER_METHOD, hm);
 	}
 
 	public static WinletDispatcherServlet getDispatcher(

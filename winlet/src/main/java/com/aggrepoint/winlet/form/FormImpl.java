@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,6 +42,10 @@ public class FormImpl implements Form, ReqConst {
 	private HashSet<String> groupNames = new HashSet<String>();
 	private Hashtable<String, Vector<String>> fieldValues = new Hashtable<String, Vector<String>>();
 	private Hashtable<String, ArrayList<String>> fieldErrors = new Hashtable<String, ArrayList<String>>();
+	/** bindingErrorCount的值为在全表单校验时BindingError的计数，不管这些Error是否有对应Form中的Field。 */
+	/** 通过程序代码提交表单请求时，请求中可能不带表单字段名称列表，即使数据有错误，fieldErrors也可能为空。 */
+	/** 一般情况下要确保bindingErrorCount也不为0才可以视为表单数据校验通过。 */
+	private int bindingErrorCount;
 	private HashSet<String> disabledFields;
 	private Vector<Change> vecChanges = new Vector<Change>();
 
@@ -89,7 +94,8 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public boolean validate(String field) {
-		return fields.contains(field) || groupNames.contains(field);
+		return !ri.isValidateField() // 不是单字段校验，对所有字段都校验
+				|| fields.contains(field) || groupNames.contains(field);
 	}
 
 	public void recordChange(Change change) {
@@ -228,7 +234,28 @@ public class FormImpl implements Form, ReqConst {
 	public boolean hasError() {
 		processBinders();
 
-		return fieldErrors.size() > 0;
+		return fieldErrors.size() > 0 || bindingErrorCount > 0;
+	}
+
+	@Override
+	public boolean hasError(boolean fieldErrorsOnly) {
+		processBinders();
+
+		if (fieldErrorsOnly)
+			return fieldErrors.size() > 0;
+
+		return fieldErrors.size() > 0 || bindingErrorCount > 0;
+	}
+
+	@Override
+	public boolean hasError(String field) {
+		processBinders();
+
+		ArrayList<String> errors = fieldErrors.get(field);
+		if (errors == null || errors.size() == 0)
+			return false;
+
+		return true;
 	}
 
 	@Override
@@ -258,6 +285,14 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public void clearErrors() {
+		processBinders();
+
+		fieldErrors.clear();
+		vecChanges.clear();
+	}
+
+	@Override
 	public void clearError(String field) {
 		processBinders();
 
@@ -281,6 +316,20 @@ public class FormImpl implements Form, ReqConst {
 
 		disabledFields.remove(field);
 		recordChange(new ChangeEnable(field));
+	}
+
+	@Override
+	public void show(String selector) {
+		processBinders();
+
+		recordChange(new ChangeShow(selector));
+	}
+
+	@Override
+	public void hide(String selector) {
+		processBinders();
+
+		recordChange(new ChangeHide(selector));
 	}
 
 	@Override
@@ -390,7 +439,7 @@ public class FormImpl implements Form, ReqConst {
 
 		HttpServletRequest request = ContextUtils.getRequest();
 		WebApplicationContext context = RequestContextUtils
-				.getWebApplicationContext(request);
+				.findWebApplicationContext(request);
 		Locale locale = RequestContextUtils.getLocale(request);
 
 		for (BindingResult val : values) {
@@ -429,7 +478,10 @@ public class FormImpl implements Form, ReqConst {
 		if (ri.isValidateField()) {
 			mergeBindingResult(ri.getValidateFieldName(), values);
 		} else {
-			fields.forEach(p -> mergeBindingResult(p, values));
+			if (values != null) {
+				values.forEach(p -> bindingErrorCount += p.getErrorCount());
+				fields.forEach(p -> mergeBindingResult(p, values));
+			}
 		}
 	}
 
@@ -443,5 +495,23 @@ public class FormImpl implements Form, ReqConst {
 	@Override
 	public boolean hasField(String field) {
 		return fields.contains(field);
+	}
+
+	@Override
+	public void verify(String field, Function<String, Boolean> v, String error) {
+		if (!validate(field))
+			return;
+
+		if (!v.apply(getValue(field)))
+			addError(field, error);
+	}
+
+	@Override
+	public void errorIf(String field, Function<String, Boolean> v, String error) {
+		if (!validate(field))
+			return;
+
+		if (v.apply(getValue(field)))
+			addError(field, error);
 	}
 }

@@ -9,15 +9,21 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.method.HandlerMethod;
 
 import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.ContextUtils;
@@ -25,6 +31,9 @@ import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.StaticUrlProvider;
 import com.aggrepoint.winlet.jsp.Resolver;
 import com.aggrepoint.winlet.site.SiteController;
+import com.aggrepoint.winlet.spring.AccessRuleChecker;
+import com.aggrepoint.winlet.spring.WinletClassLoader;
+import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.utils.BeanProperty;
 import com.aggrepoint.winlet.utils.EncodeUtils;
 
@@ -67,12 +76,38 @@ public class ELFunction {
 		}
 	}
 
+	public static String attrEncode(String str) {
+		try {
+			return EncodeUtils.attr(str);
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
+	public static String jsEncode(String str) {
+		try {
+			return EncodeUtils.js(str);
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
 	public static String textAreaEncode(String str) {
 		try {
 			if (str == null)
 				return "";
 			return str.replace("&#xd;&#xa;", "<br>").replace("&#xd;", "<br>")
 					.replace("&#xa;", "<br>");
+		} catch (Exception e) {
+			return str;
+		}
+	}
+
+	public static String textAreaEditEncode(String str) {
+		try {
+			if (str == null)
+				return "";
+			return str.replace("<br>", "&#xd;&#xa;");
 		} catch (Exception e) {
 			return str;
 		}
@@ -294,6 +329,9 @@ public class ELFunction {
 		return null;
 	}
 
+	/**
+	 * 执行Access Rule
+	 */
 	public static Boolean access(String rule) throws Exception {
 		try {
 			return ContextUtils.getAccessRuleEngine(ContextUtils.getRequest())
@@ -304,6 +342,93 @@ public class ELFunction {
 		}
 
 		return false;
+	}
+
+	static Map<String, Method> methodMap = Collections
+			.synchronizedMap(new HashMap<String, Method>());
+
+	/**
+	 * 判断当前用户是否可以访问path指向的action或window。 path值/aaa/bbb表示检查是否可以访问winlet
+	 * aaa中定义的bbb方法
+	 * path值bbb表示检查是否可以访问当前被执行的winlet中定义的bbb方法。bbb是指方法映射的URL，不是指方法名称
+	 */
+	public static Boolean canAccess(String url) {
+		if (url == null)
+			return false;
+
+		Method method = methodMap.get(url);
+
+		if (method == null) { // 找到url对应的method
+			if (methodMap.containsKey(url))
+				return false;
+
+			methodMap.put(url, null);
+
+			// { 分解winlet url和method url
+			String winletUrl = null;
+			String methodUrl = null;
+
+			url = url.trim();
+			if (url.startsWith("/"))
+				url = url.substring(1);
+			int idx = url.indexOf("/");
+			if (idx > 0) {
+				winletUrl = "/" + url.substring(0, idx).trim();
+				methodUrl = "/" + url.substring(idx + 1).trim();
+			} else
+				methodUrl = "/" + url.trim();
+			// }
+
+			// { 找到对应的Winlet类
+			Class<?> winletClass = null;
+			if (winletUrl == null) {
+				HandlerMethod hm = ContextUtils.getHandlerMethod(ContextUtils
+						.getRequest());
+				if (hm != null)
+					winletClass = hm.getBeanType();
+			} else {
+				winletClass = WinletClassLoader.getWinletClassByPath(winletUrl);
+			}
+
+			if (winletClass == null)
+				return false;
+			// }
+
+			// { 找到对应的方法
+			for (Method m : winletClass.getMethods()) {
+				RequestMapping rm = AnnotationUtils.findAnnotation(m,
+						RequestMapping.class);
+				if (rm != null)
+					for (String str : rm.value())
+						if (methodUrl.equals(str)) {
+							method = m;
+							break;
+						}
+
+				if (method != null)
+					break;
+
+				Action action = AnnotationUtils.findAnnotation(m, Action.class);
+				if (action != null) {
+					String str = action.value();
+					if (StringUtils.isEmpty(str))
+						str = m.getName();
+					str = "/" + str;
+					if (methodUrl.equals(str)) {
+						method = m;
+						break;
+					}
+				}
+			}
+
+			if (method == null)
+				return false;
+			// }
+
+			methodMap.put(url, method);
+		}
+
+		return AccessRuleChecker.evalRule(method.getDeclaringClass(), method) == null;
 	}
 
 	public static Boolean psn(String rule) throws Exception {
@@ -353,56 +478,6 @@ public class ELFunction {
 		return false;
 	}
 
-	// ///////////////////////////////////////////////////////
-	//
-	// 以下部分是Winlet专用
-	//
-	// ///////////////////////////////////////////////////////
-
-	/**
-	 * 生成函数定义<br>
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static String funcdef(String name) {
-		ReqInfo reqInfo = ContextUtils.getReqInfo();
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("document.");
-		sb.append(name);
-		sb.append(reqInfo.getRequestId());
-		sb.append(" = function");
-
-		return sb.toString();
-	}
-
-	/**
-	 * 生成函数调用<br>
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static String func(String name) {
-		ReqInfo reqInfo = ContextUtils.getReqInfo();
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("document.");
-		sb.append(name);
-		sb.append(reqInfo.getRequestId());
-
-		return sb.toString();
-	}
-
-	public static String funcResurl(String param) {
-		HttpServletRequest req = ContextUtils.getRequest();
-
-		if (param.startsWith("/"))
-			return req.getContextPath() + param;
-		else
-			return req.getContextPath() + "/" + param;
-	}
-
 	public static int funcToInt(Object val) {
 		if (val instanceof Double)
 			return ((Double) val).intValue();
@@ -416,6 +491,12 @@ public class ELFunction {
 			return ((Short) val).intValue();
 		return 0;
 	}
+
+	// ///////////////////////////////////////////////////////
+	//
+	// 以下部分是Winlet专用
+	//
+	// ///////////////////////////////////////////////////////
 
 	/**
 	 * 生成静态链接
@@ -436,27 +517,4 @@ public class ELFunction {
 			return pagePath + url.substring(1);
 		return pagePath + url;
 	}
-
-	// public static String resurl(String param, boolean isStatic) {
-	// return ResourceUrlTag.getUrl(WinletReqInfo
-	// .getInfo((HttpServletRequest) ThreadContext
-	// .getAttribute(THREAD_ATTR_REQUEST)), param, null, null,
-	// isStatic);
-	// }
-	//
-	// public static String resurl(String param) {
-	// return resurl(param, true);
-	// }
-	//
-	// public static String actionurl(String param) {
-	// return ActionUrlTag.getUrl(WinletReqInfo
-	// .getInfo((HttpServletRequest) ThreadContext
-	// .getAttribute(THREAD_ATTR_REQUEST)), param);
-	// }
-	//
-	// public static String resproxy(String res) throws Exception {
-	// return ResProxyTag.getUrl(WinletReqInfo
-	// .getInfo((HttpServletRequest) ThreadContext
-	// .getAttribute(THREAD_ATTR_REQUEST)), res);
-	// }
 }

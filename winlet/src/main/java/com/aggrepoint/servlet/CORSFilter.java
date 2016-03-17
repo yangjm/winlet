@@ -34,6 +34,8 @@ public class CORSFilter extends OncePerRequestFilter {
 		}
 
 		// CORS请求不能传递自定义的HEADER，转换为<div id="winlet-header"></div>放在返回的内容中
-		filterChain.doFilter(request, new CORSResponseWrapper(response));
+		CORSResponseWrapper wrapper = new CORSResponseWrapper(response);
+		filterChain.doFilter(request, wrapper);
+		wrapper.close();
 	}
 }

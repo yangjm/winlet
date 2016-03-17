@@ -13,6 +13,7 @@ public class ReturnDef {
 	private String value;
 	private String rule;
 	private String update;
+	private String target;
 	private boolean isDialog = false;
 	private boolean cache = false;
 	private String log;
@@ -26,6 +27,8 @@ public class ReturnDef {
 			rule = null;
 		if (update != null && "".equals(update))
 			update = null;
+		if (target != null && "".equals(target))
+			target = null;
 		if (log != null && "".equals(log))
 			log = null;
 		if (title != null && "".equals(title))
@@ -49,6 +52,7 @@ public class ReturnDef {
 		this.value = ret.value();
 		rule = ret.rule();
 		update = ret.update();
+		target = ret.target();
 		isDialog = ret.dialog();
 		cache = ret.cache();
 		log = ret.log();
@@ -60,7 +64,7 @@ public class ReturnDef {
 	}
 
 	public boolean hasValue() {
-		return !"".equals(value) || update != null || log != null
+		return !"".equals(value) || update != null || target != null || log != null
 				|| title != null || viewName != null || isDialog;
 	}
 
@@ -74,6 +78,10 @@ public class ReturnDef {
 
 	public String getUpdate() {
 		return update;
+	}
+
+	public String getTarget() {
+		return target;
 	}
 
 	public boolean isDialog() {

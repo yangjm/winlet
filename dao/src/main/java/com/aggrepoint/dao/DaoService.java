@@ -35,4 +35,7 @@ public interface DaoService<T> {
 
 	default void delete(Collection<T> entities) throws DataAccessException {
 	}
+
+	default void evict(Object entity) throws DataAccessException {
+	}
 }

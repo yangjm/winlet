@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -35,6 +36,16 @@ public class CollectionUtils {
 			return false;
 		then.accept(t);
 		return true;
+	}
+
+	public static <T, K> List<K> toList(Collection<T> entities,
+			Function<T, K> mapper) {
+		return entities.stream().map(mapper).collect(Collectors.toList());
+	}
+
+	public static <T, K> Set<K> toSet(Collection<T> entities,
+			Function<T, K> mapper) {
+		return entities.stream().map(mapper).collect(Collectors.toSet());
 	}
 
 	public static <T, K, M extends Map<K, T>> M toMap(Collection<T> entities,
@@ -141,6 +152,46 @@ public class CollectionUtils {
 	public static <T, K, V> HashMap<K, HashSet<V>> group(T[] entities,
 			Function<T, K> keyMapper, Function<T, V> valueMapper) {
 		return group(Arrays.asList(entities), keyMapper, valueMapper);
+	}
+
+	/**
+	 * Grouping into 2 levels
+	 * 
+	 * @param entities
+	 * @param keyMapper1
+	 * @param keyMapper2
+	 * @param valueMapper
+	 * @param collectionFactory
+	 * @return
+	 */
+	public static <T, K, V, P, C extends Collection<V>> HashMap<K, HashMap<P, C>> groupTwice(
+			Collection<T> entities, Function<T, K> keyMapper1,
+			Function<T, P> keyMapper2, Function<T, V> valueMapper,
+			Supplier<C> collectionFactory) {
+		return entities.stream().collect(
+				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
+						.groupingBy(keyMapper2, HashMap::new, Collectors
+								.mapping(valueMapper, Collectors
+										.toCollection(collectionFactory)))));
+	}
+
+	/**
+	 * Similar to grouping into 2 levels except each unit is not a Collection
+	 * but a single object
+	 * 
+	 * @param entities
+	 * @param keyMapper1
+	 * @param keyMapper2
+	 * @param valueMapper
+	 * @return
+	 */
+	public static <T, K, V, P> HashMap<K, HashMap<P, V>> matrix(
+			Collection<T> entities, Function<T, K> keyMapper1,
+			Function<T, P> keyMapper2, Function<T, V> valueMapper) {
+		return entities.stream().collect(
+				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
+						.toMap(keyMapper2, valueMapper, (a, b) -> a,
+								HashMap::new)));
 	}
 
 	/**
@@ -419,46 +470,6 @@ public class CollectionUtils {
 		return arr;
 	}
 
-	/**
-	 * 根据主对象的组件批量加载子对象，然后把子对象分配给各个主对象
-	 * 
-	 * @param list
-	 *            主对象列表
-	 * @param keyMapper
-	 *            从主对象获取ID
-	 * @param childCollectionMapper
-	 *            从主对象获取保存子对象的集合
-	 * @param childLoader
-	 *            负责批量加载子对象
-	 * @param parentKeyMapper
-	 *            从子对象中获取主对象ID
-	 * @return
-	 */
-	public static <T, K, C> Collection<T> loadChildren(Collection<T> list,
-			Function<T, K> keyMapper,
-			Function<T, Collection<C>> childCollectionMapper,
-			Function<Collection<K>, Collection<C>> childLoader,
-			Function<C, K> parentKeyMapper) {
-		if (list == null || list.size() == 0)
-			return list;
-
-		Collection<C> cs = childLoader.apply(list.stream().map(keyMapper)
-				.collect(Collectors.toList()));
-		if (cs == null || cs.size() == 0)
-			return list;
-
-		list.forEach(p -> {
-			Collection<C> cc = childCollectionMapper.apply(p);
-			K key = keyMapper.apply(p);
-
-			cs.stream().filter(p1 -> parentKeyMapper.apply(p1) == key)
-					.forEach(p1 -> {
-						cc.add(p1);
-					});
-		});
-		return list;
-	}
-
 	public static <T> Collection<T> sort(Collection<T> list,
 			Function<T, Number> order, boolean asc) {
 		if (list == null || order == null)
@@ -483,5 +494,30 @@ public class CollectionUtils {
 	public static <T> Collection<T> sort(Collection<T> list,
 			Function<T, Number> order) {
 		return sort(list, order, true);
+	}
+
+	/**
+	 * 用于为Collection中的父对象加载子对象。子对象加载应以父对象的key的集合为条件，父对象中应该有一个集合用于存放子对象。
+	 * 
+	 * 例如父对象Parent有属性id和集合childs，子对象Child有属性parentId。假设
+	 * loader.load()可以根据parentId加载子对象集合，对于类型为List<Parent>的parents：
+	 * 
+	 * <pre>
+	 * loadChild(parents, Parent::getId, Parent::getChilds, ids -&gt; loader.load(ids),
+	 * 		Child::getParentId);
+	 * </pre>
+	 */
+	public static <T, K, C> void loadChildren(Collection<T> list,
+			Function<T, K> keyMapper,
+			Function<T, Collection<C>> childCollectionMapper,
+			Function<Collection<K>, Collection<C>> loader,
+			Function<C, K> childKeyMapper) {
+		if (list == null || list.size() == 0)
+			return;
+
+		HashMap<K, T> map = toHashMap(list, keyMapper);
+		loader.apply(map.keySet()).forEach(
+				p -> childCollectionMapper.apply(
+						map.get(childKeyMapper.apply(p))).add(p));
 	}
 }

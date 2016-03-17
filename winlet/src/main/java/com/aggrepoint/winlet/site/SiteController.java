@@ -45,6 +45,7 @@ public class SiteController {
 	static ArrayList<Branch> branches;
 
 	public static final String PAGE_PATH = "PAGE_PATH";
+	public static final String PATH_EXPAND = "PATH_EXPAND";
 	public static final String PAGE_DATA = "PAGE_DATA";
 
 	private static void updateBranches() {
@@ -177,6 +178,10 @@ public class SiteController {
 					req.setAttribute(PAGE_PATH,
 							sc.getPageUrl(page.getFullPath()));
 					req.setAttribute(PAGE_DATA, page.getDataMap());
+					if (page.isExpand() && !page.getFullPath().equals(path)
+							&& path.startsWith(page.getFullPath()))
+						req.setAttribute(PATH_EXPAND,
+								path.substring(page.getFullPath().length()));
 
 					return "/WEB-INF/site/template/"
 							+ page.getPsnTemplate(psnEngine) + ".jsp";

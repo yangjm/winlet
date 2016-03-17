@@ -10,13 +10,15 @@ import javax.servlet.http.HttpSession;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class PageStorageImpl implements PageStorage {
+	ReqInfo reqInfo = null;
 	HashMap<Object, Object> winletSession = null;
 	HashMap<Object, Object> winletRefreshSession = null;
 
 	public static final String WINLET_SESSION_KEY_PREFIX = "com.aggrepoint.winlet.prefix";
 	public static final String REFRESH_PREFIX = "REFRESH_";
 
-	protected PageStorageImpl(ReqInfo reqInfo) {
+	@Override
+	public PageStorage reload() {
 		HttpSession session = reqInfo.getSession();
 		synchronized (session) {
 			String key = WINLET_SESSION_KEY_PREFIX
@@ -44,6 +46,13 @@ public class PageStorageImpl implements PageStorage {
 						winletRefreshSession);
 			}
 		}
+		
+		return this;
+	}
+
+	protected PageStorageImpl(ReqInfo reqInfo) {
+		this.reqInfo = reqInfo;
+		reload();
 	}
 
 	@SuppressWarnings("unchecked")

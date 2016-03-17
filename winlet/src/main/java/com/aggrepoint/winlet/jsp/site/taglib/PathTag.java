@@ -97,7 +97,7 @@ public class PathTag extends BodyTagSupport {
 			if (next == null)
 				return SKIP_BODY;
 
-			if (m_strName == null)
+			if (m_strName != null)
 				pageContext.setAttribute(m_strName, next);
 			return EVAL_BODY_BUFFERED;
 		} catch (Exception e) {
@@ -125,7 +125,7 @@ public class PathTag extends BodyTagSupport {
 			throw new JspTagException(e.getMessage());
 		}
 
-		if (m_strName == null)
+		if (m_strName != null)
 			pageContext.setAttribute(m_strName, next);
 		return EVAL_BODY_BUFFERED;
 	}

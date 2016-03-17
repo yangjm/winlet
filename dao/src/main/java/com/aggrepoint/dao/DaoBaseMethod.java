@@ -33,6 +33,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 			{ 105, "update", new Class[] { null }, DaoService.class },
 			{ 106, "delete", new Class[] { null }, DaoService.class },
 			{ 107, "delete", new Class[] { Collection.class }, DaoService.class },
+			{ 108, "evict", new Class[] { null }, DaoService.class },
 
 			{ 1, "clear", new Class[] {}, HibernateDao.class },
 			{ 2, "contains", new Class[] { Object.class }, HibernateDao.class },
@@ -239,6 +240,9 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 			Session session = getSession();
 			for (T t : (Collection<T>) args[0])
 				session.delete(t);
+			return null;
+		case 108:
+			getSession().evict(args[0]);
 			return null;
 
 		case 1:

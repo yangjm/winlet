@@ -1,5 +1,7 @@
 package com.aggrepoint.winlet.form;
 
+import java.util.function.Function;
+
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
@@ -21,6 +23,24 @@ public interface Form {
 	 * @return
 	 */
 	public boolean validate(String field);
+
+	/**
+	 * 对字段field进行校验
+	 * 
+	 * @param field
+	 * @param 参数是字段值，返回true表示校验通过，false表示校验失败
+	 * @param error 如果校验失败，使用的错误信息
+	 */
+	public void verify(String field, Function<String, Boolean> v, String error);
+
+	/**
+	 * 对字段field进行校验
+	 * 
+	 * @param field
+	 * @param 参数是字段值，返回false表示校验通过，true表示校验失败
+	 * @param error 如果校验失败，使用的错误信息
+	 */
+	public void errorIf(String field, Function<String, Boolean> v, String error);
 
 	/**
 	 * 获取字段field的值。
@@ -56,7 +76,11 @@ public interface Form {
 	 * 
 	 * @return
 	 */
-	public boolean hasError();
+	boolean hasError();
+
+	boolean hasError(boolean fieldErrorsOnly);
+
+	boolean hasError(String field);
 
 	/**
 	 * 获取字段上当前存在的所有校验错误
@@ -81,6 +105,8 @@ public interface Form {
 	 */
 	public void clearError(String field);
 
+	public void clearErrors();
+
 	/**
 	 * 将指定字段的状态改为禁用。
 	 * 
@@ -94,6 +120,20 @@ public interface Form {
 	 * @param field
 	 */
 	public void setEnabled(String field);
+
+	/**
+	 * 显示表单中的元素。
+	 * 
+	 * @param field
+	 */
+	public void show(String selector);
+
+	/**
+	 * 不显示表单中的元素。
+	 * 
+	 * @param field
+	 */
+	public void hide(String selector);
 
 	/**
 	 * 获取当前所有处于禁用状态的字段。

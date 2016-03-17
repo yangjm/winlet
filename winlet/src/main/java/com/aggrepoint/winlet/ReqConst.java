@@ -27,10 +27,15 @@ public interface ReqConst {
 	public final String PARAM_PAGE_URL = "_purl";
 	/** 是否为全页面刷新而显示 */
 	public final String PARAM_PAGE_REFRESH = "_pr";
+	/** 是否win$.include()引发的第一次Window请求 */
+	public final String PARAM_FIRST_INCLUDE = "_fi";
 
 	/** 不要预加载 */
 	public final String PARAM_NO_PRELOAD = "_np";
 
 	/** 从container发起的请求 */
 	public final String PARAM_REQ_FROM_CONTAINER = "_c";
+
+	/** 跨域请求中，Winlet来源的域名 */
+	public final String PARAM_WINLET_DOMAIN_NAME = "_dn";
 }

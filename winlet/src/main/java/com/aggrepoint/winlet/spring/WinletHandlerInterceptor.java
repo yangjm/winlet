@@ -46,9 +46,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType());
-			if (rule == null)
-				rule = AccessRuleChecker.evalRule(hm.getMethod());
+			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType(),
+					hm.getMethod());
 			if (rule != null) {
 				if (rule.exception() == Unspecified.class)
 					return false;
@@ -60,10 +59,17 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 				return true;
 			Action action = AnnotationUtils.findAnnotation(hm.getMethod(),
 					Action.class); // 不是Action
-			if (action == null)
-				return true;
 
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
+			if (action == null) {
+				if (ri.isFromContainer() && !ri.isWinInclude()) {
+					// container中只允许调用action，不能调用window
+					// action的JSP include其他window是可以的
+					return false;
+				}
+				return true;
+			}
+
 			FormImpl form = ((FormImpl) ri.getForm());
 			form.validate(ri, hm.getBean(), hm.getMethod());
 		}
@@ -108,6 +114,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 				return;
 			}
+
+			ContextUtils.setHandlerMethod(request, hm);
 
 			Window win = null;
 			Action action = null;
@@ -163,6 +171,11 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 								rd.getUpdate());
 					}
 
+					if (rd.getTarget() != null) {
+						response.setHeader(RespHeaderConst.HEADER_TARGET,
+								rd.getTarget());
+					}
+
 					if (rd.cache()) {
 						response.setHeader(RespHeaderConst.HEADER_CACHE, "yes");
 						cache = true;
@@ -176,7 +189,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
 						if (!viewName.startsWith(Const.REDIRECT)
-								&& form.isValidateForm() && form.hasError()) { // 表单校验出错
+								&& form.isValidateForm() && form.hasError(true)) { // 表单校验出错
 							response.getOutputStream().write(
 									(WINLET_FORM_RESP + StringUtils
 											.fixJson(form.getJsonChanges()))

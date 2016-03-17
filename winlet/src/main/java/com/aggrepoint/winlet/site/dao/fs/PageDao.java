@@ -27,14 +27,24 @@ public class PageDao {
 			page.setPath(page.getName());
 			Hashtable<String, String> cfgs = Utils.loadCfg(dir);
 
-			for (String str : cfgs.keySet())
+			for (String str : cfgs.keySet()) {
 				if (str.startsWith("data."))
 					page.addData(str.substring(5), cfgs.get(str));
+				else if (str.startsWith("arearule.")) {
+					String key = str.substring(9);
+					int idx = key.indexOf(".");
+					if (idx > 0 && idx < key.length() - 1) {
+						page.addAreaMap(key.substring(0, idx).trim(), key
+								.substring(idx + 1).trim(), cfgs.get(str));
+					}
+				}
+			}
 
 			page.setName(cfgs.get("name"));
 			if (page.getName() == null)
 				page.setName(page.getPath());
 			page.setRule(cfgs.get("rule"));
+			page.setExpandRule(cfgs.get("expand-rule"));
 			page.setTemplate(cfgs.get("template"));
 			page.setTemplatePrefixes(BranchDao.parseTemplatePrefix(cfgs
 					.get("template-prefix")));

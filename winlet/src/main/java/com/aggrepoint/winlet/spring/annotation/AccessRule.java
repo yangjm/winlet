@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AccessRule {
 	String value() default "";

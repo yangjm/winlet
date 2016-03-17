@@ -35,11 +35,13 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private String path;
 	private String pageId;
 	private String pageUrl;
+	private String remoteDomain;
 	private String actionId;
 	private String validateFieldName;
 	private String validateFieldValue;
 	private String validateFieldId;
 	private boolean pageRefresh;
+	private boolean firstInclude;
 	private Form form;
 	private PageStorage ps;
 	private SharedPageStorage sps;
@@ -90,6 +92,11 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 			pageRefresh = "yes".equalsIgnoreCase(getParameter(
 					PARAM_PAGE_REFRESH, ""));
 		}
+
+		remoteDomain = getParameter(PARAM_WINLET_DOMAIN_NAME, null);
+
+		firstInclude = "yes".equalsIgnoreCase(getParameter(PARAM_FIRST_INCLUDE,
+				""));
 
 		validateFieldName = getParameter(PARAM_WIN_VALIDATE_FIELD, null);
 		if (validateFieldName != null) {
@@ -287,6 +294,16 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	}
 
 	@Override
+	public String getRemoteDomain() {
+		return remoteDomain;
+	}
+
+	@Override
+	public boolean isCrossDomain() {
+		return StringUtils.notEmpty(remoteDomain);
+	}
+
+	@Override
 	public String getActionId() {
 		return actionId;
 	}
@@ -319,6 +336,11 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public boolean isPageRefresh() {
 		return pageRefresh;
+	}
+
+	@Override
+	public boolean isFirstInclude() {
+		return firstInclude;
 	}
 
 	@Override
@@ -473,5 +495,15 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 
 	public HashMap<String, String> getTopPageParams() {
 		return topPageParams;
+	}
+
+	@Override
+	public String getContextPath() {
+		return request.getContextPath();
+	}
+
+	@Override
+	public boolean isWinInclude() {
+		return request instanceof WinletRequestWrapper;
 	}
 }

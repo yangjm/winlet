@@ -2,9 +2,15 @@ package com.aggrepoint.winlet.spring;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.MethodParameter;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
@@ -22,6 +28,7 @@ import com.aggrepoint.winlet.UserProfile;
 import com.aggrepoint.winlet.form.Form;
 import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
+import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
@@ -52,10 +59,20 @@ public class WinletHandlerMethodArgumentResolver implements
 			return true;
 
 		if (clz == Boolean.class || clz == boolean.class)
-			if (parameter.getParameterAnnotation(PageRefresh.class) != null)
+			if (parameter.getParameterAnnotation(PageRefresh.class) != null
+					|| parameter.getParameterAnnotation(AccessRule.class) != null)
 				return true;
 
 		return false;
+	}
+
+	Object checkClass(Object val, Class<?> expected, Exception e)
+			throws Exception {
+		if (expected.isAssignableFrom(val.getClass()))
+			return val;
+		if (e == null)
+			return null;
+		throw e;
 	}
 
 	@Override
@@ -67,18 +84,57 @@ public class WinletHandlerMethodArgumentResolver implements
 		PageStorageAttr attr = parameter
 				.getParameterAnnotation(PageStorageAttr.class);
 		if (attr != null) {
-			PageStorage ps = ContextUtils.getReqInfo().getPageStorage();
-			Object obj = ps.getAttribute(attr.value());
-			if (obj == null && attr.createIfNotExist()) {
-				obj = clz.newInstance();
-				ps.setAttribute(attr.value(), obj);
+			Object arg = null;
+
+			if (!StringUtils.isEmpty(attr.reqparam())) { // 有定义请求参数，从请求参数中取值
+				arg = webRequest.getParameter(attr.reqparam());
+				if (StringUtils.isEmpty(arg))
+					arg = null;
 			}
 
-			return obj;
+			PageStorage ps = ContextUtils.getReqInfo().getPageStorage();
+
+			if (arg == null) // 没有定义请求参数，或请求参数中没有值，从PageStorage中取
+				arg = ps.getAttribute(attr.value());
+
+			// 转换为参数所需格式。参考了AbstractNamedValueMethodArgumentResolver.resolveArgument中的实现
+			if (binderFactory != null) {
+				Class<?> paramType = parameter.getParameterType();
+				WebDataBinder binder = binderFactory.createBinder(webRequest,
+						null, parameter.getParameterName());
+				try {
+					arg = binder.convertIfNecessary(arg, paramType, parameter);
+				} catch (ConversionNotSupportedException ex) {
+					throw new MethodArgumentConversionNotSupportedException(
+							arg, ex.getRequiredType(),
+							parameter.getParameterName(), parameter,
+							ex.getCause());
+				} catch (TypeMismatchException ex) {
+					throw new MethodArgumentTypeMismatchException(arg,
+							ex.getRequiredType(), parameter.getParameterName(),
+							parameter, ex.getCause());
+
+				}
+			}
+
+			if (arg == null && attr.createIfNotExist())
+				arg = clz.newInstance();
+
+			ps.setAttribute(attr.value(), arg);
+
+			return arg;
 		}
 
-		if (clz == Boolean.class || clz == boolean.class)
-			return ContextUtils.getReqInfo().isPageRefresh();
+		if (clz == Boolean.class || clz == boolean.class) {
+			if (parameter.getParameterAnnotation(PageRefresh.class) != null)
+				return ContextUtils.getReqInfo().isPageRefresh();
+			AccessRule rule = parameter
+					.getParameterAnnotation(AccessRule.class);
+			if (rule != null)
+				return ContextUtils.getAccessRuleEngine(
+						ContextUtils.getRequest()).eval(rule.value());
+			return false;
+		}
 
 		if (clz.isAssignableFrom(Validation.class))
 			return new ValidationImpl(ContextUtils.getReqInfo());
@@ -108,22 +164,23 @@ public class WinletHandlerMethodArgumentResolver implements
 		HttpServletRequest req = ContextUtils.getRequest();
 
 		if (UserProfile.class.isAssignableFrom(clz))
-			return ContextUtils.getUserEngine(req).getUser(req);
+			return checkClass(ContextUtils.getUserEngine(req).getUser(req),
+					clz, null);
 
 		if (UserEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getUserEngine(req);
+			return checkClass(ContextUtils.getUserEngine(req), clz, null);
 
 		if (ConfigProvider.class.isAssignableFrom(clz))
-			return ContextUtils.getConfigProvider(req);
+			return checkClass(ContextUtils.getConfigProvider(req), clz, null);
 
 		if (AccessRuleEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getAccessRuleEngine(req);
+			return checkClass(ContextUtils.getAccessRuleEngine(req), clz, null);
 
 		if (PsnRuleEngine.class.isAssignableFrom(clz))
-			return ContextUtils.getPsnRuleEngine(req);
+			return checkClass(ContextUtils.getPsnRuleEngine(req), clz, null);
 
 		if (ListProvider.class.isAssignableFrom(clz))
-			return ContextUtils.getListProvider(req);
+			return checkClass(ContextUtils.getListProvider(req), clz, null);
 
 		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
 		if (cfg != null) {

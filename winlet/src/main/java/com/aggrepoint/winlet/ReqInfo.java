@@ -72,4 +72,15 @@ public interface ReqInfo {
 	boolean noPreload();
 
 	boolean isFromContainer();
+
+	boolean isFirstInclude();
+
+	String getRemoteDomain();
+
+	boolean isCrossDomain();
+
+	public String getContextPath();
+
+	/** 当前请求是否由win:include引起 */
+	boolean isWinInclude();
 }

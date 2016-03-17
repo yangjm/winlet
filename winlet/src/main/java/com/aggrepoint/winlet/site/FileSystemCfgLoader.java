@@ -30,22 +30,24 @@ public class FileSystemCfgLoader {
 	}
 
 	public synchronized ArrayList<Branch> load(ArrayList<Branch> branches) {
-		boolean reload = false;
+		if (branches != null) {
+			boolean reload = false;
 
-		if (lastMaxModified == 0
-				|| System.currentTimeMillis() - lastCheckTime > interval) {
-			long maxModified = getMaxModified(rootDir);
-			int count = getCount(rootDir);
-			if (maxModified > lastMaxModified || count != lastCount) {
-				lastMaxModified = maxModified;
-				lastCount = count;
-				reload = true;
+			if (lastMaxModified == 0
+					|| System.currentTimeMillis() - lastCheckTime > interval) {
+				long maxModified = getMaxModified(rootDir);
+				int count = getCount(rootDir);
+				if (maxModified > lastMaxModified || count != lastCount) {
+					lastMaxModified = maxModified;
+					lastCount = count;
+					reload = true;
+				}
+				lastCheckTime = System.currentTimeMillis();
 			}
-			lastCheckTime = System.currentTimeMillis();
-		}
 
-		if (!reload)
-			return branches;
+			if (!reload)
+				return branches;
+		}
 
 		ArrayList<Branch> bs = new ArrayList<Branch>();
 

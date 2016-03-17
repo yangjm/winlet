@@ -58,12 +58,42 @@
 	</function>
 
 	<function>
+		<name>attrencode</name>
+		<function-class>
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String attrEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>jsencode</name>
+		<function-class>
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String jsEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
 		<name>textareaencode</name>
 		<function-class>
 			com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.String textAreaEncode(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>textareaeditencode</name>
+		<function-class>
+			com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.String textAreaEditEncode(java.lang.String)
 		</function-signature>
 	</function>
 
@@ -290,49 +320,20 @@
 	</function>
 
 	<function>
-		<name>res</name>
-		<function-class>
-			com.aggrepoint.winlet.jsp.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String funcResurl(java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>w</name>
-		<function-class>
-			com.aggrepoint.winlet.jsp.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.Object m(java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>funcdef</name>
-		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String funcdef(java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
-		<name>func</name>
-		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
-		</function-class>
-		<function-signature>
-			java.lang.String func(java.lang.String)
-		</function-signature>
-	</function>
-
-	<function>
 		<name>access</name>
 		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
 		</function-class>
 		<function-signature>
 			java.lang.Boolean access(java.lang.String)
+		</function-signature>
+	</function>
+
+	<function>
+		<name>canAccess</name>
+		<function-class>com.aggrepoint.winlet.jsp.taglib.ELFunction
+		</function-class>
+		<function-signature>
+			java.lang.Boolean canAccess(java.lang.String)
 		</function-signature>
 	</function>
 
@@ -512,6 +513,11 @@
 		<attribute>
 			<name>window</name>
 			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>root</name>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
