@@ -1,9 +1,16 @@
-# 关于
-Winlet是一个建立在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础上的Web应用开发框架。
+# About
+Winlet is a Java web application framework for building web components. A web component is similar to a web widget, it occupies only a portion of the whole web page (like a window on page), and multiple Winlet components can coexits on same page. 
 
-# 使用Winlet库
+Winlet framework is built top of Spring MVC, Hibernate, jQuery and Bootstrap.
 
-最新的Winlet库已经发布到Maven中央仓库。要在项目中使用Winlet，请把以下配置加入到项目的pom.xml文件中：
+<link href="http://www.kidsprograms.ca/portal/resources/kidsprograms/css/registration_full.0.1.css" rel="stylesheet" type="text/css"> 
+<script>var jQuery_1_8_3 = jQuery.noConflict(true);</script>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+# Use Winlet
+
+Latest Winlet library has been published to Maven central repository. Add below lines to pom.xml to inclde Winlet library to your project:
 
 ```
 <dependency>
@@ -12,7 +19,7 @@ Winlet是一个建立在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础�
   <version>0.1.6</version>
 </dependency>
 ```
-Winlet框架需要运行在Java 8环境中。
+Winlet requires JRE 8.
 
-# 文档
-请见[Winlet 框架文档](http://docs.aggrepoint.com)
+# Documents
+[Winlet Document](http://docs.aggrepoint.com)
