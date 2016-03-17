@@ -1,16 +1,11 @@
 # About
-Winlet is a Java web application framework for building web components. A web component is similar to a web widget, it occupies only a portion of the whole web page (like a window on page), and multiple Winlet components can coexits on same page. 
+Winlet is a Java web application framework for building Rich Internet Application that composed of Winlet windows. A Winlet window is similar to a web widget, it can be added to any web page (even a static web page on a different domain), occupies only a portion of the web page, communicates with server using Ajax. Multiple Winlet windows can coexit and collaborate on one page. A Winlet window can be included by another web window at server side, to create sophisticated functionality. A Winlet window can also be added into web page dynamically by another web component at client side.
 
 Winlet framework is built top of Spring MVC, Hibernate, jQuery and Bootstrap.
 
-<link href="http://www.kidsprograms.ca/portal/resources/kidsprograms/css/registration_full.0.1.css" rel="stylesheet" type="text/css"> 
-<script>var jQuery_1_8_3 = jQuery.noConflict(true);</script>
-<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-
-
 # Use Winlet
 
-Latest Winlet library has been published to Maven central repository. Add below lines to pom.xml to inclde Winlet library to your project:
+Latest Winlet java library has been published to Maven central repository. Add below lines to pom.xml to inclde Winlet library to your project:
 
 ```
 <dependency>
