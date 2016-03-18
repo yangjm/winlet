@@ -5,7 +5,7 @@ Winlet framework is built on top of Spring MVC, Hibernate, jQuery and Bootstrap.
 
 # Use Winlet
 
-Latest Winlet java library has been published to Maven central repository. Add below lines to pom.xml to inclde Winlet library to your project:
+Latest Winlet java library has been published to Maven central repository. Add below lines to pom.xml to include Winlet library into your project:
 
 ```
 <dependency>
