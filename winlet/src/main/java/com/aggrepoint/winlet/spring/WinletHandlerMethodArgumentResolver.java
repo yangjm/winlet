@@ -15,6 +15,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ListProvider;
@@ -52,6 +53,7 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| UserEngine.class.isAssignableFrom(clz)
 				|| ConfigProvider.class.isAssignableFrom(clz)
 				|| PsnRuleEngine.class.isAssignableFrom(clz)
+				|| AuthorizationEngine.class.isAssignableFrom(clz)
 				|| AccessRuleEngine.class.isAssignableFrom(clz)
 				|| ListProvider.class.isAssignableFrom(clz)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
@@ -172,6 +174,10 @@ public class WinletHandlerMethodArgumentResolver implements
 
 		if (ConfigProvider.class.isAssignableFrom(clz))
 			return checkClass(ContextUtils.getConfigProvider(req), clz, null);
+
+		if (AuthorizationEngine.class.isAssignableFrom(clz))
+			return checkClass(ContextUtils.getAuthorizationEngine(req), clz,
+					null);
 
 		if (AccessRuleEngine.class.isAssignableFrom(clz))
 			return checkClass(ContextUtils.getAccessRuleEngine(req), clz, null);

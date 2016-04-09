@@ -16,7 +16,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 public class PageDao {
 	static final Log logger = LogFactory.getLog(PageDao.class);
 
-	public static Page load(File dir) {
+	public static Page load(File dir, String contextRoot) {
 		if (!dir.isDirectory())
 			return null;
 
@@ -62,11 +62,11 @@ public class PageDao {
 			if (!page.isStatic()) // 静态目录里面所有内容都视为静态内容，不再作为子目录处理
 				for (File f : dir.listFiles()) {
 					if (f.isDirectory()) { // 页面
-						Page p = load(f);
+						Page p = load(f, contextRoot);
 						if (p != null)
 							page.addPage(p);
 					} else if (f.getName().endsWith(".html")) { // area内容
-						Area a = AreaDao.load(f);
+						Area a = AreaDao.load(f, contextRoot);
 						if (a != null)
 							page.addArea(a);
 					}

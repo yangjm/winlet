@@ -33,7 +33,7 @@ public class BranchDao {
 		return ht;
 	}
 
-	public static Branch load(File dir) {
+	public static Branch load(File dir, String contextRoot) {
 		if (!dir.isDirectory())
 			return null;
 
@@ -58,11 +58,11 @@ public class BranchDao {
 
 				for (File f : dir.listFiles()) {
 					if (f.isDirectory()) { // 页面
-						Page p = PageDao.load(f);
+						Page p = PageDao.load(f, contextRoot);
 						if (p != null)
 							branch.getRootPage().addPage(p);
 					} else if (f.getName().endsWith(".html")) { // area内容
-						Area a = AreaDao.load(f);
+						Area a = AreaDao.load(f, contextRoot);
 						if (a != null)
 							branch.addArea(a);
 					}

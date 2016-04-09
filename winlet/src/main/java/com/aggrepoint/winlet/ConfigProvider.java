@@ -42,4 +42,6 @@ public interface ConfigProvider {
 	boolean getBoolean(String name, boolean def);
 
 	boolean getBoolean(Object context, String name, boolean def);
+
+	boolean checkStr(String name, String value);
 }

@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.aggrepoint.dao.UserContext;
 import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ConfigProvider;
 import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.ContextUtils;
@@ -34,6 +35,7 @@ import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.jsp.Resolver;
 import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
+import com.aggrepoint.winlet.plugin.AccessRuleAuthorizationEngine;
 import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
 import com.aggrepoint.winlet.plugin.DefaultListProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
@@ -47,6 +49,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 	private static final long serialVersionUID = 1L;
 	Map<String, RequestLogger> loggers;
 	UserEngine userEngine;
+	AuthorizationEngine authEngine;
 	AccessRuleEngine accessRuleEngine;
 	PsnRuleEngine psnRuleEngine;
 	ConfigProvider configProvider;
@@ -72,6 +75,14 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		}
 		if (userEngine == null)
 			userEngine = new DefaultUserEngine();
+
+		try {
+			authEngine = context
+					.getBean(AuthorizationEngine.class);
+		} catch (Exception e) {
+		}
+		if (authEngine == null)
+			authEngine = new AccessRuleAuthorizationEngine();
 
 		try {
 			accessRuleEngine = context.getBean(AccessRuleEngine.class);
@@ -136,6 +147,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		ContextUtils.setDispatcher(req, this);
 		ContextUtils.setApplicationContext(req, getWebApplicationContext());
 		ContextUtils.setUserEngine(req, userEngine);
+		ContextUtils.setAuthorizationEngine(req, authEngine);
 		ContextUtils.setAccessRuleEngine(req, accessRuleEngine);
 		ContextUtils.setPsnRuleEngine(req, psnRuleEngine);
 		ContextUtils.setConfigProvider(req, configProvider);

@@ -16,7 +16,7 @@ import com.aggrepoint.winlet.site.domain.Area;
 public class AreaDao {
 	static final Log logger = LogFactory.getLog(AreaDao.class);
 
-	public static Area load(File file) {
+	public static Area load(File file, String contextRoot) {
 		if (file.isDirectory())
 			return null;
 
@@ -41,7 +41,7 @@ public class AreaDao {
 			}
 			fis.close();
 
-			area.setContent(baos.toString("UTF-8"));
+			area.setContent(baos.toString("UTF-8"), contextRoot);
 
 			return area;
 		} catch (Exception e) {

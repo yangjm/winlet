@@ -819,6 +819,8 @@ public class StringUtils {
 			return false;
 		if (str.indexOf("@", idx + 1) > 0)
 			return false;
+		if (str.indexOf(".", idx + 1) < 0)
+			return false;
 
 		return true;
 	}

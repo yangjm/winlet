@@ -6,6 +6,9 @@ import java.util.Vector;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.WinletManager;
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class IncludeTag extends BodyTagSupport {
 	private static final long serialVersionUID = 1L;
+	static final Log logger = LogFactory.getLog(IncludeTag.class);
 
 	String var;
 
@@ -27,6 +31,8 @@ public class IncludeTag extends BodyTagSupport {
 	String m_strWindow;
 
 	WinletDef winletDef;
+
+	boolean winletNotFound = false;
 
 	boolean root;
 
@@ -46,7 +52,11 @@ public class IncludeTag extends BodyTagSupport {
 
 	public void setWinlet(String winlet) {
 		Class<?> clz = WinletClassLoader.getWinletClassByPath(winlet);
-		this.winletDef = WinletDef.getDef(clz);
+		if (clz == null) {
+			logger.error("Unable to find winlet from path " + winlet);
+			winletNotFound = true;
+		} else
+			this.winletDef = WinletDef.getDef(clz);
 	}
 
 	public void setRoot(String isRoot) {
@@ -66,6 +76,9 @@ public class IncludeTag extends BodyTagSupport {
 
 	@Override
 	public int doEndTag() throws JspTagException {
+		if (winletNotFound)
+			return EVAL_PAGE;
+
 		try {
 			Vector<String> v = null;
 			if (vars != null) {
