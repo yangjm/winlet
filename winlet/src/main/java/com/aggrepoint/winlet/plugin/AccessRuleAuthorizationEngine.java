@@ -90,6 +90,13 @@ public class AccessRuleAuthorizationEngine implements AuthorizationEngine {
 	@Override
 	public Class<? extends Exception> check(Page page, boolean expand) {
 		String rule = expand ? page.getExpandRule() : page.getRule();
+boolean debug = false;
+if ("/student/".equals(page.getFullPath())) {
+	debug = true;
+	System.out.println("=================================");
+	System.out.print(rule);
+	System.out.print(expand);
+}
 		if (rule == null) {
 			if (!expand) {
 				// 访问page本身，但page上没有定义访问规则。
@@ -102,6 +109,9 @@ public class AccessRuleAuthorizationEngine implements AuthorizationEngine {
 					if (area.getWinletUrls().size() > 0) {
 						hasWinlet = true;
 						for (String url : area.getWinletUrls()) {
+							if (debug)
+								System.out.println(url + ": " + check(url));
+
 							if (check(url) == null)
 								return null;
 						}
