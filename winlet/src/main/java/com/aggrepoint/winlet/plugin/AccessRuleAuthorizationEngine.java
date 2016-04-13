@@ -94,8 +94,8 @@ boolean debug = false;
 if ("/student/".equals(page.getFullPath())) {
 	debug = true;
 	System.out.println("=================================");
-	System.out.print(rule);
-	System.out.print(expand);
+	System.out.println(rule);
+	System.out.println(expand);
 }
 		if (rule == null) {
 			if (!expand) {
