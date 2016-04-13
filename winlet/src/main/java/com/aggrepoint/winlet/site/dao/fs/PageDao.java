@@ -58,6 +58,7 @@ public class PageDao {
 					|| "true".equalsIgnoreCase(cfgs.get("expand")));
 			page.setStatic("".equals(cfgs.get("static"))
 					|| "true".equalsIgnoreCase(cfgs.get("static")));
+			page.setExpandAreas(cfgs.get("expand-area"));
 
 			if (!page.isStatic()) // 静态目录里面所有内容都视为静态内容，不再作为子目录处理
 				for (File f : dir.listFiles()) {

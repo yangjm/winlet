@@ -90,35 +90,26 @@ public class AccessRuleAuthorizationEngine implements AuthorizationEngine {
 	@Override
 	public Class<? extends Exception> check(Page page, boolean expand) {
 		String rule = expand ? page.getExpandRule() : page.getRule();
-boolean debug = false;
-if ("/student/".equals(page.getFullPath())) {
-	debug = true;
-	System.out.println("=================================");
-	System.out.println(rule);
-	System.out.println(expand);
-}
+
 		if (rule == null) {
 			if (!expand) {
 				// 访问page本身，但page上没有定义访问规则。
 				// 如果page中有area，并且area中有引用winlet，则当前用户至少可以访问其中一个winlet才允许访问该页面
 				boolean hasWinlet = false;
-				for (Area area : page.getAreas()) {
+				for (Area area : page.getAreas(expand)) {
 					if (area.isCascade()) // cascade的area不作为判断依据
 						continue;
 
 					if (area.getWinletUrls().size() > 0) {
 						hasWinlet = true;
 						for (String url : area.getWinletUrls()) {
-							if (debug)
-								System.out.println(url + ": " + check(url));
-
 							if (check(url) == null)
 								return null;
 						}
-
-						return hasWinlet ? Unspecified.class : null;
 					}
 				}
+
+				return hasWinlet ? Unspecified.class : null;
 			}
 
 			return null;

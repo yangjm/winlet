@@ -3,12 +3,17 @@ package com.aggrepoint.winlet.site.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.StringUtils;
 
 import com.aggrepoint.utils.TwoValues;
 import com.aggrepoint.winlet.AuthorizationEngine;
@@ -41,6 +46,7 @@ public class Page extends Base {
 	private int level;
 	private String fullPath;
 	private String fullDir;
+	private Set<String> expandAreas = new HashSet<String>();
 	/** key为area name，twovalues中第一个值为规则，第二个值为如果符合规则要映射到的area name */
 	private Map<String, List<TwoValues<String, String>>> areaMap = new HashMap<String, List<TwoValues<String, String>>>();
 
@@ -218,6 +224,13 @@ public class Page extends Base {
 		return areas;
 	}
 
+	public List<Area> getAreas(boolean expand) {
+		return areas.stream().filter(p -> {
+			boolean isExpand = expandAreas.contains(p.getName());
+			return expand && isExpand || !expand && !isExpand;
+		}).collect(Collectors.toList());
+	}
+
 	public void addAreaMap(String from, String to, String rule) {
 		List<TwoValues<String, String>> list = areaMap.get(from);
 		if (list == null) {
@@ -355,5 +368,18 @@ public class Page extends Base {
 
 	public String getData(String name) {
 		return getDataMap().get(name);
+	}
+
+	public void setExpandAreas(String expandAreas) {
+		if (StringUtils.isEmpty(expandAreas))
+			return;
+
+		StringTokenizer st = new StringTokenizer(expandAreas, " ,;");
+		while (st.hasMoreTokens())
+			this.expandAreas.add(st.nextToken());
+	}
+
+	public boolean isExpandArea(String name) {
+		return expandAreas.contains(name);
 	}
 }
