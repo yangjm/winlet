@@ -38,4 +38,6 @@ public interface ReqConst {
 
 	/** 跨域请求中，Winlet来源的域名 */
 	public final String PARAM_WINLET_DOMAIN_NAME = "_dn";
+
+	public final String PARAM_WINLET_DEBUG = "_winlet_debug_";
 }

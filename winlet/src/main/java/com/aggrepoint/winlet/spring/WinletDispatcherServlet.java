@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet.spring;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,17 +31,19 @@ import com.aggrepoint.winlet.ListProvider;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.ReqConst;
+import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.RequestLogger;
 import com.aggrepoint.winlet.UserEngine;
 import com.aggrepoint.winlet.form.FormImpl;
 import com.aggrepoint.winlet.jsp.Resolver;
-import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
 import com.aggrepoint.winlet.plugin.AccessRuleAuthorizationEngine;
+import com.aggrepoint.winlet.plugin.DefaultAccessRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultConfigProvider;
 import com.aggrepoint.winlet.plugin.DefaultListProvider;
 import com.aggrepoint.winlet.plugin.DefaultPsnRuleEngine;
 import com.aggrepoint.winlet.plugin.DefaultRequestLogger;
 import com.aggrepoint.winlet.plugin.DefaultUserEngine;
+import com.aggrepoint.winlet.utils.BufferedResponse;
 
 /**
  * @author Jiangming Yang (yangjm@gmail.com)
@@ -77,8 +80,7 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 			userEngine = new DefaultUserEngine();
 
 		try {
-			authEngine = context
-					.getBean(AuthorizationEngine.class);
+			authEngine = context.getBean(AuthorizationEngine.class);
 		} catch (Exception e) {
 		}
 		if (authEngine == null)
@@ -182,5 +184,40 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		ModelAndView mv = getHandlerAdapter(mappedHandler.getHandler()).handle(
 				wreq, resp, mappedHandler.getHandler());
 		return mv.getModel();
+	}
+
+	@Override
+	protected void render(ModelAndView mv, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		boolean addViewName = "true".equalsIgnoreCase(request
+				.getParameter(ReqConst.PARAM_WINLET_DEBUG));
+
+		if (!addViewName) {
+			super.render(mv, request, response);
+			return;
+		}
+
+		ReqInfo reqInfo = ContextUtils.getReqInfo();
+		if (reqInfo.getWinlet() == null) {
+			super.render(mv, request, response);
+			return;
+		}
+
+		BufferedResponse resp = new BufferedResponse();
+		super.render(mv, request, resp);
+		byte[] bytes = resp.getBuffered();
+		String str = bytes == null ? "" : new String(bytes, "UTF-8");
+		response.getWriter()
+				.write("<div class=\"winlet_debug_view\"><div class=\"winlet_debug_view_title\">");
+		Method method = reqInfo.getWinletMethod();
+		if (method != null) {
+			response.getWriter().write(
+					"<div>" + method.getDeclaringClass().getSimpleName() + ":"
+							+ method.getName() + "</div>");
+		}
+		response.getWriter().write(mv.getViewName() + "</div>");
+		response.getWriter().write(str);
+		response.getWriter().write("<div style=\"clear:both\"></div></div>");
+		response.getWriter().flush();
 	}
 }

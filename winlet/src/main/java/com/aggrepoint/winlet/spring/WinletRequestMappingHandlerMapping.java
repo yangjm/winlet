@@ -67,9 +67,10 @@ public class WinletRequestMappingHandlerMapping extends
 				WinletDef def = WinletDef.getDef(clz);
 				Object winlet = WinletManager.getWinlet(Context.get(), def);
 				req.setWinlet(def, winlet);
+				req.setWinletMethod(def.getWindow(annotation.value())
+						.getMethod());
 
-				return new HandlerMethod(winlet, def.getWindow(
-						annotation.value()).getMethod());
+				return new HandlerMethod(winlet, req.getWinletMethod());
 			} else {
 				int idx = req.getActionId().indexOf(".");
 				if (idx > 0) {
@@ -80,16 +81,17 @@ public class WinletRequestMappingHandlerMapping extends
 							.getWinletClassByPath(winlet));
 					Object w = WinletManager.getWinlet(Context.get(), def);
 					req.setWinlet(def, w);
+					req.setWinletMethod(def.getAction(action).getMethod());
 
-					return new HandlerMethod(w, def.getAction(action)
-							.getMethod());
+					return new HandlerMethod(w, req.getWinletMethod());
 				} else {
 					WinletDef def = WinletDef.getDef(clz);
 					Object w = WinletManager.getWinlet(Context.get(), def);
 					req.setWinlet(def, w);
 
 					ActionDef action = def.getAction(req.getActionId());
-					return new HandlerMethod(w, action.getMethod());
+					req.setWinletMethod(action.getMethod());
+					return new HandlerMethod(w, req.getWinletMethod());
 				}
 			}
 		}

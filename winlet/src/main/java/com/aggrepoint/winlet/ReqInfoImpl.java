@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	private ReturnDef rd;
 	private WinletDef winletDef;
 	private Object winlet;
+	private Method winletMethod;
 	private boolean noPreload;
 	private boolean isFromContainer;
 	/** 搜索引擎用_escaped_fargment_参数请求时为true */
@@ -455,6 +457,16 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 	@Override
 	public Object getWinlet() {
 		return winlet;
+	}
+
+	@Override
+	public void setWinletMethod(Method winletMethod) {
+		this.winletMethod = winletMethod;
+	}
+
+	@Override
+	public Method getWinletMethod() {
+		return winletMethod;
 	}
 
 	@Override

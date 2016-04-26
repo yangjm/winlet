@@ -1,5 +1,6 @@
 package com.aggrepoint.winlet;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -83,4 +84,8 @@ public interface ReqInfo {
 
 	/** 当前请求是否由win:include引起 */
 	boolean isWinInclude();
+
+	void setWinletMethod(Method winletMethod);
+
+	Method getWinletMethod();
 }
