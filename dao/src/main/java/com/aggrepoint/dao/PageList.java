@@ -12,14 +12,13 @@ import java.util.List;
 public class PageList<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private List<T> list;
 	private int totalPage;
 	private int totalCount;
 	private int pageSize;
 	private int currentPage;
+	private List<T> list;
 
 	public PageList() {
-
 	}
 
 	public PageList(PageList<?> ref) {
