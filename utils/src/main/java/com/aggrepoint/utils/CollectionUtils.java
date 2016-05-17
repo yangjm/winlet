@@ -143,6 +143,12 @@ public class CollectionUtils {
 		return group(entities, keyMapper, Function.identity(), ArrayList::new);
 	}
 
+	public static <T, K, V> HashMap<K, List<V>> groupAsList(
+			Collection<T> entities, Function<T, K> keyMapper,
+			Function<T, V> valueMapper) {
+		return group(entities, keyMapper, valueMapper, ArrayList::new);
+	}
+
 	public static <T, K, V> HashMap<K, String> groupJoining(
 			Collection<T> entities, Function<T, K> keyMapper,
 			Function<T, String> valueMapper, String delimiter) {
