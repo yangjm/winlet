@@ -4,7 +4,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,6 +27,34 @@ public class BeanUtils {
 			wTo.setPropertyValue(prop, wFrom.getPropertyValue(prop));
 
 		return to;
+	}
+
+	public static <T> T setProps(T obj, HashMap<String, Object> props) {
+		if (obj == null || props == null)
+			return obj;
+		BeanWrapperImpl w = new BeanWrapperImpl(obj);
+		for (String key : props.keySet())
+			w.setPropertyValue(key, props.get(key));
+		return obj;
+	}
+
+	public static <T> T setProps(T obj, HashMap<String, ?> props,
+			Collection<String> keys) {
+		if (obj == null || props == null)
+			return obj;
+		BeanWrapperImpl w = new BeanWrapperImpl(obj);
+		for (String key : keys)
+			w.setPropertyValue(key, props.get(key));
+		return obj;
+	}
+
+	public static <T> T setProps(T obj, HashMap<String, ?> props, String[] keys) {
+		if (obj == null || props == null)
+			return obj;
+		BeanWrapperImpl w = new BeanWrapperImpl(obj);
+		for (String key : keys)
+			w.setPropertyValue(key, props.get(key));
+		return obj;
 	}
 
 	public static List<String> getPropertyNames(Class<?> beanClass)
