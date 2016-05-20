@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ public class CollectionUtils {
 
 	public static <T> boolean firstThen(Collection<T> entities,
 			Function<T, Boolean> compare, Consumer<T> then) {
+		if (entities == null)
+			return false;
 		T t = first(entities, compare);
 		if (t == null)
 			return false;
@@ -40,16 +43,30 @@ public class CollectionUtils {
 
 	public static <T, K> List<K> toList(Collection<T> entities,
 			Function<T, K> mapper) {
+		if (entities == null)
+			return null;
 		return entities.stream().map(mapper).collect(Collectors.toList());
+	}
+
+	public static <T, K> List<K> toList(Collection<T> entities,
+			Predicate<T> predicate, Function<T, K> mapper) {
+		if (entities == null)
+			return null;
+		return entities.stream().filter(predicate).map(mapper)
+				.collect(Collectors.toList());
 	}
 
 	public static <T, K> Set<K> toSet(Collection<T> entities,
 			Function<T, K> mapper) {
+		if (entities == null)
+			return null;
 		return entities.stream().map(mapper).collect(Collectors.toSet());
 	}
 
 	public static <T, K, M extends Map<K, T>> M toMap(Collection<T> entities,
 			Function<T, K> keyMapper, Supplier<M> supplier) {
+		if (entities == null)
+			return null;
 		return entities.stream().collect(
 				Collectors.toMap(keyMapper, Function.identity(), (a, b) -> b,
 						supplier));
@@ -58,6 +75,8 @@ public class CollectionUtils {
 	public static <T, K, V, M extends Map<K, V>> M toMap(
 			Collection<T> entities, Function<T, K> keyMapper,
 			Function<T, V> valueMapper, Supplier<M> supplier) {
+		if (entities == null)
+			return null;
 		return entities.stream()
 				.collect(
 						Collectors.toMap(keyMapper, valueMapper, (a, b) -> b,
@@ -124,6 +143,8 @@ public class CollectionUtils {
 	public static <T, K, V, C extends Collection<V>> HashMap<K, C> group(
 			Collection<T> entities, Function<T, K> keyMapper,
 			Function<T, V> valueMapper, Supplier<C> collectionFactory) {
+		if (entities == null)
+			return null;
 		return entities.stream().collect(
 				Collectors.groupingBy(
 						keyMapper,
@@ -152,6 +173,8 @@ public class CollectionUtils {
 	public static <T, K, V> HashMap<K, String> groupJoining(
 			Collection<T> entities, Function<T, K> keyMapper,
 			Function<T, String> valueMapper, String delimiter) {
+		if (entities == null)
+			return null;
 		return entities.stream().collect(
 				Collectors.groupingBy(
 						keyMapper,
@@ -179,6 +202,8 @@ public class CollectionUtils {
 			Collection<T> entities, Function<T, K> keyMapper1,
 			Function<T, P> keyMapper2, Function<T, V> valueMapper,
 			Supplier<C> collectionFactory) {
+		if (entities == null)
+			return null;
 		return entities.stream().collect(
 				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
 						.groupingBy(keyMapper2, HashMap::new, Collectors
@@ -199,6 +224,8 @@ public class CollectionUtils {
 	public static <T, K, V, P> HashMap<K, HashMap<P, V>> matrix(
 			Collection<T> entities, Function<T, K> keyMapper1,
 			Function<T, P> keyMapper2, Function<T, V> valueMapper) {
+		if (entities == null)
+			return null;
 		return entities.stream().collect(
 				Collectors.groupingBy(keyMapper1, HashMap::new, Collectors
 						.toMap(keyMapper2, valueMapper, (a, b) -> a,
@@ -216,6 +243,8 @@ public class CollectionUtils {
 	 */
 	public static <T, K> K[] toArray(Collection<T> entities,
 			Function<T, K> keyMapper, K[] arr) {
+		if (entities == null)
+			return null;
 		return entities.stream().map(keyMapper).toArray(size -> arr);
 	}
 
@@ -229,6 +258,8 @@ public class CollectionUtils {
 	 */
 	public static <T, K> boolean moveUp(List<T> list, K key,
 			Function<T, K> keyMapper, int n) {
+		if (list == null)
+			return false;
 		ArrayList<T> newList = new ArrayList<T>();
 		boolean changed = false;
 		for (int i = 0; i < list.size(); i++) {
@@ -267,6 +298,8 @@ public class CollectionUtils {
 	 */
 	public static <T, K> boolean moveDown(List<T> list, K key,
 			Function<T, K> keyMapper, int n) {
+		if (list == null)
+			return false;
 		ArrayList<T> newList = new ArrayList<T>();
 		boolean changed = false;
 		int start = list.size() - 1;
