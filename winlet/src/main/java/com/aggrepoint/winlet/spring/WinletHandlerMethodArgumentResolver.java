@@ -33,6 +33,8 @@ import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
+import com.aggrepoint.winlet.spring.annotation.IntegerParameter;
+import com.aggrepoint.winlet.spring.annotation.StringParameter;
 
 /**
  * 
@@ -57,7 +59,9 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| AccessRuleEngine.class.isAssignableFrom(clz)
 				|| ListProvider.class.isAssignableFrom(clz)
 				|| parameter.getParameterAnnotation(Cfg.class) != null
-				|| parameter.getParameterAnnotation(PageStorageAttr.class) != null)
+				|| parameter.getParameterAnnotation(PageStorageAttr.class) != null
+				|| parameter.getParameterAnnotation(StringParameter.class) != null
+				|| parameter.getParameterAnnotation(IntegerParameter.class) != null)
 			return true;
 
 		if (clz == Boolean.class || clz == boolean.class)
@@ -82,6 +86,37 @@ public class WinletHandlerMethodArgumentResolver implements
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
 		Class<?> clz = parameter.getParameterType();
+
+		StringParameter rs = parameter
+				.getParameterAnnotation(StringParameter.class);
+		if (rs != null) {
+			String val = webRequest.getParameter(rs.value());
+			if (val != null && rs.options() != null)
+				for (String str : rs.options()) {
+					if (rs.caseInsensitive() && val.equalsIgnoreCase(str)
+							|| !rs.caseInsensitive() && val.equals(str))
+						return str;
+				}
+
+			return StringUtils.isEmpty(rs.def()) && rs.options() != null
+					&& rs.options().length > 0 ? rs.options()[0] : rs.def();
+		}
+
+		IntegerParameter ri = parameter
+				.getParameterAnnotation(IntegerParameter.class);
+		if (ri != null) {
+			int val = 0;
+
+			try {
+				val = Integer.parseInt(webRequest.getParameter(ri.value()));
+			} catch (Exception e) {
+				return ri.def();
+			}
+
+			if (val < ri.min() || val > ri.max())
+				return ri.def();
+			return val;
+		}
 
 		PageStorageAttr attr = parameter
 				.getParameterAnnotation(PageStorageAttr.class);

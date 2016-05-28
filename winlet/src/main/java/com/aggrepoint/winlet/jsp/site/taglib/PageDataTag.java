@@ -39,8 +39,9 @@ public class PageDataTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 			Page page = Utils.getPage(this, pageContext, strPage, iLevel);
+			String data = page.getData(strName);
 			if (page != null)
-				pageContext.getOut().print(page.getData(strName));
+				pageContext.getOut().print(data == null ? "" : data);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new JspException(e.getMessage());
