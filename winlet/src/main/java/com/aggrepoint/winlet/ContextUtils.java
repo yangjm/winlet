@@ -25,6 +25,8 @@ public class ContextUtils {
 			+ ".REQUEST_USER_ENGINE";
 	private static String REQUEST_RULE_ENGINE = ContextUtils.class.getName()
 			+ ".REQUEST_RULE_ENGINE";
+	private static String REQUEST_AUTHORIZATION_ENGINE = ContextUtils.class
+			.getName() + ".REQUEST_AUTH_ENGINE";
 	private static String REQUEST_PSN_RULE_ENGINE = ContextUtils.class
 			.getName() + ".REQUEST_PSN_RULE_ENGINE";
 	private static String REQUEST_CONFIG_PROVIDER = ContextUtils.class
@@ -128,6 +130,17 @@ public class ContextUtils {
 	public static void setUserEngine(HttpServletRequest request,
 			UserEngine userEngine) {
 		request.setAttribute(REQUEST_USER_ENGINE, userEngine);
+	}
+
+	public static AuthorizationEngine getAuthorizationEngine(
+			HttpServletRequest request) {
+		return (AuthorizationEngine) request
+				.getAttribute(REQUEST_AUTHORIZATION_ENGINE);
+	}
+
+	public static void setAuthorizationEngine(HttpServletRequest request,
+			AuthorizationEngine engine) {
+		request.setAttribute(REQUEST_AUTHORIZATION_ENGINE, engine);
 	}
 
 	public static AccessRuleEngine getAccessRuleEngine(

@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet.spring;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,5 +86,9 @@ public class WinletClassLoader extends ClassLoader {
 		if (!path.startsWith("/"))
 			path = "/" + path;
 		return pathToClassMap.get(path);
+	}
+
+	public static Collection<Class<?>> getClasses() {
+		return pathToClassMap.values();
 	}
 }

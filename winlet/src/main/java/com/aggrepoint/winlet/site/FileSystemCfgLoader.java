@@ -29,7 +29,8 @@ public class FileSystemCfgLoader {
 		interval = checkInterval;
 	}
 
-	public synchronized ArrayList<Branch> load(ArrayList<Branch> branches) {
+	public synchronized ArrayList<Branch> load(ArrayList<Branch> branches,
+			String contextRoot) {
 		if (branches != null) {
 			boolean reload = false;
 
@@ -53,7 +54,7 @@ public class FileSystemCfgLoader {
 
 		for (File f : rootDir.listFiles()) {
 			if (f.isDirectory()) {
-				Branch b = BranchDao.load(f);
+				Branch b = BranchDao.load(f, contextRoot);
 				if (b != null) {
 					b.init();
 					bs.add(b);

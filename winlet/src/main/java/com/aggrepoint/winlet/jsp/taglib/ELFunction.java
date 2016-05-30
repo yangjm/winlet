@@ -21,9 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.method.HandlerMethod;
 
 import com.aggrepoint.utils.StringUtils;
 import com.aggrepoint.winlet.ContextUtils;
@@ -31,9 +28,6 @@ import com.aggrepoint.winlet.ReqInfo;
 import com.aggrepoint.winlet.StaticUrlProvider;
 import com.aggrepoint.winlet.jsp.Resolver;
 import com.aggrepoint.winlet.site.SiteController;
-import com.aggrepoint.winlet.spring.AccessRuleChecker;
-import com.aggrepoint.winlet.spring.WinletClassLoader;
-import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.utils.BeanProperty;
 import com.aggrepoint.winlet.utils.EncodeUtils;
 
@@ -353,82 +347,8 @@ public class ELFunction {
 	 * path值bbb表示检查是否可以访问当前被执行的winlet中定义的bbb方法。bbb是指方法映射的URL，不是指方法名称
 	 */
 	public static Boolean canAccess(String url) {
-		if (url == null)
-			return false;
-
-		Method method = methodMap.get(url);
-
-		if (method == null) { // 找到url对应的method
-			if (methodMap.containsKey(url))
-				return false;
-
-			methodMap.put(url, null);
-
-			// { 分解winlet url和method url
-			String winletUrl = null;
-			String methodUrl = null;
-
-			url = url.trim();
-			if (url.startsWith("/"))
-				url = url.substring(1);
-			int idx = url.indexOf("/");
-			if (idx > 0) {
-				winletUrl = "/" + url.substring(0, idx).trim();
-				methodUrl = "/" + url.substring(idx + 1).trim();
-			} else
-				methodUrl = "/" + url.trim();
-			// }
-
-			// { 找到对应的Winlet类
-			Class<?> winletClass = null;
-			if (winletUrl == null) {
-				HandlerMethod hm = ContextUtils.getHandlerMethod(ContextUtils
-						.getRequest());
-				if (hm != null)
-					winletClass = hm.getBeanType();
-			} else {
-				winletClass = WinletClassLoader.getWinletClassByPath(winletUrl);
-			}
-
-			if (winletClass == null)
-				return false;
-			// }
-
-			// { 找到对应的方法
-			for (Method m : winletClass.getMethods()) {
-				RequestMapping rm = AnnotationUtils.findAnnotation(m,
-						RequestMapping.class);
-				if (rm != null)
-					for (String str : rm.value())
-						if (methodUrl.equals(str)) {
-							method = m;
-							break;
-						}
-
-				if (method != null)
-					break;
-
-				Action action = AnnotationUtils.findAnnotation(m, Action.class);
-				if (action != null) {
-					String str = action.value();
-					if (StringUtils.isEmpty(str))
-						str = m.getName();
-					str = "/" + str;
-					if (methodUrl.equals(str)) {
-						method = m;
-						break;
-					}
-				}
-			}
-
-			if (method == null)
-				return false;
-			// }
-
-			methodMap.put(url, method);
-		}
-
-		return AccessRuleChecker.evalRule(method.getDeclaringClass(), method) == null;
+		return ContextUtils.getAuthorizationEngine(ContextUtils.getRequest())
+				.check(url) == null;
 	}
 
 	public static Boolean psn(String rule) throws Exception {

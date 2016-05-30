@@ -11,7 +11,7 @@ import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.site.SiteContext;
 import com.aggrepoint.winlet.site.domain.Page;
@@ -106,8 +106,8 @@ public class TreeTag extends BodyTagSupport {
 		try {
 			SiteContext sc = (SiteContext) pageContext.getRequest()
 					.getAttribute(SiteContext.SITE_CONTEXT_KEY);
-			AccessRuleEngine re = ContextUtils
-					.getAccessRuleEngine((HttpServletRequest) pageContext
+			AuthorizationEngine ap = ContextUtils
+					.getAuthorizationEngine((HttpServletRequest) pageContext
 							.getRequest());
 
 			Page page = null;
@@ -127,13 +127,14 @@ public class TreeTag extends BodyTagSupport {
 				if (tt != null)
 					page = tt.getPage();
 				else
-					page = sc.getBranch().getHome(re);
+					page = sc.getBranch().getHome(ap);
 			}
 
 			if (page == null)
 				return SKIP_BODY;
 
-			m_enum = Collections.enumeration(page.getPages(re, false, true, false));
+			m_enum = Collections.enumeration(page.getPages(ap, false, true,
+					false));
 			Object next = nextElement();
 			if (next == null)
 				return SKIP_BODY;

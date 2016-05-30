@@ -103,4 +103,14 @@ public class SelectOptionUtils {
 				}).collect(Collectors.toList());
 	}
 
+	public static String getLabel(List<Option> list, String value) {
+		if (list == null || value == null)
+			return null;
+
+		for (Option option : list)
+			if (value.equals(option.value))
+				return option.label;
+
+		return null;
+	}
 }

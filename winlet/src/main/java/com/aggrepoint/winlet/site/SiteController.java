@@ -22,7 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.PsnRuleEngine;
 import com.aggrepoint.winlet.site.domain.Branch;
@@ -48,7 +48,7 @@ public class SiteController {
 	public static final String PATH_EXPAND = "PATH_EXPAND";
 	public static final String PAGE_DATA = "PAGE_DATA";
 
-	private static void updateBranches() {
+	private static void updateBranches(String contextRoot) {
 		if (context == null)
 			context = Context.get().getBean(ServletContext.class);
 
@@ -57,15 +57,15 @@ public class SiteController {
 					context.getRealPath("/WEB-INF/site/branch"),
 					CHECK_UPDATE_INTERVAL);
 
-		branches = loader.load(branches);
+		branches = loader.load(branches, contextRoot);
 	}
 
-	public static Branch getBranch(AccessRuleEngine engine) {
-		updateBranches();
+	public static Branch getBranch(AuthorizationEngine ap, String contextRoot) {
+		updateBranches(contextRoot);
 		Branch branch = null;
 		for (Branch b : branches) {
 			try {
-				if (b.getRule() == null || engine.eval(b.getRule())) {
+				if (ap.check(b) == null) {
 					branch = b;
 					break;
 				}
@@ -79,12 +79,13 @@ public class SiteController {
 		return branch;
 	}
 
-	public static Page getPage(AccessRuleEngine engine, String path) {
-		updateBranches();
+	public static Page getPage(AuthorizationEngine ap, String path,
+			String contextRoot) {
+		updateBranches(contextRoot);
 		Branch branch = null;
 		for (Branch b : branches) {
 			try {
-				if (b.getRule() == null || engine.eval(b.getRule())) {
+				if (ap.check(b) == null) {
 					branch = b;
 					break;
 				}
@@ -97,7 +98,7 @@ public class SiteController {
 
 		if (branch == null)
 			return null;
-		return branch.findPage(path, engine);
+		return branch.findPage(path, ap);
 	}
 
 	static byte[] toByteArray(InputStream input) throws IOException {
@@ -142,13 +143,14 @@ public class SiteController {
 	public Object site(
 			HttpServletRequest req,
 			HttpServletResponse resp,
-			AccessRuleEngine engine,
+			AuthorizationEngine ap,
 			PsnRuleEngine psnEngine,
 			@RequestHeader(value = "X-Url-Prefix", required = false) String urlPrefix) {
 		String path = req.getServletPath().substring(5);
 
 		try {
-			Branch branch = getBranch(engine);
+			Branch branch = getBranch(ap, req.getServletContext()
+					.getContextPath());
 			if (branch == null) {
 				return "/WEB-INF/site/error/pagenotfound.jsp";
 			}
@@ -159,7 +161,7 @@ public class SiteController {
 
 				return returnFile(branch, path);
 			} else {
-				Page page = branch.findPage(path, engine);
+				Page page = branch.findPage(path, ap);
 				if (page == null)
 					return "/WEB-INF/site/error/pagenotfound.jsp";
 

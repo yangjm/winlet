@@ -16,7 +16,6 @@ import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.RespHeaderConst;
 import com.aggrepoint.winlet.form.FormImpl;
-import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Action;
 import com.aggrepoint.winlet.spring.annotation.Unspecified;
 import com.aggrepoint.winlet.spring.annotation.Window;
@@ -46,12 +45,13 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			AccessRule rule = AccessRuleChecker.evalRule(hm.getBeanType(),
-					hm.getMethod());
-			if (rule != null) {
-				if (rule.exception() == Unspecified.class)
+			Class<? extends Exception> exp = ContextUtils
+					.getAuthorizationEngine(request).check(hm.getBeanType(),
+							hm.getMethod());
+			if (exp != null) {
+				if (exp == Unspecified.class)
 					return false;
-				throw rule.exception().newInstance();
+				throw exp.newInstance();
 			}
 
 			WinletDef def = WinletDef.getDef(hm.getBeanType());

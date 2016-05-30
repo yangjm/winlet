@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.site.SiteContext;
 import com.aggrepoint.winlet.site.domain.Page;
@@ -28,12 +28,13 @@ public class Utils {
 
 		SiteContext sc = (SiteContext) context.getRequest().getAttribute(
 				SiteContext.SITE_CONTEXT_KEY);
-		AccessRuleEngine re = ContextUtils
-				.getAccessRuleEngine((HttpServletRequest) context.getRequest());
+		AuthorizationEngine ap = ContextUtils
+				.getAuthorizationEngine((HttpServletRequest) context
+						.getRequest());
 
 		if (strPage != null) {
 			if (strPage.equals("AE_ROOT"))
-				page = sc.getBranch().getHome(re);
+				page = sc.getBranch().getHome(ap);
 			else if (strPage.equals("AE_CURRENT"))
 				page = sc.getPage();
 			else

@@ -3,15 +3,20 @@ package com.aggrepoint.winlet.site.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.StringUtils;
 
 import com.aggrepoint.utils.TwoValues;
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.PsnRuleEngine;
 
@@ -41,6 +46,7 @@ public class Page extends Base {
 	private int level;
 	private String fullPath;
 	private String fullDir;
+	private Set<String> expandAreas = new HashSet<String>();
 	/** key为area name，twovalues中第一个值为规则，第二个值为如果符合规则要映射到的area name */
 	private Map<String, List<TwoValues<String, String>>> areaMap = new HashMap<String, List<TwoValues<String, String>>>();
 
@@ -218,6 +224,13 @@ public class Page extends Base {
 		return areas;
 	}
 
+	public List<Area> getAreas(boolean expand) {
+		return areas.stream().filter(p -> {
+			boolean isExpand = expandAreas.contains(p.getName());
+			return expand && isExpand || !expand && !isExpand;
+		}).collect(Collectors.toList());
+	}
+
 	public void addAreaMap(String from, String to, String rule) {
 		List<TwoValues<String, String>> list = areaMap.get(from);
 		if (list == null) {
@@ -235,25 +248,19 @@ public class Page extends Base {
 		return pages;
 	}
 
-	protected boolean containsNotSkip(AccessRuleEngine re) {
+	protected boolean containsNotSkip(AuthorizationEngine ap) {
 		if (!skip)
 			return true;
 
 		for (Page page : pages)
-			try {
-				if (page.getRule() == null || re.eval(page.getRule()))
-					if (page.containsNotSkip(re))
-						return true;
-			} catch (Exception e) {
-				logger.error("Error evaluating rule \"" + page.getRule()
-						+ "\" defined on page \"" + page.getFullPath() + "\".",
-						e);
-			}
+			if (ap.check(page, false) == null)
+				if (page.containsNotSkip(ap))
+					return true;
 
 		return false;
 	}
 
-	public List<Page> getPages(AccessRuleEngine re, boolean includeHide,
+	public List<Page> getPages(AuthorizationEngine ap, boolean includeHide,
 			boolean constainsNotSkip, boolean includeExpand) {
 		if (pages.size() == 0)
 			return pages;
@@ -264,10 +271,9 @@ public class Page extends Base {
 				continue;
 
 			try {
-				if (p.getRule() == null || re.eval(p.getRule())
-						|| includeExpand && p.getExpandRule() != null
-						&& re.eval(p.getExpandRule()))
-					if (!constainsNotSkip || p.containsNotSkip(re))
+				if (ap.check(p, false) == null || includeExpand && p.isExpand()
+						&& ap.check(p, true) == null)
+					if (!constainsNotSkip || p.containsNotSkip(ap))
 						list.add(p);
 			} catch (Exception e) {
 				logger.error("Error evaluating rule \"" + p.getRule()
@@ -299,12 +305,12 @@ public class Page extends Base {
 		return fullDir;
 	}
 
-	public Page findPage(String path, AccessRuleEngine re) {
+	public Page findPage(String path, AuthorizationEngine ap) {
 		if (path.equals(fullPath)) {
 			// 非扩展匹配，确认符合非扩展匹配规则
 			// getPage()返回的页面有可能是符合扩展匹配但不符合非扩展匹配，所以需要检查
 			try {
-				if (rule == null || re.eval(rule))
+				if (ap.check(this, false) == null)
 					return this;
 			} catch (Exception e) {
 				logger.error("Error evaluating rule \"" + rule
@@ -317,16 +323,16 @@ public class Page extends Base {
 		if (!path.startsWith(fullPath))
 			return null;
 
-		List<Page> list = getPages(re, true, true, true);
+		List<Page> list = getPages(ap, true, true, true);
 		for (Page p : list) {
-			Page f = p.findPage(path, re);
+			Page f = p.findPage(path, ap);
 			if (f != null)
 				return f;
 		}
 
 		if (isExpand())
 			try {
-				if (expandRule == null || re.eval(expandRule)) {
+				if (ap.check(this, true) == null) {
 					// 扩展匹配，确认符合扩展匹配规则
 					// getPage()返回的页面有可能是符合非扩展匹配但不符合扩展匹配，所以需要检查
 					return this;
@@ -339,15 +345,15 @@ public class Page extends Base {
 		return null;
 	}
 
-	public Page findNotSkip(AccessRuleEngine re) {
+	public Page findNotSkip(AuthorizationEngine ap) {
 		if (!skip)
 			return this;
 
-		List<Page> list = getPages(re, true, true, false);
+		List<Page> list = getPages(ap, true, true, false);
 		if (list.size() == 0)
 			return this;
 
-		return list.get(0).findNotSkip(re);
+		return list.get(0).findNotSkip(ap);
 	}
 
 	public HashMap<String, String> getDataMap() {
@@ -362,5 +368,18 @@ public class Page extends Base {
 
 	public String getData(String name) {
 		return getDataMap().get(name);
+	}
+
+	public void setExpandAreas(String expandAreas) {
+		if (StringUtils.isEmpty(expandAreas))
+			return;
+
+		StringTokenizer st = new StringTokenizer(expandAreas, " ,;");
+		while (st.hasMoreTokens())
+			this.expandAreas.add(st.nextToken());
+	}
+
+	public boolean isExpandArea(String name) {
+		return expandAreas.contains(name);
 	}
 }

@@ -27,6 +27,9 @@ public class DefaultNamingStrategy extends ImprovedNamingStrategy {
 		String name = addUnderscores(StringHelper.unqualify(className))
 				.toUpperCase();
 
+		if (name.equals("NEWS") || name.endsWith("_NEWS"))
+			return name;
+
 		if (name.endsWith("Y"))
 			if (!name.endsWith("AY") && !name.endsWith("EY")
 					&& !name.endsWith("OY") && !name.endsWith("IY")

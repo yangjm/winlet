@@ -5,7 +5,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.site.SiteContext;
 import com.aggrepoint.winlet.site.domain.Page;
@@ -57,8 +57,8 @@ public class SubCountTag extends TagSupport {
 
 			SiteContext sc = (SiteContext) pageContext.getRequest()
 					.getAttribute(SiteContext.SITE_CONTEXT_KEY);
-			AccessRuleEngine re = ContextUtils
-					.getAccessRuleEngine((HttpServletRequest) pageContext
+			AuthorizationEngine ap = ContextUtils
+					.getAuthorizationEngine((HttpServletRequest) pageContext
 							.getRequest());
 
 			Page page = null;
@@ -78,11 +78,11 @@ public class SubCountTag extends TagSupport {
 				if (tt != null)
 					page = tt.getPage();
 				else
-					page = sc.getBranch().getHome(re);
+					page = sc.getBranch().getHome(ap);
 			}
 
 			if (page != null)
-				count = page.getPages(re, false, true, false).size();
+				count = page.getPages(ap, false, true, false).size();
 
 			if (m_strName == null)
 				out.print(count);

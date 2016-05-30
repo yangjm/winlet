@@ -173,4 +173,14 @@ public class DefaultConfigProvider implements ConfigProvider {
 		return booleanTrue.equalsIgnoreCase(getStr(context, name,
 				def ? booleanTrue : ""));
 	}
+
+	@Override
+	public boolean checkStr(String name, String value) {
+		String v = getStr(name);
+		if (v == null && value == null)
+			return true;
+		if (v == null || value == null)
+			return false;
+		return v.equals(value);
+	}
 }

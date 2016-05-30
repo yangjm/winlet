@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.aggrepoint.winlet.AccessRuleEngine;
+import com.aggrepoint.winlet.AuthorizationEngine;
 
 /**
  * 
@@ -93,21 +93,21 @@ public class Branch extends Base {
 		return rootPage;
 	}
 
-	public Page getHome(AccessRuleEngine re) {
-		List<Page> pages = rootPage.getPages(re, true, true, false);
+	public Page getHome(AuthorizationEngine ap) {
+		List<Page> pages = rootPage.getPages(ap, true, true, false);
 
 		if (pages.size() == 0)
 			return null;
 
-		return pages.get(0).findNotSkip(re);
+		return pages.get(0).findNotSkip(ap);
 	}
 
-	public Page findPage(String path, AccessRuleEngine re) {
+	public Page findPage(String path, AuthorizationEngine ap) {
 		if (!path.endsWith("/"))
 			path = path + "/";
 
-		Page f = rootPage.findPage(path, re);
+		Page f = rootPage.findPage(path, ap);
 
-		return f == null || f == rootPage ? getHome(re) : f.findNotSkip(re);
+		return f == null || f == rootPage ? getHome(ap) : f.findNotSkip(ap);
 	}
 }
