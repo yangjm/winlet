@@ -11,7 +11,7 @@ Winlet是一个建立在Spring MVC, Hibernate, jQuery, Bootstrap等框架基础�
 <dependency>
   <groupId>com.aggrepoint.framework</groupId>
   <artifactId>winlet</artifactId>
-  <version>0.1.6</version>
+  <version>0.1.7</version>
 </dependency>
 ```
 Winlet框架需要运行在Java 8环境中。
