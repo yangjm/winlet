@@ -200,6 +200,9 @@ public class Resolver extends javax.el.ELResolver {
 
 				context.setPropertyResolved(true);
 			} else {
+				if (property.toString().equals("sectionId"))
+					System.out.println();
+
 				if (AnnotationUtils.findAnnotation(base.getClass(),
 						Winlet.class) != null) {
 					try {
