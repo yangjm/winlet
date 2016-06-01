@@ -86,10 +86,6 @@ public class Resolver extends javax.el.ELResolver {
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		Object val = null;
 
-		if (property == null) {
-			System.out.println();
-		}
-
 		if (base == null) {
 			if (property.equals("r")) {
 				val = ContextUtils.getReqInfo().getReturnDef();
@@ -200,9 +196,6 @@ public class Resolver extends javax.el.ELResolver {
 
 				context.setPropertyResolved(true);
 			} else {
-				if (property.toString().equals("sectionId"))
-					System.out.println();
-
 				if (AnnotationUtils.findAnnotation(base.getClass(),
 						Winlet.class) != null) {
 					try {
