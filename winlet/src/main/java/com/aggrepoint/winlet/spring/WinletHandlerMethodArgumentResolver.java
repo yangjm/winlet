@@ -1,8 +1,9 @@
 package com.aggrepoint.winlet.spring;
 
+import java.util.function.Function;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.StringUtils;
@@ -31,9 +32,9 @@ import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
+import com.aggrepoint.winlet.spring.annotation.IntegerParameter;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
-import com.aggrepoint.winlet.spring.annotation.IntegerParameter;
 import com.aggrepoint.winlet.spring.annotation.StringParameter;
 
 /**
@@ -118,6 +119,27 @@ public class WinletHandlerMethodArgumentResolver implements
 			return val;
 		}
 
+		// 转换为参数所需格式。参考了AbstractNamedValueMethodArgumentResolver.resolveArgument中的实现
+		Function<Object, Object> convert = (arg) -> {
+			if (binderFactory != null) {
+				Class<?> paramType = parameter.getParameterType();
+				try {
+					WebDataBinder binder = binderFactory.createBinder(
+							webRequest, null, parameter.getParameterName());
+					return binder.convertIfNecessary(arg, paramType, parameter);
+				} catch (TypeMismatchException ex) {
+					throw new MethodArgumentTypeMismatchException(arg,
+							ex.getRequiredType(), parameter.getParameterName(),
+							parameter, ex.getCause());
+				} catch (Exception ex) {
+					throw new MethodArgumentConversionNotSupportedException(
+							arg, paramType, parameter.getParameterName(),
+							parameter, ex.getCause());
+				}
+			}
+			return arg;
+		};
+
 		PageStorageAttr attr = parameter
 				.getParameterAnnotation(PageStorageAttr.class);
 		if (attr != null) {
@@ -134,25 +156,7 @@ public class WinletHandlerMethodArgumentResolver implements
 			if (arg == null) // 没有定义请求参数，或请求参数中没有值，从PageStorage中取
 				arg = ps.getAttribute(attr.value());
 
-			// 转换为参数所需格式。参考了AbstractNamedValueMethodArgumentResolver.resolveArgument中的实现
-			if (binderFactory != null) {
-				Class<?> paramType = parameter.getParameterType();
-				WebDataBinder binder = binderFactory.createBinder(webRequest,
-						null, parameter.getParameterName());
-				try {
-					arg = binder.convertIfNecessary(arg, paramType, parameter);
-				} catch (ConversionNotSupportedException ex) {
-					throw new MethodArgumentConversionNotSupportedException(
-							arg, ex.getRequiredType(),
-							parameter.getParameterName(), parameter,
-							ex.getCause());
-				} catch (TypeMismatchException ex) {
-					throw new MethodArgumentTypeMismatchException(arg,
-							ex.getRequiredType(), parameter.getParameterName(),
-							parameter, ex.getCause());
-
-				}
-			}
+			arg = convert.apply(arg);
 
 			if (arg == null && attr.createIfNotExist())
 				arg = clz.newInstance();
@@ -160,6 +164,17 @@ public class WinletHandlerMethodArgumentResolver implements
 			ps.setAttribute(attr.value(), arg);
 
 			return arg;
+		}
+
+		HttpServletRequest req = ContextUtils.getRequest();
+
+		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
+		if (cfg != null) {
+			String value = ContextUtils.getConfigProvider(req).getStr(
+					cfg.value());
+			if (value == null)
+				value = cfg.def();
+			return convert.apply(value);
 		}
 
 		if (clz == Boolean.class || clz == boolean.class) {
@@ -170,7 +185,6 @@ public class WinletHandlerMethodArgumentResolver implements
 			if (rule != null)
 				return ContextUtils.getAccessRuleEngine(
 						ContextUtils.getRequest()).eval(rule.value());
-			return false;
 		}
 
 		if (clz.isAssignableFrom(Validation.class))
@@ -198,8 +212,6 @@ public class WinletHandlerMethodArgumentResolver implements
 			return sps;
 		}
 
-		HttpServletRequest req = ContextUtils.getRequest();
-
 		if (UserProfile.class.isAssignableFrom(clz))
 			return checkClass(ContextUtils.getUserEngine(req).getUser(req),
 					clz, null);
@@ -222,15 +234,6 @@ public class WinletHandlerMethodArgumentResolver implements
 
 		if (ListProvider.class.isAssignableFrom(clz))
 			return checkClass(ContextUtils.getListProvider(req), clz, null);
-
-		Cfg cfg = parameter.getParameterAnnotation(Cfg.class);
-		if (cfg != null) {
-			String value = ContextUtils.getConfigProvider(req).getStr(
-					cfg.value());
-			if (value == null)
-				value = cfg.def();
-			return value;
-		}
 
 		return null;
 	}
