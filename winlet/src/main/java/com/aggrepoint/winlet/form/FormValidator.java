@@ -116,8 +116,8 @@ public class FormValidator implements PropertyTypeCode {
 	static Pattern EMAIL = Pattern.compile(
 			"^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
 			Pattern.CASE_INSENSITIVE);
-	static Pattern INT = Pattern.compile("^\\d+$");
-	static Pattern FLOAT = Pattern.compile("^\\d+(\\.\\d+)?$");
+	static Pattern INT = Pattern.compile("^\\-?\\d+$");
+	static Pattern FLOAT = Pattern.compile("^\\-?\\d+(\\.\\d+)?$");
 
 	static Pattern getPattern(Vector<String> args) {
 		if (args == null || args.size() == 0)
