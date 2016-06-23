@@ -3,6 +3,7 @@ package com.aggrepoint.winlet.jsp.site.taglib;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.site.domain.Page;
 
 /**
@@ -33,8 +34,15 @@ public class PageNameTag extends TagSupport {
 	public int doStartTag() throws JspException {
 		try {
 			Page page = Utils.getPage(this, pageContext, m_strPage, m_iLevel);
-			if (page != null)
-				pageContext.getOut().print(page.getName());
+			if (page != null) {
+				String name = null;
+				if (page.getNameCfg() != null)
+					name = ContextUtils.getConfigProvider().getStr(
+							page.getNameCfg());
+
+				pageContext.getOut()
+						.print(name == null ? page.getName() : name);
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new JspException(e.getMessage());

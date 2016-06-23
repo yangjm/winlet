@@ -40,6 +40,7 @@ public class PageDao {
 				}
 			}
 
+			page.setNameCfg(cfgs.get("nameCfg"));
 			page.setName(cfgs.get("name"));
 			if (page.getName() == null)
 				page.setName(page.getPath());

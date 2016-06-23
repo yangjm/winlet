@@ -1,5 +1,8 @@
 package com.aggrepoint.winlet;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -41,50 +44,71 @@ public class ContextUtils {
 			+ ".REQUEST_DISPATCHER_KEY";
 
 	public static ReqInfoImpl getReqInfo() {
-		return (ReqInfoImpl) RequestContextHolder.currentRequestAttributes()
-				.getAttribute(REQUEST_ATTR_REQUEST,
-						RequestAttributes.SCOPE_REQUEST);
+		try {
+			return (ReqInfoImpl) RequestContextHolder
+					.currentRequestAttributes().getAttribute(
+							REQUEST_ATTR_REQUEST,
+							RequestAttributes.SCOPE_REQUEST);
+		} catch (IllegalStateException e) {
+			return null;
+		}
 	}
 
 	public static void setReqInfo(ReqInfo reqInfo) {
-		RequestContextHolder.currentRequestAttributes().setAttribute(
-				REQUEST_ATTR_REQUEST, reqInfo, RequestAttributes.SCOPE_REQUEST);
+		try {
+			RequestContextHolder.currentRequestAttributes().setAttribute(
+					REQUEST_ATTR_REQUEST, reqInfo,
+					RequestAttributes.SCOPE_REQUEST);
+		} catch (IllegalStateException e) {
+		}
+	}
+
+	static <A, B> B ifNotNull(A obj, Function<A, B> next) {
+		if (obj == null)
+			return null;
+		return next.apply(obj);
+	}
+
+	static <A> void ifNotNullNoReturn(A obj, Consumer<A> next) {
+		if (obj == null)
+			return;
+		next.accept(obj);
 	}
 
 	public static HttpServletRequest getRequest() {
-		return getReqInfo().getRequest();
+		return ifNotNull(getReqInfo(), ReqInfoImpl::getRequest);
 	}
 
 	public static Object getRequestAttribute(String name) {
-		return getRequest().getAttribute(name);
+		return ifNotNull(getRequest(), (p) -> p.getAttribute(name));
 	}
 
 	public static void setRequestAttribute(String name, Object value) {
-		getRequest().setAttribute(name, value);
+		ifNotNullNoReturn(getRequest(), (p) -> p.setAttribute(name, value));
 	}
 
 	public static void removeRequestAttribute(String name) {
-		getRequest().removeAttribute(name);
+		ifNotNullNoReturn(getRequest(), (p) -> p.removeAttribute(name));
 	}
 
 	public static HttpSession getSession() {
-		return getReqInfo().getSession();
+		return ifNotNull(getReqInfo(), ReqInfoImpl::getSession);
 	}
 
 	public static HttpSession getSession(boolean create) {
-		return getReqInfo().getSession(create);
+		return ifNotNull(getReqInfo(), (p) -> p.getSession(create));
 	}
 
 	public static Object getSessionAttribute(String name) {
-		return getSession().getAttribute(name);
+		return ifNotNull(getSession(), (p) -> p.getAttribute(name));
 	}
 
 	public static void setSessionAttribute(String name, Object value) {
-		getSession().setAttribute(name, value);
+		ifNotNullNoReturn(getSession(), (p) -> p.setAttribute(name, value));
 	}
 
 	public static void removeSessionAttribute(String name) {
-		getSession().removeAttribute(name);
+		ifNotNullNoReturn(getSession(), (p) -> p.removeAttribute(name));
 	}
 
 	public static LogInfoImpl getLogInfo(HttpServletRequest request) {

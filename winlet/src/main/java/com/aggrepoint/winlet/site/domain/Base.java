@@ -13,6 +13,8 @@ public class Base implements Comparable<Base> {
 	protected String dir;
 	protected int order;
 	protected String name;
+	/** 名字的配置名称。优先级高于name */
+	protected String nameCfg;
 	protected String rule;
 
 	public int compareTo(Base o) {
@@ -41,6 +43,14 @@ public class Base implements Comparable<Base> {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getNameCfg() {
+		return nameCfg;
+	}
+
+	public void setNameCfg(String nameCfg) {
+		this.nameCfg = nameCfg;
 	}
 
 	public String getRule() {
