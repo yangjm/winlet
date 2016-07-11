@@ -1,5 +1,6 @@
 package com.aggrepoint.winlet.form;
 
+import java.util.Collection;
 import java.util.function.Function;
 
 /**
@@ -28,8 +29,10 @@ public interface Form {
 	 * 对字段field进行校验
 	 * 
 	 * @param field
-	 * @param 参数是字段值，返回true表示校验通过，false表示校验失败
-	 * @param error 如果校验失败，使用的错误信息
+	 * @param 参数是字段值
+	 *            ，返回true表示校验通过，false表示校验失败
+	 * @param error
+	 *            如果校验失败，使用的错误信息
 	 */
 	public void verify(String field, Function<String, Boolean> v, String error);
 
@@ -37,8 +40,10 @@ public interface Form {
 	 * 对字段field进行校验
 	 * 
 	 * @param field
-	 * @param 参数是字段值，返回false表示校验通过，true表示校验失败
-	 * @param error 如果校验失败，使用的错误信息
+	 * @param 参数是字段值
+	 *            ，返回false表示校验通过，true表示校验失败
+	 * @param error
+	 *            如果校验失败，使用的错误信息
 	 */
 	public void errorIf(String field, Function<String, Boolean> v, String error);
 
@@ -149,4 +154,6 @@ public interface Form {
 	 * @return
 	 */
 	public boolean hasField(String field);
+
+	void setSelectOptions(String field, Collection<? extends SelectOption> list);
 }

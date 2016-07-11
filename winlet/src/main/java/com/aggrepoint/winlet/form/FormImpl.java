@@ -231,6 +231,13 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public void setSelectOptions(String field, Collection<? extends SelectOption> list) {
+		processBinders();
+
+		recordChange(new ChangeUpdateList(field, list));
+	}
+
+	@Override
 	public boolean hasError() {
 		processBinders();
 

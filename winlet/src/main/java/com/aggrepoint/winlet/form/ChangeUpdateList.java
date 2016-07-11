@@ -1,25 +1,25 @@
 package com.aggrepoint.winlet.form;
 
-import java.util.Vector;
-
+import java.util.Collection;
 
 /**
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ChangeUpdateList extends Change {
-	Vector<SelectOption> list;
+	Collection<? extends SelectOption> list;
 
-	public ChangeUpdateList(String input, Vector<SelectOption> list) {
+	public ChangeUpdateList(String input,
+			Collection<? extends SelectOption> list) {
 		super(input, "l");
 		this.list = list;
 	}
 
-	public Vector<SelectOption> getList() {
+	public Collection<? extends SelectOption> getList() {
 		return list;
 	}
 
-	public void setList(Vector<SelectOption> list) {
+	public void setList(Collection<? extends SelectOption> list) {
 		this.list = list;
 	}
 }
