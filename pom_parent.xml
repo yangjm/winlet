@@ -4,7 +4,7 @@
 
 	<groupId>com.aggrepoint.framework</groupId>
 	<artifactId>pom-parent</artifactId>
-	<version>0.1.10-SNAPSHOT</version>
+	<version>0.1.10</version>
 	<packaging>pom</packaging>
 
 	<name>AggrePoint Framework Parent</name>

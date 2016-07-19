@@ -231,7 +231,8 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public void setSelectOptions(String field, Collection<? extends SelectOption> list) {
+	public void setSelectOptions(String field,
+			Collection<? extends SelectOption> list) {
 		processBinders();
 
 		recordChange(new ChangeUpdateList(field, list));
@@ -242,6 +243,11 @@ public class FormImpl implements Form, ReqConst {
 		processBinders();
 
 		return fieldErrors.size() > 0 || bindingErrorCount > 0;
+	}
+
+	@Override
+	public boolean hasErrorOrValidateField() {
+		return hasError() || isValidateField();
 	}
 
 	@Override
@@ -505,20 +511,66 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public void verify(String field, Function<String, Boolean> v, String error) {
+	public Form addError(String field, Function<String, Boolean> when,
+			String error, boolean validateEvenErrorExist) {
 		if (!validate(field))
-			return;
+			return this;
+		if (hasError(field) && !validateEvenErrorExist)
+			return this;
 
-		if (!v.apply(getValue(field)))
+		if (when.apply(getValue(field)))
 			addError(field, error);
+
+		return this;
 	}
 
 	@Override
-	public void errorIf(String field, Function<String, Boolean> v, String error) {
+	public Form addError(String field, boolean when, String error,
+			boolean validateEvenErrorExist) {
 		if (!validate(field))
-			return;
+			return this;
+		if (hasError(field) && !validateEvenErrorExist)
+			return this;
 
-		if (v.apply(getValue(field)))
+		if (when)
 			addError(field, error);
+
+		return this;
+	}
+
+	@Override
+	public Form addError(String field, Function<String, Boolean> when,
+			String error) {
+		return addError(field, when, error, false);
+	}
+
+	@Override
+	public Form addError(String field, boolean when, String error) {
+		return addError(field, when, error, false);
+	}
+
+	@Override
+	public String mapStatus(String vf, String vfError, String error,
+			String passed) {
+		if (isValidateField())
+			if (hasError())
+				return vfError;
+			else
+				return vf;
+		if (hasError())
+			return error;
+		return passed;
+	}
+
+	@Override
+	public String mapStatus(String vf, String vfError, String error) {
+		return mapStatus(vf, vfError, error, null);
+	}
+
+	@Override
+	public Form noError(Process process) throws Exception {
+		if (!hasError() && !isValidateField())
+			process.run();
+		return this;
 	}
 }

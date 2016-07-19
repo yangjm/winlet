@@ -60,43 +60,45 @@ public class EveluateTag extends TagSupport {
 
 			Page currentPage = sc.getPage();
 
-			boolean bResult = false;
+			Object val = new Boolean(false);
 
 			Page page = Utils.getPage(this, pageContext, m_strPage, m_iLevel);
 
 			if (m_strType.equals("hassub")) { // 判断指定的页是否包含子页面
 				if (page.getPages(ap, false, true, false).size() > 0)
-					bResult = true;
+					val = new Boolean(true);
 			} else if (m_strType.equals("current")) { // 判断指定的页是否当前页
 				if (currentPage == page)
-					bResult = true;
+					val = new Boolean(true);
 			} else if (m_strType.equals("focus")) { // 判断指定的页是否当前页或当前页的直接上级页面
 				while (currentPage != null
 						&& currentPage.getParent() != currentPage
 						&& currentPage != page)
 					currentPage = currentPage.getParent();
 				if (currentPage == page)
-					bResult = true;
+					val = new Boolean(true);
 			} else if (m_strType.equals("first")) { // 用于在tree标记中，判断当前页面是否第一个页面
 				TreeTag tt = (TreeTag) TagSupport.findAncestorWithClass(this,
 						TreeTag.class);
 				if (tt != null)
 					if (tt.isFirst())
-						bResult = true;
+						val = new Boolean(true);
 			} else if (m_strType.equals("last")) { // 用于在tree标记中，判断当前页面是否还有后续页面
 				TreeTag tt = (TreeTag) TagSupport.findAncestorWithClass(this,
 						TreeTag.class);
 				if (tt != null)
 					if (!tt.hasNext())
-						bResult = true;
+						val = new Boolean(true);
 			} else if (m_strType.equals("canaccess")) { // 是否可以访问当前页。用于处理只能扩展访问但不能直接访问的页面
 				if (ContextUtils.getAuthorizationEngine(
 						(HttpServletRequest) pageContext.getRequest()).check(
 						page, false) == null)
-					bResult = true;
+					val = new Boolean(true);
+			} else if (m_strType.startsWith("data.")) { // 获取data
+				val = page.getData(m_strType.substring(5));
 			}
 
-			pageContext.setAttribute(m_strName, new Boolean(bResult));
+			pageContext.setAttribute(m_strName, val);
 		} catch (Exception e) {
 			throw new JspException(e.getMessage());
 		}

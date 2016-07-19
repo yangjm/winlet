@@ -29,23 +29,21 @@ public interface Form {
 	 * 对字段field进行校验
 	 * 
 	 * @param field
-	 * @param 参数是字段值
-	 *            ，返回true表示校验通过，false表示校验失败
+	 * @param when
+	 *            true表示校验未通过
 	 * @param error
 	 *            如果校验失败，使用的错误信息
 	 */
-	public void verify(String field, Function<String, Boolean> v, String error);
+	public Form addError(String field, Function<String, Boolean> when,
+			String error);
 
-	/**
-	 * 对字段field进行校验
-	 * 
-	 * @param field
-	 * @param 参数是字段值
-	 *            ，返回false表示校验通过，true表示校验失败
-	 * @param error
-	 *            如果校验失败，使用的错误信息
-	 */
-	public void errorIf(String field, Function<String, Boolean> v, String error);
+	public Form addError(String field, boolean when, String error);
+
+	public Form addError(String field, Function<String, Boolean> when,
+			String error, boolean validateEvenErrorExist);
+
+	public Form addError(String field, boolean when, String error,
+			boolean validateEvenErrorExist);
 
 	/**
 	 * 获取字段field的值。
@@ -86,6 +84,8 @@ public interface Form {
 	boolean hasError(boolean fieldErrorsOnly);
 
 	boolean hasError(String field);
+
+	boolean hasErrorOrValidateField();
 
 	/**
 	 * 获取字段上当前存在的所有校验错误
@@ -156,4 +156,11 @@ public interface Form {
 	public boolean hasField(String field);
 
 	void setSelectOptions(String field, Collection<? extends SelectOption> list);
+
+	public String mapStatus(String vf, String vfError, String error);
+
+	public String mapStatus(String vf, String vfError, String error,
+			String passed);
+
+	public Form noError(Process process) throws Exception;
 }
