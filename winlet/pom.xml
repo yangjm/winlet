@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.10</version>
+		<version>0.1.11-SNAPSHOT</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -24,7 +24,7 @@
 		<yuicompressor-version>2.4.8</yuicompressor-version>
 		<freemarker-version>2.3.20</freemarker-version>
 
-		<dao-version>0.1.10</dao-version>
+		<dao-version>0.1.11-SNAPSHOT</dao-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
