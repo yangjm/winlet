@@ -16,15 +16,20 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 
 public class BeanUtils {
-	public static <T> T copyProps(T from, T to, String props) {
+	public static <T> T copyProps(T from, T to, String... props) {
 		if (props == null || from == null || to == null)
 			return to;
 
 		BeanWrapperImpl wFrom = new BeanWrapperImpl(from);
 		BeanWrapperImpl wTo = new BeanWrapperImpl(to);
 
-		for (String prop : props.split(", "))
-			wTo.setPropertyValue(prop, wFrom.getPropertyValue(prop));
+		for (String prop : props) {
+			if (StringUtils.isEmpty(prop))
+				continue;
+
+			for (String p : prop.split(", "))
+				wTo.setPropertyValue(p, wFrom.getPropertyValue(p));
+		}
 
 		return to;
 	}

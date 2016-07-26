@@ -94,6 +94,9 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public boolean validate(String field) {
+		if (disabledFields != null && disabledFields.contains(field))
+			return false;
+
 		return !ri.isValidateField() // 不是单字段校验，对所有字段都校验
 				|| fields.contains(field) || groupNames.contains(field);
 	}
