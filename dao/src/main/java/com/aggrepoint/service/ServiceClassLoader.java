@@ -2,6 +2,7 @@ package com.aggrepoint.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -176,6 +177,7 @@ public class ServiceClassLoader extends ClassLoader {
 				methods.retainAll(find);
 				Method[] toadd = (Method[]) methods.stream()
 						.filter(p -> !declares(clz, p))
+						.filter(p -> !Modifier.isStatic(p.getModifiers()))
 						.toArray(size -> new Method[size]);
 
 				if (toadd != null && toadd.length > 0) {

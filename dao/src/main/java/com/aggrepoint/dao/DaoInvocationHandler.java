@@ -2,6 +2,7 @@ package com.aggrepoint.dao;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import com.aggrepoint.dao.annotation.Delete;
 import com.aggrepoint.dao.annotation.Deletes;
 import com.aggrepoint.dao.annotation.Find;
 import com.aggrepoint.dao.annotation.Finds;
+import com.aggrepoint.dao.annotation.Load;
 import com.aggrepoint.dao.annotation.Update;
 import com.aggrepoint.dao.annotation.Updates;
 
@@ -81,7 +83,8 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 				for (Annotation ann : method.getDeclaredAnnotations()) {
 					Class<?> t = ann.annotationType();
 					if (t == Find.class || t == Cache.class
-							|| t == Update.class || t == Delete.class) {
+							|| t == Update.class || t == Delete.class
+							|| t == Load.class) {
 						addDaoMethod(method, new DaoAnnotationMethod<T>(clz,
 								method, ann, funcs, entityManager,
 								sessionFactory, cacheManager, cs));
@@ -107,7 +110,7 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 					}
 				}
 
-			if (!found)
+			if (!found && !method.isDefault())
 				throw new IllegalArgumentException("Unsupported method "
 						+ daoInterface.getName() + "." + method.getName() + ".");
 		}
@@ -147,6 +150,13 @@ public class DaoInvocationHandler<T> implements InvocationHandler, Serializable 
 				return proxy.getClass().hashCode();
 			} else if (toString.equals(method)) {
 				return proxy.getClass().toString();
+			} else if (method.isDefault()) {
+				Class<?> declaringClass = method.getDeclaringClass();
+				return DaoAnnotationMethod.CONSTRUCTOR
+						.newInstance(declaringClass,
+								MethodHandles.Lookup.PRIVATE)
+						.unreflectSpecial(method, declaringClass).bindTo(proxy)
+						.invokeWithArguments(args);
 			}
 
 			return null;

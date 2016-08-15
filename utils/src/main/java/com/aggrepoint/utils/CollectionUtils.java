@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -45,7 +46,8 @@ public class CollectionUtils {
 			Function<T, K> mapper) {
 		if (entities == null)
 			return null;
-		return entities.stream().map(mapper).collect(Collectors.toList());
+		return entities.stream().map(mapper).filter(p -> p != null)
+				.collect(Collectors.toList());
 	}
 
 	public static <T, K> List<K> toList(Collection<T> entities,
@@ -53,14 +55,15 @@ public class CollectionUtils {
 		if (entities == null)
 			return null;
 		return entities.stream().filter(predicate).map(mapper)
-				.collect(Collectors.toList());
+				.filter(p -> p != null).collect(Collectors.toList());
 	}
 
 	public static <T, K> Set<K> toSet(Collection<T> entities,
 			Function<T, K> mapper) {
 		if (entities == null)
 			return null;
-		return entities.stream().map(mapper).collect(Collectors.toSet());
+		return entities.stream().map(mapper).filter(p -> p != null)
+				.collect(Collectors.toSet());
 	}
 
 	public static <T, K, M extends Map<K, T>> M toMap(Collection<T> entities,
@@ -563,5 +566,91 @@ public class CollectionUtils {
 		loader.apply(map.keySet()).forEach(
 				p -> childCollectionMapper.apply(
 						map.get(childKeyMapper.apply(p))).add(p));
+	}
+
+	/**
+	 * list为装有类型为T的对象的集合，称为集合一。用T对象中通过keyGetter获得的key值组成集合，调用
+	 * loader，可以获得类型为S的对象集合，称为集合二。T和S的关系是N对1。把集合一中通过
+	 * keyGetter获得的关键值与集合二中通过loadedKeyGetter获得关键值相同的T和S对象匹配，调用match。
+	 */
+	public static <T, K, S, X extends Collection<T>> X loadNToOne(X list,
+			Function<T, K> keyGetter,
+			Function<Collection<K>, Collection<S>> loader,
+			Function<S, K> loadedKeyGetter, BiConsumer<T, S> match) {
+		if (list == null || list.size() == 0)
+			return list;
+
+		Set<K> keys = toSet(list, keyGetter);
+		if (keys == null || keys.size() == 0)
+			return list;
+
+		Collection<S> subs = loader.apply(keys);
+		if (subs == null || subs.size() == 0)
+			return list;
+
+		HashMap<K, S> map = toHashMap(subs, loadedKeyGetter);
+		for (T item : list) {
+			K key = keyGetter.apply(item);
+			if (key == null)
+				continue;
+
+			S sub = map.get(key);
+			if (sub == null)
+				continue;
+			match.accept(item, sub);
+		}
+
+		return list;
+	}
+
+	/**
+	 * list为装有类型为T的对象的集合，称为集合一。用T对象中通过keyGetter获得的key值组成集合，调用
+	 * loader，可以获得类型为S的对象集合，称为集合二。T和S的关系是1对N。把集合一中通过
+	 * keyGetter获得的关键值与集合二中通过loadedKeyGetter获得关键值相同的T和S对象匹配，调用match。
+	 */
+	public static <T, K, S, X extends Collection<T>> X loadOneToN(X list,
+			Function<T, K> keyGetter,
+			Function<Collection<K>, Collection<S>> loader,
+			Function<S, K> loadedKeyGetter, BiConsumer<T, S> match) {
+		if (list == null || list.size() == 0)
+			return list;
+
+		Set<K> keys = toSet(list, keyGetter);
+		if (keys == null || keys.size() == 0)
+			return list;
+
+		Collection<S> subs = loader.apply(keys);
+		if (subs == null || subs.size() == 0)
+			return list;
+
+		HashMap<K, T> map = toHashMap(list, keyGetter);
+		for (S sub : subs) {
+			T item = map.get(loadedKeyGetter.apply(sub));
+			if (item == null)
+				continue;
+			match.accept(item, sub);
+		}
+
+		return list;
+	}
+
+	public static <T> List<T> asList(T obj) {
+		if (obj == null)
+			return null;
+		List<T> list = new ArrayList<T>();
+		list.add(obj);
+		return list;
+	}
+
+	/**
+	 * 把obj包装为集合，调用function
+	 */
+	public static <T> T callAsCollection(T obj, Consumer<Collection<T>> function) {
+		if (obj == null)
+			return null;
+		List<T> list = new ArrayList<T>();
+		list.add(obj);
+		function.accept(list);
+		return obj;
 	}
 }

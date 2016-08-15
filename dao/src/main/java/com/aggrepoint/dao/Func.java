@@ -12,14 +12,14 @@ import java.util.regex.Pattern;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class Function {
+public class Func {
 	static Pattern P_FUNC = Pattern.compile(":(([\\w\\d]+)\\[(.*?)\\])");
 
 	String match;
 	IFunc func;
 	String[] params;
 
-	protected Function(List<IFunc> funcs, Matcher m)
+	protected Func(List<IFunc> funcs, Matcher m)
 			throws FunctionNotFoundException {
 		match = m.group(1);
 
@@ -52,18 +52,18 @@ public class Function {
 		return func.getName();
 	}
 
-	public static Function[] getFunctions(List<IFunc> funcs, String hql)
+	public static Func[] getFunctions(List<IFunc> funcs, String hql)
 			throws FunctionNotFoundException {
-		Vector<Function> vec = new Vector<Function>();
+		Vector<Func> vec = new Vector<Func>();
 
 		Matcher m = P_FUNC.matcher(hql);
 		while (m.find()) {
-			vec.add(new Function(funcs, m));
+			vec.add(new Func(funcs, m));
 		}
 
 		if (vec.size() == 0)
 			return null;
 
-		return vec.toArray(new Function[vec.size()]);
+		return vec.toArray(new Func[vec.size()]);
 	}
 }

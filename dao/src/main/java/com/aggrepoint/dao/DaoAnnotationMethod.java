@@ -2,18 +2,22 @@ package com.aggrepoint.dao;
 
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,12 +42,14 @@ import com.aggrepoint.dao.annotation.Cache;
 import com.aggrepoint.dao.annotation.Delete;
 import com.aggrepoint.dao.annotation.Find;
 import com.aggrepoint.dao.annotation.Like;
+import com.aggrepoint.dao.annotation.Load;
 import com.aggrepoint.dao.annotation.PageNum;
 import com.aggrepoint.dao.annotation.PageSize;
 import com.aggrepoint.dao.annotation.Param;
 import com.aggrepoint.dao.annotation.Replace;
 import com.aggrepoint.dao.annotation.Update;
 import com.aggrepoint.jpa.UpdatedDate;
+import com.aggrepoint.utils.ThreadContext;
 
 /**
  * 
@@ -93,10 +99,11 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	Hashtable<String, ParamProperty> props = new Hashtable<String, ParamProperty>();
 	Hashtable<String, Like> likes = new Hashtable<String, Like>();
 	Hashtable<String, Replace> replaces = new Hashtable<String, Replace>();
-	Hashtable<String, Function> funcs = new Hashtable<String, Function>();
+	Hashtable<String, Func> funcs = new Hashtable<String, Func>();
 	Hashtable<String, Integer> positions = new Hashtable<String, Integer>();
 	int pageNumIdx = -1;
 	int pageSizeIdx = -1;
+	boolean findForLoad = false;
 
 	void setCount(String count) {
 		if (!"".equals(count))
@@ -136,6 +143,15 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 				type = TYPE_FIND;
 				hql = ((Find) ann).value();
 				setCount(((Find) ann).count());
+			}
+		} else if (ann.annotationType() == Load.class) {
+			findForLoad = true;
+			if (!"".equals(((Load) ann).sql())) {
+				type = TYPE_FIND_SQL;
+				hql = ((Load) ann).sql();
+			} else {
+				type = TYPE_FIND;
+				hql = ((Load) ann).value();
 			}
 		} else if (ann.annotationType() == Cache.class) {
 			if (cacheManager == null)
@@ -233,9 +249,9 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		if (when != null && when.trim().equals(""))
 			when = null;
 
-		Function[] functions = null;
+		Func[] functions = null;
 		try {
-			functions = Function.getFunctions(funcs, hql);
+			functions = Func.getFunctions(funcs, hql);
 		} catch (FunctionNotFoundException e) {
 			throw new IllegalArgumentException("Undefined function '"
 					+ e.getName() + "' used by "
@@ -243,7 +259,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 					+ method.getName());
 		}
 		if (functions != null) {
-			for (Function f : functions)
+			for (Func f : functions)
 				this.funcs.put(f.getMatch(), f);
 
 			// 为避免替换数字参数时影响到function的参数，先将function转换为特殊的字符串
@@ -500,8 +516,46 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		return values;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static Constructor<MethodHandles.Lookup> CONSTRUCTOR;
+	static {
+		try {
+			CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(
+					Class.class, int.class);
+			CONSTRUCTOR.setAccessible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public Object invoke(Object proxy, Method method, Object[] args)
+			throws Throwable, IllegalAccessException {
+		if (findForLoad) {
+			Function<Collection<?>, Object> func = (ids) -> {
+				try {
+					return invokeImpl(proxy, method, new Object[] { ids });
+				} catch (Exception e) {
+					e.printStackTrace();
+					return null;
+				}
+			};
+			ThreadContext.setAttribute(Loader.THREAD_ATTR_LOADER, func);
+			try {
+				final Class<?> declaringClass = method.getDeclaringClass();
+				return CONSTRUCTOR
+						.newInstance(declaringClass,
+								MethodHandles.Lookup.PRIVATE)
+						.unreflectSpecial(method, declaringClass).bindTo(proxy)
+						.invokeWithArguments(args);
+			} finally {
+				ThreadContext.removeAttribute(Loader.THREAD_ATTR_LOADER);
+			}
+		}
+
+		return invokeImpl(proxy, method, args);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	Object invokeImpl(Object proxy, Method method, Object[] args)
 			throws NoSuchMethodException, InvocationTargetException,
 			IllegalAccessException {
 		Object fromCache = null;

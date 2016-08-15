@@ -14,4 +14,15 @@ public class LambdaUtils {
 			return func.apply(val);
 		return null;
 	}
+
+	/**
+	 * 将val分发给consumers
+	 */
+	@SafeVarargs
+	public static <T> T pass(T val, Consumer<T>... consumers) {
+		if (consumers != null)
+			for (Consumer<T> c : consumers)
+				c.accept(val);
+		return val;
+	}
 }

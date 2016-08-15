@@ -22,6 +22,5 @@ public interface DaoMethod<T> {
 			InvocationTargetException, IllegalAccessException;
 
 	public Object invoke(Object proxy, Method method, Object[] args)
-			throws NoSuchMethodException, InvocationTargetException,
-			IllegalAccessException;
+			throws Throwable;
 }

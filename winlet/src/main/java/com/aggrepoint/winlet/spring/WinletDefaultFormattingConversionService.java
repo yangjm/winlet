@@ -125,6 +125,8 @@ public class WinletDefaultFormattingConversionService extends
 
 		if (val == null)
 			return null;
+		if (val.getClass().isArray())
+			return null;
 
 		if (!cache.get(key))
 			return val.toString();

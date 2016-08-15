@@ -29,7 +29,7 @@ public class QueryPart {
 	public QueryPart(Method method, boolean optional, String part,
 			HashSet<String> params, Hashtable<String, Like> likes,
 			Hashtable<String, Replace> replaces,
-			Hashtable<String, Function> funcs) {
+			Hashtable<String, Func> funcs) {
 		this.optional = optional;
 		this.part = part;
 
