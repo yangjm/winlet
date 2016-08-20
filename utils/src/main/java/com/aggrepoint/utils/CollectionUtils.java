@@ -653,4 +653,15 @@ public class CollectionUtils {
 		function.accept(list);
 		return obj;
 	}
+
+	public static <T, K> T findOrFirst(Collection<K> list, Function<K, T> mapper,
+			T toFind) {
+		if (list == null || list.size() == 0)
+			return null;
+		if (toFind != null)
+			for (K k : list)
+				if (mapper.apply(k).equals(toFind))
+					return toFind;
+		return mapper.apply(list.iterator().next());
+	}
 }

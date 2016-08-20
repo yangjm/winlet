@@ -25,4 +25,13 @@ public class LambdaUtils {
 				c.accept(val);
 		return val;
 	}
+
+	/**
+	 * 将val分发给consumer
+	 */
+	public static <T> T pass(T val, Consumer<T> consumer) {
+		if (consumer != null)
+			consumer.accept(val);
+		return val;
+	}
 }

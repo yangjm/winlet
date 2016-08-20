@@ -36,4 +36,10 @@ public class AuthConfig {
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	public void updateWinletsByRoles() {
+		if (winlets != null && roles != null)
+			for (AuthCfgWinlet winlet : winlets)
+				winlet.retianRoles(roles);
+	}
 }

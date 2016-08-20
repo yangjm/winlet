@@ -254,6 +254,11 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
+	public boolean hasErrorOrValidateField(boolean fieldErrorsOnly) {
+		return hasError(fieldErrorsOnly) || isValidateField();
+	}
+
+	@Override
 	public boolean hasError(boolean fieldErrorsOnly) {
 		processBinders();
 

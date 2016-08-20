@@ -87,6 +87,8 @@ public interface Form {
 
 	boolean hasErrorOrValidateField();
 
+	boolean hasErrorOrValidateField(boolean fieldErrorsOnly);
+
 	/**
 	 * 获取字段上当前存在的所有校验错误
 	 * 

@@ -43,4 +43,13 @@ public class AuthCfgWinlet {
 	public void setMethods(List<AuthCfgMethod> methods) {
 		this.methods = methods;
 	}
+
+	public void retianRoles(List<String> roles) {
+		if (this.roles != null && roles != null)
+			this.roles.retainAll(roles);
+
+		if (methods != null)
+			for (AuthCfgMethod method : methods)
+				method.retianRoles(roles);
+	}
 }

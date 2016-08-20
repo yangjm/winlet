@@ -35,15 +35,16 @@ public abstract class AuthCfgAuthorizationEngine extends
 			winletMap = new HashMap<String, AuthCfgWinlet>();
 			methodMap = new HashMap<String, AuthCfgMethod>();
 
-			for (AuthCfgWinlet winlet : cfg.getWinlets()) {
-				winletMap.put(winlet.getPath(), winlet);
+			if (cfg.getWinlets() != null)
+				for (AuthCfgWinlet winlet : cfg.getWinlets()) {
+					winletMap.put(winlet.getPath(), winlet);
 
-				for (AuthCfgMethod method : winlet.getMethods()) {
-					String path = winlet.getPath() + "/" + method.getPath();
-					winletMap.put(path, winlet);
-					methodMap.put(path, method);
+					for (AuthCfgMethod method : winlet.getMethods()) {
+						String path = winlet.getPath() + "/" + method.getPath();
+						winletMap.put(path, winlet);
+						methodMap.put(path, method);
+					}
 				}
-			}
 		}
 	}
 

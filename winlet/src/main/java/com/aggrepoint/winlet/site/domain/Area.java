@@ -41,8 +41,8 @@ public class Area extends Base {
 			if (!url.startsWith("/"))
 				url = "/" + url;
 
-			if (!url.startsWith(contextRoot)) // winlet路径不是以context
-												// root开始，加上context root
+			if (!url.startsWith(contextRoot + "/")) // winlet路径不是以context
+				// root开始，加上context root
 				url = contextRoot + url;
 
 			winlets.add(url.substring(contextRoot.length() + 1));

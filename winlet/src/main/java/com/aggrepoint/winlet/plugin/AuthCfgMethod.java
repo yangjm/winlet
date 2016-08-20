@@ -43,4 +43,9 @@ public class AuthCfgMethod {
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
 	}
+
+	public void retianRoles(List<String> roles) {
+		if (this.roles != null && roles != null)
+			this.roles.retainAll(roles);
+	}
 }
