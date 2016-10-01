@@ -1,5 +1,8 @@
 package com.aggrepoint.winlet.spring;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +35,7 @@ import com.aggrepoint.winlet.form.Validation;
 import com.aggrepoint.winlet.form.ValidationImpl;
 import com.aggrepoint.winlet.spring.annotation.AccessRule;
 import com.aggrepoint.winlet.spring.annotation.Cfg;
+import com.aggrepoint.winlet.spring.annotation.DateParameter;
 import com.aggrepoint.winlet.spring.annotation.IntegerParameter;
 import com.aggrepoint.winlet.spring.annotation.PageRefresh;
 import com.aggrepoint.winlet.spring.annotation.PageStorageAttr;
@@ -62,7 +66,8 @@ public class WinletHandlerMethodArgumentResolver implements
 				|| parameter.getParameterAnnotation(Cfg.class) != null
 				|| parameter.getParameterAnnotation(PageStorageAttr.class) != null
 				|| parameter.getParameterAnnotation(StringParameter.class) != null
-				|| parameter.getParameterAnnotation(IntegerParameter.class) != null)
+				|| parameter.getParameterAnnotation(IntegerParameter.class) != null
+				|| parameter.getParameterAnnotation(DateParameter.class) != null)
 			return true;
 
 		if (clz == Boolean.class || clz == boolean.class)
@@ -80,6 +85,19 @@ public class WinletHandlerMethodArgumentResolver implements
 		if (e == null)
 			return null;
 		throw e;
+	}
+
+	static final HashMap<String, SimpleDateFormat> SDFS = new HashMap<String, SimpleDateFormat>();
+
+	private SimpleDateFormat getSDF(String format) {
+		if (StringUtils.isEmpty(format))
+			return null;
+		SimpleDateFormat sdf = SDFS.get(format);
+		if (sdf == null) {
+			sdf = new SimpleDateFormat(format);
+			SDFS.put(format, sdf);
+		}
+		return sdf;
 	}
 
 	@Override
@@ -116,6 +134,21 @@ public class WinletHandlerMethodArgumentResolver implements
 
 			if (val < ri.min() || val > ri.max())
 				return ri.def();
+			return val;
+		}
+
+		DateParameter rd = parameter
+				.getParameterAnnotation(DateParameter.class);
+		if (rd != null) {
+			Date val = null;
+
+			try {
+				val = getSDF(rd.format()).parse(
+						webRequest.getParameter(rd.value()));
+			} catch (Exception e) {
+				return null;
+			}
+
 			return val;
 		}
 
