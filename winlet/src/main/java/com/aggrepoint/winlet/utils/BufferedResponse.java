@@ -1,22 +1,22 @@
 package com.aggrepoint.winlet.utils;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-
 public class BufferedResponse implements HttpServletResponse {
 	protected BufferedResponseStream stream = null;
 	protected PrintWriter writer = null;
+	private String characterEncoding = "UTF-8";
 
 	@Override
 	public String getCharacterEncoding() {
-		return null;
+		return this.characterEncoding;
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class BufferedResponse implements HttpServletResponse {
 
 	@Override
 	public void setCharacterEncoding(String charset) {
-
+		this.characterEncoding = charset;
 	}
 
 	@Override
