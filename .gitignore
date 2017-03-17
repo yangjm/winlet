@@ -6,3 +6,8 @@ classes/
 .springBeans
 .settings
 .DS_Store
+
+## Intellij IDEA ##
+.idea/
+out/
+*.iml
