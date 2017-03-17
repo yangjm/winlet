@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 public @interface IntegerParameter {
 	String value();
 
-	int min();
+	int min() default 0;
 
-	int max();
+	int max() default Integer.MAX_VALUE;
 
-	int def();
+	int def() default 0;
 }
