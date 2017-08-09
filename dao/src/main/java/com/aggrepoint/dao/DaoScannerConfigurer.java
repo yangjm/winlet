@@ -5,9 +5,6 @@ import static org.springframework.util.Assert.notNull;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
-import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
@@ -36,8 +33,8 @@ public class DaoScannerConfigurer implements
 		ApplicationContextAware, BeanNameAware {
 	private String basePackage;
 	private ApplicationContext applicationContext;
-	private EntityManager entityManager;
-	private SessionFactory sessionFactory;
+	private String entityManagerName;
+	private String sessionFactoryName;
 
 	private String beanName;
 
@@ -47,6 +44,8 @@ public class DaoScannerConfigurer implements
 
 	private List<IFunc> functions;
 
+	private List<DaoDataSource> dataSources;
+
 	public String getBasePackage() {
 		return basePackage;
 	}
@@ -55,20 +54,28 @@ public class DaoScannerConfigurer implements
 		this.basePackage = basePackage;
 	}
 
-	public EntityManager getEntityManager() {
-		return entityManager;
+	public String getEntityManagerName() {
+		return entityManagerName;
 	}
 
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
+	public void setEntityManagerName(String entityManagerName) {
+		this.entityManagerName = entityManagerName;
 	}
 
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
+	public String getSessionFactoryName() {
+		return sessionFactoryName;
 	}
 
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
+	public void setSessionFactoryName(String sessionFactoryName) {
+		this.sessionFactoryName = sessionFactoryName;
+	}
+
+	public List<DaoDataSource> getDataSources() {
+		return dataSources;
+	}
+
+	public void setDataSources(List<DaoDataSource> dataSources) {
+		this.dataSources = dataSources;
 	}
 
 	@Override
@@ -125,7 +132,8 @@ public class DaoScannerConfigurer implements
 			processPropertyPlaceHolders();
 
 		DaoScanner scanner = new DaoScanner(registry, applicationContext,
-				nameGenerator, functions, entityManager, sessionFactory);
+				nameGenerator, functions, entityManagerName,
+				sessionFactoryName, dataSources);
 		scanner.scan(StringUtils.tokenizeToStringArray(this.basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
 	}

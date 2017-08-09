@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.support.DaoSupport;
+import org.springframework.util.StringUtils;
 
 /**
  * 不能注入SessionFactory，不能在checkDaoConfig时获取SessionFactory，
@@ -38,7 +39,9 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 
 	private static ConversionService conversionService;
 	private ApplicationContext ctx;
+	private String entityManagerName;
 	private EntityManager entityManager;
+	private String sessionFactoryName;
 	private SessionFactory sessionFactory;
 	private Class<T> daoInterface;
 	private T proxy;
@@ -50,12 +53,12 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 		ctx = applicationContext;
 	}
 
-	public void setEntityManager(EntityManager manager) {
-		entityManager = manager;
+	public void setEntityManagerName(String manager) {
+		entityManagerName = manager;
 	}
 
-	public void setSessionFactory(SessionFactory factory) {
-		sessionFactory = factory;
+	public void setSessionFactoryName(String factory) {
+		sessionFactoryName = factory;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -125,8 +128,12 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 	private EntityManager getEntityManager() {
 		if (entityManager == null)
 			try {
-				entityManager = ctx.getBean(EntityManagerFactory.class)
-						.createEntityManager();
+				if (StringUtils.isEmpty(entityManagerName))
+					entityManager = ctx.getBean(EntityManagerFactory.class)
+							.createEntityManager();
+				else
+					entityManager = ctx.getBean(entityManagerName,
+							EntityManagerFactory.class).createEntityManager();
 			} catch (NoSuchBeanDefinitionException e) {
 			}
 		return entityManager;
@@ -135,7 +142,11 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 	private SessionFactory getSessionFactory() {
 		if (sessionFactory == null)
 			try {
-				sessionFactory = ctx.getBean(SessionFactory.class);
+				if (StringUtils.isEmpty(sessionFactoryName))
+					sessionFactory = ctx.getBean(SessionFactory.class);
+				else
+					sessionFactory = ctx.getBean(sessionFactoryName,
+							SessionFactory.class);
 			} catch (NoSuchBeanDefinitionException e) {
 			}
 		return sessionFactory;

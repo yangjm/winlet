@@ -2,12 +2,12 @@ package com.aggrepoint.dao;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
-import org.hibernate.SessionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -21,6 +21,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
+import org.springframework.util.StringUtils;
 
 /**
  * 
@@ -28,18 +29,23 @@ import org.springframework.core.type.filter.TypeFilter;
  * 
  */
 public class DaoScanner extends ClassPathBeanDefinitionScanner {
+	private static final Log logger = LogFactory.getLog(DaoScanner.class);
+
 	private List<IFunc> functions;
-	private EntityManager entityManager;
-	private SessionFactory sessionFactory;
+	private HashMap<String, String> daoSessionFactoryNames = new HashMap<>();
+	private HashMap<String, String> daoEntityManagerNames = new HashMap<>();
+	private String entityManagerName;
+	private String sessionFactoryName;
 
 	public DaoScanner(BeanDefinitionRegistry registry,
 			ResourceLoader resourceLoader, BeanNameGenerator beanNameGenerator,
-			List<IFunc> funcs, EntityManager manager, SessionFactory factory) {
+			List<IFunc> funcs, String defaultEntityManager,
+			String defaultSessionFactory, List<DaoDataSource> dataSources) {
 		super(registry, false);
 
 		functions = funcs;
-		entityManager = manager;
-		sessionFactory = factory;
+		entityManagerName = defaultEntityManager;
+		sessionFactoryName = defaultSessionFactory;
 		setResourceLoader(resourceLoader);
 		setBeanNameGenerator(beanNameGenerator);
 
@@ -60,6 +66,28 @@ public class DaoScanner extends ClassPathBeanDefinitionScanner {
 				return className.endsWith("package-info");
 			}
 		});
+
+		if (dataSources != null)
+			for (DaoDataSource ds : dataSources) {
+				if (StringUtils.isEmpty(ds.getClassNames())) {
+					logger.warn("className not specified for DaoDataSource");
+					continue;
+				}
+				String sf = ds.getSessionFactoryName();
+				String em = ds.getEntityManagerName();
+				if (StringUtils.isEmpty(sf) && StringUtils.isEmpty(em)) {
+					logger.warn("Both sessionFactoryName and entityManagerName are not specified for DaoDataSource");
+					continue;
+				}
+
+				for (String str : ds.getClassNames().split(",")) {
+					str = str.trim();
+					if (sf != null)
+						daoSessionFactoryNames.put(str, sf);
+					if (em != null)
+						daoEntityManagerNames.put(str, em);
+				}
+			}
 	}
 
 	/**
@@ -91,10 +119,18 @@ public class DaoScanner extends ClassPathBeanDefinitionScanner {
 				definition.getPropertyValues().add("daoInterface",
 						definition.getBeanClassName());
 				definition.getPropertyValues().add("funcs", functions);
-				definition.getPropertyValues().add("entityManager",
-						entityManager);
-				definition.getPropertyValues().add("sessionFactory",
-						sessionFactory);
+				String className = definition.getBeanClassName();
+				int idx = className.lastIndexOf(".");
+				if (idx > 0)
+					className = className.substring(idx + 1);
+				String em = daoEntityManagerNames.get(className);
+				if (em == null)
+					em = entityManagerName;
+				String sf = daoSessionFactoryNames.get(className);
+				if (sf == null)
+					sf = sessionFactoryName;
+				definition.getPropertyValues().add("entityManagerName", em);
+				definition.getPropertyValues().add("sessionFactoryName", sf);
 				definition.setBeanClass(DaoFactoryBean.class);
 
 				definition
