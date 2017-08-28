@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 import javassist.ClassPool;
@@ -14,6 +15,11 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.StringMemberValue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +41,7 @@ public class ServiceClassLoader extends ClassLoader {
 			.getLog(ServiceClassLoader.class);
 
 	private ClassLoader innerLoader;
+	private HashMap<String, String> tmMap = new HashMap<String, String>();
 
 	Map<Class<?>, Class<?>> classMap = Collections
 			.synchronizedMap(new HashMap<Class<?>, Class<?>>());
@@ -44,6 +51,25 @@ public class ServiceClassLoader extends ClassLoader {
 	public ServiceClassLoader(ClassLoader inner) {
 		super(inner);
 		innerLoader = inner;
+	}
+
+	public ServiceClassLoader(ClassLoader inner,
+			TransactionManagerConfig... tmcfgs) {
+		super(inner);
+		innerLoader = inner;
+
+		if (tmcfgs != null && tmcfgs.length > 0) {
+			for (TransactionManagerConfig tmc : tmcfgs) {
+				if (tmc != null && tmc.getName() != null
+						&& tmc.getClasses() != null
+						&& tmc.getClasses().length > 0) {
+					for (Class<?> c : tmc.getClasses()) {
+						if (c != null)
+							tmMap.put(c.getName(), tmc.getName());
+					}
+				}
+			}
+		}
 	}
 
 	public static Field findDaoField(Class<?> clz) {
@@ -193,6 +219,30 @@ public class ServiceClassLoader extends ClassLoader {
 						classPool.appendClassPath(new LoaderClassPath(this));
 
 						CtClass ctclass = classPool.get(clz.getName());
+
+						String tm = tmMap.get(daoField.getType().getName());
+						if (tm != null) {
+							// Change @Transactional annotation to use specified
+							// transaction manager
+							ConstPool cp = ctclass.getClassFile()
+									.getConstPool();
+							Iterator<?> it = ctclass.getClassFile()
+									.getAttributes().iterator();
+							while (it.hasNext()) {
+								AttributeInfo ai = (AttributeInfo) it.next();
+								if (ai instanceof AnnotationsAttribute) {
+									AnnotationsAttribute aa = (AnnotationsAttribute) ai;
+									if (aa.removeAnnotation("org.springframework.transaction.annotation.Transactional")) {
+										Annotation anno = new Annotation(
+												"org.springframework.transaction.annotation.Transactional",
+												cp);
+										anno.addMemberValue("value",
+												new StringMemberValue(tm, cp));
+										aa.addAnnotation(anno);
+									}
+								}
+							}
+						}
 
 						// add interface method implementation
 						for (Method method : toadd) {
