@@ -30,6 +30,9 @@ public class DefaultNamingStrategy5 implements PhysicalNamingStrategy {
 
 	@Override
 	public Identifier toPhysicalTableName(Identifier n, JdbcEnvironment jdbcEnvironment) {
+		if (n.getText().toUpperCase().equals(n.getText())) // Assume @Table() use all upper case table name
+			return n;
+
 		String name = addUnderscores(n.getText()).toUpperCase();
 
 		if (name.equals("NEWS") || name.endsWith("_NEWS"))
