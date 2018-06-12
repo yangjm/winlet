@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.18-SNAPSHOT</version>
+		<version>0.5.0</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -14,12 +14,12 @@
 	<description>Data Access Object layer utilities</description>
 
 	<properties>
-		<org.hibernate-em-version>4.3.11.Final</org.hibernate-em-version>
+		<org.hibernate-em-version>5.2.17.Final</org.hibernate-em-version>
 		<org.hibernate-validator-version>5.2.2.Final</org.hibernate-validator-version>
 		<commons-beanutils-version>1.9.2</commons-beanutils-version>
 		<validation-api-version>1.1.0.Final</validation-api-version>
 
-		<utils-version>0.1.18-SNAPSHOT</utils-version>
+		<utils-version>0.5.0</utils-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

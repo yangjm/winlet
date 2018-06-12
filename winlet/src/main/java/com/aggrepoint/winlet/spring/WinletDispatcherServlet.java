@@ -128,8 +128,8 @@ public class WinletDispatcherServlet extends DispatcherServlet {
 		if (adapter != null) {
 			WebBindingInitializer initializer = adapter
 					.getWebBindingInitializer();
-			adapter.setWebBindingInitializer((binder, request) -> {
-				initializer.initBinder(binder, request);
+			adapter.setWebBindingInitializer((binder) -> {
+				initializer.initBinder(binder);
 				((FormImpl) ContextUtils.getReqInfo().getForm())
 						.addBinder(binder);
 			});

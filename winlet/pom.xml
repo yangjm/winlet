@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>0.1.18-SNAPSHOT</version>
+		<version>0.5.0</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -19,12 +19,12 @@
 		<javax.servlet.jstl-version>1.2</javax.servlet.jstl-version>
 		<org.ow2.asm-version>5.0.4</org.ow2.asm-version>
 		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
-		<jackson-version>2.4.2</jackson-version>
+		<jackson-version>2.9.5</jackson-version>
 		<htmlcompressor-version>1.5.2</htmlcompressor-version>
 		<yuicompressor-version>2.4.8</yuicompressor-version>
 		<freemarker-version>2.3.20</freemarker-version>
 
-		<dao-version>0.1.18-SNAPSHOT</dao-version>
+		<dao-version>0.5.0</dao-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

@@ -8,7 +8,6 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.commons.logging.Log;
@@ -33,14 +32,13 @@ import org.springframework.util.StringUtils;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
-		ApplicationContextAware {
+public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, ApplicationContextAware {
 	private static final Log logger = LogFactory.getLog(DaoFactoryBean.class);
 
 	private static ConversionService conversionService;
 	private ApplicationContext ctx;
-	private String entityManagerName;
-	private EntityManager entityManager;
+	private String entityManagerFactoryName;
+	private EntityManagerFactory entityManagerFactory;
 	private String sessionFactoryName;
 	private SessionFactory sessionFactory;
 	private Class<T> daoInterface;
@@ -48,13 +46,12 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 	private Class<K> domainClz;
 	private List<IFunc> funcs;
 
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		ctx = applicationContext;
 	}
 
-	public void setEntityManagerName(String manager) {
-		entityManagerName = manager;
+	public void setEntityManagerFactoryName(String manager) {
+		entityManagerFactoryName = manager;
 	}
 
 	public void setSessionFactoryName(String factory) {
@@ -88,8 +85,7 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 		if (domainClz == null) {
 			// { exception caught by Spring framework, so have to print it out
 			// here
-			String err = "Unable to match extract domain class from dao interface '"
-					+ daoInterface + "'.";
+			String err = "Unable to match extract domain class from dao interface '" + daoInterface + "'.";
 			logger.error(err);
 			// }
 
@@ -112,8 +108,7 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 			return conversionService;
 
 		try {
-			conversionService = (ConversionService) ctx
-					.getBean("daoConversionService");
+			conversionService = (ConversionService) ctx.getBean("daoConversionService");
 			if (conversionService != null)
 				return conversionService;
 		} catch (Exception e) {
@@ -125,18 +120,16 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 		return conversionService;
 	}
 
-	private EntityManager getEntityManager() {
-		if (entityManager == null)
+	private EntityManagerFactory getEntityManagerFactory() {
+		if (entityManagerFactory == null)
 			try {
-				if (StringUtils.isEmpty(entityManagerName))
-					entityManager = ctx.getBean(EntityManagerFactory.class)
-							.createEntityManager();
+				if (StringUtils.isEmpty(entityManagerFactoryName))
+					entityManagerFactory = ctx.getBean(EntityManagerFactory.class);
 				else
-					entityManager = ctx.getBean(entityManagerName,
-							EntityManagerFactory.class).createEntityManager();
+					entityManagerFactory = ctx.getBean(entityManagerFactoryName, EntityManagerFactory.class);
 			} catch (NoSuchBeanDefinitionException e) {
 			}
-		return entityManager;
+		return entityManagerFactory;
 	}
 
 	private SessionFactory getSessionFactory() {
@@ -145,8 +138,7 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 				if (StringUtils.isEmpty(sessionFactoryName))
 					sessionFactory = ctx.getBean(SessionFactory.class);
 				else
-					sessionFactory = ctx.getBean(sessionFactoryName,
-							SessionFactory.class);
+					sessionFactory = ctx.getBean(sessionFactoryName, SessionFactory.class);
 			} catch (NoSuchBeanDefinitionException e) {
 			}
 		return sessionFactory;
@@ -171,15 +163,11 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 					}
 				}
 
-				proxy = (T) Proxy.newProxyInstance(daoInterface
-						.getClassLoader(), new Class[] { daoInterface },
-						new DaoInvocationHandler<K>(getEntityManager(),
-								getSessionFactory(), cm,
-								getConversionService(), daoInterface,
-								domainClz, funcs));
+				proxy = (T) Proxy.newProxyInstance(daoInterface.getClassLoader(), new Class[] { daoInterface },
+						new DaoInvocationHandler<K>(getEntityManagerFactory(), getSessionFactory(), cm, getConversionService(),
+								daoInterface, domainClz, funcs));
 			} catch (Throwable t) {
-				logger.error("Error while creating proxy for dao interface '"
-						+ this.daoInterface + "'.", t);
+				logger.error("Error while creating proxy for dao interface '" + this.daoInterface + "'.", t);
 				throw new IllegalArgumentException(t);
 			}
 		}
@@ -204,7 +192,6 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>,
 	@Override
 	protected void checkDaoConfig() throws IllegalArgumentException {
 		notNull(daoInterface, "Property 'daoInterface' is required");
-		isTrue(daoInterface.isInterface(),
-				"Property 'daoInterface' must be interface");
+		isTrue(daoInterface.isInterface(), "Property 'daoInterface' must be interface");
 	}
 }

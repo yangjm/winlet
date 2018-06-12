@@ -129,7 +129,7 @@ public class DaoScanner extends ClassPathBeanDefinitionScanner {
 				String sf = daoSessionFactoryNames.get(className);
 				if (sf == null)
 					sf = sessionFactoryName;
-				definition.getPropertyValues().add("entityManagerName", em);
+				definition.getPropertyValues().add("entityManagerFactoryName", em);
 				definition.getPropertyValues().add("sessionFactoryName", sf);
 				definition.setBeanClass(DaoFactoryBean.class);
 
