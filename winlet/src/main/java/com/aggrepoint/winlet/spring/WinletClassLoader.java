@@ -23,8 +23,7 @@ import com.aggrepoint.winlet.spring.annotation.Winlet;
 public class WinletClassLoader extends ClassLoader {
 	private ClassLoader innerLoader;
 
-	Map<Class<?>, Class<?>> classMap = Collections
-			.synchronizedMap(new HashMap<Class<?>, Class<?>>());
+	Map<Class<?>, Class<?>> classMap = Collections.synchronizedMap(new HashMap<Class<?>, Class<?>>());
 
 	static Map<String, Class<?>> pathToClassMap = new HashMap<String, Class<?>>();
 
@@ -36,6 +35,8 @@ public class WinletClassLoader extends ClassLoader {
 	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		Class<?> clz = innerLoader.loadClass(name);
+		if (name.startsWith("org.springframework")) // 避免AnnotationUtils.findAnnotation打印异常
+			return clz;
 
 		if (classMap.containsKey(clz))
 			return classMap.get(clz);
@@ -58,8 +59,7 @@ public class WinletClassLoader extends ClassLoader {
 
 		if (process) {
 			try {
-				ClassReader cr = new ClassReader(clz.getResource(
-						"/" + name.replace('.', '/') + ".class").openStream());
+				ClassReader cr = new ClassReader(clz.getResource("/" + name.replace('.', '/') + ".class").openStream());
 
 				ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				cr.accept(new WinletClassVisitor(cw), 0);
@@ -68,9 +68,7 @@ public class WinletClassLoader extends ClassLoader {
 				ret = defineClass(name, b, 0, b.length);
 
 				if (winlet != null)
-					pathToClassMap.put(
-							winlet.value().startsWith("/") ? winlet.value()
-									: "/" + winlet.value(), ret);
+					pathToClassMap.put(winlet.value().startsWith("/") ? winlet.value() : "/" + winlet.value(), ret);
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

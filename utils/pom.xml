@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,13 +14,24 @@
 	<name>AggrePoint Framework - Utils</name>
 	<description>Common utilities used by both Dao and Winlet project</description>
 
+	<properties>
+		<jackson-version>2.9.5</jackson-version>
+		<imgscalr-version>4.2</imgscalr-version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.imgscalr</groupId>
 			<artifactId>imgscalr-lib</artifactId>
-			<version>4.2</version>
+			<version>${imgscalr-version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<artifactId>jackson-databind</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<version>${jackson-version}</version>
 		</dependency>
 	</dependencies>
 </project>

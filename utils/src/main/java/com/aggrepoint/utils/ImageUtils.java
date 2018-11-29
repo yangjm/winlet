@@ -21,8 +21,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.imgscalr.Scalr;
@@ -33,9 +33,8 @@ import org.imgscalr.Scalr;
  *         图片处理功能集合
  */
 public class ImageUtils {
-	private static char[] m_chars = { '3', '4', '5', '6', '7', '8', '9', 'A',
-			'B', 'C', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R',
-			'S', 'T', 'V', 'W', 'X', 'Y' };
+	private static char[] m_chars = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'E', 'F', 'G', 'H', 'J', 'K',
+			'L', 'M', 'N', 'P', 'R', 'S', 'T', 'V', 'W', 'X', 'Y' };
 
 	private static double PI2 = java.lang.Math.PI * 2;
 
@@ -75,8 +74,7 @@ public class ImageUtils {
 				// http://stackoverflow.com/questions/3123574/how-to-convert-from-cmyk-to-rgb-in-java-correctly
 
 				// Find a suitable ImageReader
-				Iterator<ImageReader> readers = ImageIO
-						.getImageReadersByFormatName("JPEG");
+				Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("JPEG");
 				ImageReader reader = null;
 				while (readers.hasNext()) {
 					reader = (ImageReader) readers.next();
@@ -93,8 +91,8 @@ public class ImageUtils {
 				Raster raster = reader.readRaster(0, null);
 
 				// Create a new RGB image
-				BufferedImage bi = new BufferedImage(raster.getWidth(),
-						raster.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+				BufferedImage bi = new BufferedImage(raster.getWidth(), raster.getHeight(),
+						BufferedImage.TYPE_4BYTE_ABGR);
 
 				// Fill the new image with the old raster
 				bi.getRaster().setRect(raster);
@@ -106,30 +104,27 @@ public class ImageUtils {
 		}
 	}
 
-	public static int writeImage(String dest, BufferedImage bufferedImage,
-			float quality) throws IOException {
+	public static int writeImage(String dest, BufferedImage bufferedImage, float quality) throws IOException {
 		// extracts extension of output file
 		String formatName = dest.substring(dest.lastIndexOf(".") + 1);
 
 		File output = new File(dest);
 
-		if (formatName.equalsIgnoreCase("jpg")
-				|| formatName.equalsIgnoreCase("jpeg")) {
+		if (formatName.equalsIgnoreCase("jpg") || formatName.equalsIgnoreCase("jpeg")) {
 			FileOutputStream fos = new FileOutputStream(output);
 
-			Iterator<ImageWriter> iterator = ImageIO
-					.getImageWritersByFormatName(formatName);
+			Iterator<ImageWriter> iterator = ImageIO.getImageWritersByFormatName(formatName);
 			ImageWriter imageWriter = iterator.next();
-			ImageWriteParam imageWriteParam = imageWriter
-					.getDefaultWriteParam();
+			ImageWriteParam imageWriteParam = imageWriter.getDefaultWriteParam();
 			imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			imageWriteParam.setCompressionQuality(quality);
-			ImageOutputStream imageOutputStream = new MemoryCacheImageOutputStream(
-					fos);
+			MemoryCacheImageOutputStream imageOutputStream = new MemoryCacheImageOutputStream(fos);
 			imageWriter.setOutput(imageOutputStream);
-			IIOImage iioimage = new IIOImage(bufferedImage, null, null);
-			imageWriter.write(null, iioimage, imageWriteParam);
+			IIOImage iioimage = new IIOImage(bufferedImage, null, (IIOMetadata) null);
+			imageWriter.write((IIOMetadata) null, iioimage, imageWriteParam);
 			imageOutputStream.flush();
+			fos.close();
+			imageOutputStream.close();
 		} else {
 			ImageIO.write(bufferedImage, formatName, output);
 		}
@@ -146,21 +141,18 @@ public class ImageUtils {
 	 * @param height
 	 * @throws IOException
 	 */
-	public static int resizeImage(BufferedImage inputImage, String dest,
-			int width, int height, float quality) throws IOException {
-		BufferedImage outputImage = Scalr.resize(inputImage,
-				Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, width, height,
+	public static int resizeImage(BufferedImage inputImage, String dest, int width, int height, float quality)
+			throws IOException {
+		BufferedImage outputImage = Scalr.resize(inputImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, width, height,
 				Scalr.OP_ANTIALIAS);
 		return writeImage(dest, outputImage, 0.9f);
 	}
 
-	public static int resizeImage(BufferedImage inputImage, String dest,
-			int width, int height) throws IOException {
+	public static int resizeImage(BufferedImage inputImage, String dest, int width, int height) throws IOException {
 		return resizeImage(inputImage, dest, width, height, 0.9f);
 	}
 
-	public static int resizeImage(String src, String dest, int width, int height)
-			throws Exception {
+	public static int resizeImage(String src, String dest, int width, int height) throws Exception {
 		return resizeImage(readImage(new File(src)), dest, width, height);
 	}
 
@@ -173,8 +165,7 @@ public class ImageUtils {
 	 * @param height
 	 * @throws IOException
 	 */
-	public static int[] shrinkImage(BufferedImage srcImg, String dest,
-			int width, int height) throws IOException {
+	public static int[] shrinkImage(BufferedImage srcImg, String dest, int width, int height) throws IOException {
 		int w = srcImg.getWidth(null);
 		int h = srcImg.getHeight(null);
 
@@ -203,8 +194,7 @@ public class ImageUtils {
 		return new int[] { width, height, size };
 	}
 
-	public static int[] shrinkImage(String src, String dest, int width,
-			int height) throws IOException {
+	public static int[] shrinkImage(String src, String dest, int width, int height) throws IOException {
 		return shrinkImage(readImage(new File(src)), dest, width, height);
 	}
 
@@ -215,8 +205,7 @@ public class ImageUtils {
 	 * @param bXDir
 	 * @return
 	 */
-	public static BufferedImage twistImage(BufferedImage srcBmp, int width,
-			int height, boolean bXDir) {
+	public static BufferedImage twistImage(BufferedImage srcBmp, int width, int height, boolean bXDir) {
 		double dMultValue = getRandomDouble(1, 3);
 		double dPhase = getRandomDouble(0, PI2);
 
@@ -225,8 +214,7 @@ public class ImageUtils {
 		if (height > srcBmp.getHeight())
 			height = srcBmp.getHeight();
 
-		BufferedImage destBmp = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage destBmp = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		Graphics g = destBmp.getGraphics();
 
@@ -245,8 +233,7 @@ public class ImageUtils {
 		for (int i = 1; i < width - 1; i++) {
 			for (int j = 1; j < height - 1; j++) {
 				double dx = 0;
-				dx = bXDir ? (PI2 * (double) j) / dBaseAxisLen
-						: (PI2 * (double) i) / dBaseAxisLen;
+				dx = bXDir ? (PI2 * (double) j) / dBaseAxisLen : (PI2 * (double) i) / dBaseAxisLen;
 				dx += dPhase;
 				double dy = Math.sin(dx);
 
@@ -256,8 +243,7 @@ public class ImageUtils {
 				nOldY = bXDir ? j : j + (int) (dy * dMultValue);
 
 				int color = srcBmp.getRGB(i, j);
-				if (nOldX >= 1 && nOldX < width - 1 && nOldY >= 1
-						&& nOldY < height - 1) {
+				if (nOldX >= 1 && nOldX < width - 1 && nOldY >= 1 && nOldY < height - 1) {
 					destBmp.setRGB(nOldX, nOldY, color);
 				}
 			}
@@ -274,8 +260,7 @@ public class ImageUtils {
 	 * @return
 	 */
 	public static BufferedImage genRandomImage(String rand, int size) {
-		BufferedImage image = new BufferedImage(100, 100,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 		Font font = new Font("Courier New", Font.BOLD, size);
 
 		// 获取图形上下文
@@ -296,11 +281,9 @@ public class ImageUtils {
 
 		// 随机产生干扰点
 		for (int i = 0; i < 500; i++)
-			image.setRGB(m_ran.nextInt(image.getWidth()),
-					m_ran.nextInt(image.getWidth()), 0);
+			image.setRGB(m_ran.nextInt(image.getWidth()), m_ran.nextInt(image.getWidth()), 0);
 
-		return twistImage(image, (int) rect.getWidth() + 4,
-				(int) rect.getHeight() + 4, true);
+		return twistImage(image, (int) rect.getWidth() + 4, (int) rect.getHeight() + 4, true);
 	}
 
 	/**

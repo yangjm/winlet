@@ -54,8 +54,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 			return null;
 		} else if (DESC_WINLET.equals(desc)) {
 			// 处理@Winlet注解
-			return new AnnotationVisitor(ASM5,
-					cv.visitAnnotation(desc, visible)) {
+			return new AnnotationVisitor(ASM5, cv.visitAnnotation(desc, visible)) {
 				public void visit(String name, Object value) {
 					super.visit(name, value);
 
@@ -73,8 +72,9 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 					// 加入@RequestMapping注解
 					av = cv.visitAnnotation(DESC_REQUEST_MAPPING, true);
 					AnnotationVisitor av1 = av.visitArray("value");
-					av1.visit(null, winletPath.startsWith("/") ? winletPath
-							: "/" + winletPath);
+					String path = winletPath.startsWith("/") ? winletPath : "/" + winletPath;
+					// 用/win/开始，以区别/site/和其他内容
+					av1.visit(null, "/win" + path);
 					av1.visitEnd();
 					av.visitEnd();
 				}
@@ -85,22 +85,18 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 	}
 
 	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-			String signature, String[] exceptions) {
+	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		final String methodName = name;
 
-		return new MethodVisitor(ASM5, super.visitMethod(access, name, desc,
-				signature, exceptions)) {
+		return new MethodVisitor(ASM5, super.visitMethod(access, name, desc, signature, exceptions)) {
 			@Override
-			public AnnotationVisitor visitAnnotation(String desc,
-					boolean visible) {
+			public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
 				if (DESC_WINDOW.equals(desc)) {
 					hasWindow = true;
 
 					// 1. 在@Window之前添加@RequestMapping
 					// 2. 当@Window没有指定value()时，取方法的名称作为value()的值
-					final AnnotationVisitor theAv = mv.visitAnnotation(
-							DESC_REQUEST_MAPPING, visible);
+					final AnnotationVisitor theAv = mv.visitAnnotation(DESC_REQUEST_MAPPING, visible);
 
 					return new AnnotationVisitor(ASM5) {
 						String value = methodName;
@@ -110,14 +106,12 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 						 */
 						@Override
 						public void visit(String name, Object value) {
-							if ("value".equals(name)
-									&& !"".equals(value.toString()))
+							if ("value".equals(name) && !"".equals(value.toString()))
 								this.value = value.toString();
 						}
 
 						/**
-						 * Replace @Window value() string with RequestMapping
-						 * value() string array
+						 * Replace @Window value() string with RequestMapping value() string array
 						 */
 						@Override
 						public void visitEnd() {
@@ -135,8 +129,7 @@ public class WinletClassVisitor extends ClassVisitor implements Opcodes {
 					hasAction = true;
 
 					// 当@Action没有指定value()时，取方法的名称作为value()的值
-					return new AnnotationVisitor(ASM5, mv.visitAnnotation(desc,
-							visible)) {
+					return new AnnotationVisitor(ASM5, mv.visitAnnotation(desc, visible)) {
 						boolean visited = false;
 
 						@Override

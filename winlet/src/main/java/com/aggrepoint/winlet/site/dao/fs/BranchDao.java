@@ -17,7 +17,7 @@ import com.aggrepoint.winlet.site.domain.Page;
 public class BranchDao {
 	static final Log logger = LogFactory.getLog(BranchDao.class);
 
-	static Hashtable<String, String> parseTemplatePrefix(String prefix) {
+	public static Hashtable<String, String> parseTemplatePrefix(String prefix) {
 		if (prefix == null)
 			return null;
 		Hashtable<String, String> ht = null;
@@ -53,8 +53,7 @@ public class BranchDao {
 				if (branch.getTemplate() == null)
 					throw new Exception("Template not specified for branch.");
 
-				branch.setTemplatePrefixes(parseTemplatePrefix(cfgs
-						.get("template-prefix")));
+				branch.setTemplatePrefixes(parseTemplatePrefix(cfgs.get("template-prefix")));
 
 				for (File f : dir.listFiles()) {
 					if (f.isDirectory()) { // 页面
@@ -69,8 +68,7 @@ public class BranchDao {
 				}
 			} else {
 				branch.setIndex(cfgs.get("index"));
-				if (branch.getIndex() != null
-						&& !branch.getIndex().startsWith("/"))
+				if (branch.getIndex() != null && !branch.getIndex().startsWith("/"))
 					branch.setIndex("/" + branch.getIndex());
 			}
 

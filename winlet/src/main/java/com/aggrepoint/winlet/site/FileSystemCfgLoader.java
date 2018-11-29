@@ -12,7 +12,7 @@ import com.aggrepoint.winlet.site.domain.Branch;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class FileSystemCfgLoader {
+public class FileSystemCfgLoader implements CfgLoader {
 	/** 检查是否有变更的时间间隔 */
 	private int interval;
 	/** 根目录 */
@@ -29,13 +29,12 @@ public class FileSystemCfgLoader {
 		interval = checkInterval;
 	}
 
-	public synchronized ArrayList<Branch> load(ArrayList<Branch> branches,
-			String contextRoot) {
+	@Override
+	public synchronized ArrayList<Branch> load(ArrayList<Branch> branches, String contextRoot) {
 		if (branches != null) {
 			boolean reload = false;
 
-			if (lastMaxModified == 0
-					|| System.currentTimeMillis() - lastCheckTime > interval) {
+			if (lastMaxModified == 0 || System.currentTimeMillis() - lastCheckTime > interval) {
 				long maxModified = getMaxModified(rootDir);
 				int count = getCount(rootDir);
 				if (maxModified > lastMaxModified || count != lastCount) {

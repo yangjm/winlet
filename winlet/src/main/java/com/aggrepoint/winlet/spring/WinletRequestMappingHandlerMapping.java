@@ -6,12 +6,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.aggrepoint.winlet.Context;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfoImpl;
 import com.aggrepoint.winlet.WinletManager;
@@ -25,10 +25,9 @@ import com.aggrepoint.winlet.spring.def.WinletDef;
  * 
  * @author Jiangming Yang (yangjm@gmail.com)
  */
-public class WinletRequestMappingHandlerMapping extends
-		RequestMappingHandlerMapping {
-	Map<HandlerMethod, Class<?>> classMap = Collections
-			.synchronizedMap(new HashMap<HandlerMethod, Class<?>>());
+public class WinletRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
+	Map<HandlerMethod, Class<?>> classMap = Collections.synchronizedMap(new HashMap<HandlerMethod, Class<?>>());
+	ApplicationContext context;
 
 	public WinletRequestMappingHandlerMapping() {
 		setOrder(-1);
@@ -36,8 +35,13 @@ public class WinletRequestMappingHandlerMapping extends
 	}
 
 	@Override
-	protected HandlerMethod lookupHandlerMethod(String lookupPath,
-			HttpServletRequest request) throws Exception {
+	protected void initApplicationContext(ApplicationContext context) {
+		super.initApplicationContext(context);
+		this.context = context;
+	}
+
+	@Override
+	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		ReqInfoImpl req = new ReqInfoImpl(request, lookupPath);
 		LogInfoImpl.getLogInfo(request, null).setReqInfo(req);
 
@@ -59,16 +63,14 @@ public class WinletRequestMappingHandlerMapping extends
 
 		if (clz != null) { // This is a Winlet
 			if (StringUtils.isEmpty(req.getActionId())) { // 没有指定Action
-				Window annotation = AnnotationUtils.findAnnotation(
-						hm.getMethod(), Window.class);
+				Window annotation = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
 				if (annotation == null) // 不是@Window方法
 					return hm;
 
 				WinletDef def = WinletDef.getDef(clz);
-				Object winlet = WinletManager.getWinlet(Context.get(), def);
+				Object winlet = WinletManager.getWinlet(context, def);
 				req.setWinlet(def, winlet);
-				req.setWinletMethod(def.getWindow(annotation.value())
-						.getMethod());
+				req.setWinletMethod(def.getWindow(annotation.value()).getMethod());
 
 				return new HandlerMethod(winlet, req.getWinletMethod());
 			} else {
@@ -77,16 +79,15 @@ public class WinletRequestMappingHandlerMapping extends
 					String winlet = req.getActionId().substring(0, idx);
 					String action = req.getActionId().substring(idx + 1);
 
-					WinletDef def = WinletDef.getDef(WinletClassLoader
-							.getWinletClassByPath(winlet));
-					Object w = WinletManager.getWinlet(Context.get(), def);
+					WinletDef def = WinletDef.getDef(WinletClassLoader.getWinletClassByPath(winlet));
+					Object w = WinletManager.getWinlet(context, def);
 					req.setWinlet(def, w);
 					req.setWinletMethod(def.getAction(action).getMethod());
 
 					return new HandlerMethod(w, req.getWinletMethod());
 				} else {
 					WinletDef def = WinletDef.getDef(clz);
-					Object w = WinletManager.getWinlet(Context.get(), def);
+					Object w = WinletManager.getWinlet(context, def);
 					req.setWinlet(def, w);
 
 					ActionDef action = def.getAction(req.getActionId());

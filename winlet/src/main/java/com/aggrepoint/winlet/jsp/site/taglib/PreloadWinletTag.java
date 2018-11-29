@@ -75,26 +75,23 @@ public class PreloadWinletTag extends BodyTagSupport {
 	static final long serialVersionUID = 0;
 
 	// 在内容中寻找要预加载的winlet
-	static Pattern WINLET_PRELOAD = Pattern
-			.compile("<div\\s+data-winlet\\s*=\\s*\"\\s*(/?\\w+(/[^\"]+/\\w+))(\\?([^\\s\"]+))?(\\s+([^\"]*?))?\"\\s+(data-preload(-forced)?)\\s*>\\s*</div>");
+	static Pattern WINLET_PRELOAD = Pattern.compile(
+			"<div\\s+data-winlet\\s*=\\s*\"\\s*([^\\s\"\\?]+)(\\?([^\\s\"]+))?(\\s+([^\"]*?))?\"\\s+(data-preload(-forced)?)\\s*>\\s*</div>");
 	static Pattern WINLET_NO_PRELOAD = Pattern
 			.compile("<div\\s+data-winlet\\s*=\\s*\"([^\">]+)\"\\s+data-preload\\s*>(\\s*)</div>");
-	static Pattern WINLET_ALL = Pattern
-			.compile("<div\\s+data-winlet\\s*=\\s*\"\\s*(/?\\w+(/[^\"]+/\\w+))(\\?([^\\s\"]+))?(\\s+([^\"]*?))?\"[^>]*>\\s*</div>");
+	static Pattern WINLET_ALL = Pattern.compile(
+			"<div\\s+data-winlet\\s*=\\s*\"\\s*([^\\s\"\\?]+)(\\?([^\\s\"]+))?(\\s+([^\"]*?))?\"[^>]*>\\s*</div>");
 
 	static Pattern META_BY_NAME = Pattern
 			.compile("<meta\\s+name\\s*=\\s*\"([^\"]+)\"\\s+content\\s*=\\s*\"([^\"]+)\"[^>]*>");
 	static Pattern META_BY_PROPERTY = Pattern
 			.compile("<meta\\s+property\\s*=\\s*\"([^\"]+)\"\\s+content\\s*=\\s*\"([^\"]+)\"[^>]*>");
-	static Pattern CANONICAL_LINK = Pattern
-			.compile("<link[^>]*\\s+rel\\s*=\\s*\"\\s*canonical\\s*\"[^>]*>");
+	static Pattern CANONICAL_LINK = Pattern.compile("<link[^>]*\\s+rel\\s*=\\s*\"\\s*canonical\\s*\"[^>]*>");
 
 	static Pattern HASH_GROUP_URL = Pattern.compile("^/?\\w+/\\w+/");
-	static Pattern BODY = Pattern.compile("(<body[^>]*>).*</body>",
-			Pattern.DOTALL);
+	static Pattern BODY = Pattern.compile("(<body[^>]*>).*</body>", Pattern.DOTALL);
 
-	static public String preloadWinlet(ReqInfo reqInfo, String content,
-			boolean wholeBody) throws Exception {
+	static public String preloadWinlet(ReqInfo reqInfo, String content, boolean wholeBody) throws Exception {
 		ReqInfoImpl ri = (ReqInfoImpl) reqInfo;
 
 		Pattern pattern = null;
@@ -106,23 +103,17 @@ public class PreloadWinletTag extends BodyTagSupport {
 
 			if (ri.noPreload())
 				// 不加载“判断预加载”窗口
-				content = WINLET_NO_PRELOAD.matcher(content).replaceAll(
-						"<div data-winlet=\"$1\">$2</div>");
+				content = WINLET_NO_PRELOAD.matcher(content).replaceAll("<div data-winlet=\"$1\">$2</div>");
 		}
 
 		HashMap<String, String> metaByName = new HashMap<String, String>();
 		HashMap<String, String> metaByProperty = new HashMap<String, String>();
 		HttpServletRequest request = reqInfo.getRequest();
-		String pagePath = (String) request
-				.getAttribute(SiteController.PAGE_PATH);
-		String rootUrl = request.getScheme()
-				+ "://"
-				+ request.getServerName()
-				+ ("http".equals(request.getScheme())
-						&& request.getServerPort() == 80
-						|| "https".equals(request.getScheme())
-						&& request.getServerPort() == 443 ? "" : ":"
-						+ request.getServerPort())
+		String pagePath = (String) request.getAttribute(SiteController.PAGE_PATH);
+		String rootUrl = request.getScheme() + "://" + request.getServerName()
+				+ ("http".equals(request.getScheme()) && request.getServerPort() == 80
+						|| "https".equals(request.getScheme()) && request.getServerPort() == 443 ? ""
+								: ":" + request.getServerPort())
 				+ (pagePath == null ? "" : pagePath);
 
 		Consumer<StaticUrlProvider> processUrlProvider = urlProvider -> {
@@ -147,8 +138,7 @@ public class PreloadWinletTag extends BodyTagSupport {
 				if (urlProvider.getPropertyMetas() != null)
 					for (String key : urlProvider.getPropertyMetas().keySet())
 						if (!metaByProperty.containsKey(key)) {
-							String value = urlProvider.getPropertyMetas().get(
-									key);
+							String value = urlProvider.getPropertyMetas().get(key);
 							if (key.equals("og:url")) { // 把og:url路径补充完整
 								if (pagePath == null)
 									value = null;
@@ -174,10 +164,8 @@ public class PreloadWinletTag extends BodyTagSupport {
 				reqParams.put(ReqConst.PARAM_PAGE_URL, ri.getPageUrl());
 				if (ri.getTopPageParams() != null)
 					reqParams.putAll(ri.getTopPageParams());
-				String str = ri
-						.getWindowContent(WinletManager.getSeqId(),
-								ri.getTopPageUrl(), reqParams, null,
-								processUrlProvider);
+				String str = ri.getWindowContent(WinletManager.getSeqId(), ri.getTopPageUrl(), reqParams, null,
+						processUrlProvider);
 
 				// { 提取meta
 				while (true) {
@@ -218,8 +206,8 @@ public class PreloadWinletTag extends BodyTagSupport {
 			};
 
 			while (true) {
-				Matcher m = pattern.matcher(content);
-				if (!m.find())
+				Matcher mx = pattern.matcher(content);
+				if (!mx.find())
 					break;
 
 				boolean forced = false;
@@ -227,19 +215,18 @@ public class PreloadWinletTag extends BodyTagSupport {
 				if (ri.isHashEscaped())
 					forced = true;
 				else
-					forced = m.group(7).equals("data-preload-forced");
+					forced = mx.group(6).equals("data-preload-forced");
 
 				String params = null;
 
 				HashMap<String, String> reqParams = new HashMap<String, String>();
-				if (m.group(4) != null) {
-					StringTokenizer st = new StringTokenizer(m.group(4), "&");
+				if (mx.group(3) != null) {
+					StringTokenizer st = new StringTokenizer(mx.group(3), "&");
 					while (st.hasMoreElements()) {
 						String s = st.nextToken();
 						int idx = s.indexOf("=");
 						if (idx >= 0)
-							reqParams.put(s.substring(0, idx),
-									s.substring(idx + 1));
+							reqParams.put(s.substring(0, idx), s.substring(idx + 1));
 					}
 				}
 				if (reqParams.size() > 0)
@@ -250,27 +237,30 @@ public class PreloadWinletTag extends BodyTagSupport {
 
 				long wid = WinletManager.getSeqId();
 
-				String settings = m.group(5);
+				String settings = mx.group(4);
 				if (settings == null)
 					settings = "";
 
+				// 去除掉context root之后的url
+				String winletUrl = mx.group(1);
+				if (!winletUrl.startsWith("/"))
+					winletUrl = "/" + winletUrl;
+				String contextRoot = ri.getRequest().getContextPath();
+				if (winletUrl.startsWith("/" + contextRoot + "/"))
+					winletUrl = winletUrl.substring(contextRoot.length() + 1);
+
 				if (ri.isHashEscaped()) { // 把hash中的参数带上
-					if (settings.indexOf("root:yes") > 0
-							&& !hashGroups.containsKey("root")) {
-						hashGroups
-								.put(getHashGroupKey.apply(ri.getRequest()
-										.getContextPath() + m.group(2)), "root");
+					if (settings.indexOf("root:yes") > 0 && !hashGroups.containsKey("root")) {
+						hashGroups.put(getHashGroupKey.apply(ri.getRequest().getContextPath() + winletUrl), "root");
 					}
 
 					HashMap<String, String> hashParams = ri
-							.getHashParams(getHashGroup.apply(ri.getRequest()
-									.getContextPath() + m.group(2)));
+							.getHashParams(getHashGroup.apply(ri.getRequest().getContextPath() + winletUrl));
 					if (hashParams != null)
 						reqParams.putAll(hashParams);
 				}
 
-				String str = ri.getWindowContent(wid, m.group(2), reqParams,
-						null, processUrlProvider);
+				String str = ri.getWindowContent(wid, winletUrl, reqParams, null, processUrlProvider);
 
 				// { 提取meta
 				while (true) {
@@ -299,24 +289,19 @@ public class PreloadWinletTag extends BodyTagSupport {
 				sb.append("<div data-winlet-id=\"").append(wid).append("\"");
 
 				if (!forced)
-					sb.append(" data-winlet=\"")
-							.append(ri.getRequest().getContextPath())
-							.append(m.group(2)).append(settings).append("\"");
+					sb.append(" data-winlet=\"").append(ri.getRequest().getContextPath()).append(winletUrl)
+							.append(settings).append("\"");
 
-				sb.append(" data-winlet-url=\"")
-						.append(ri.getRequest().getContextPath())
-						.append(m.group(2)).append("\"");
+				sb.append(" data-winlet-url=\"").append(ri.getRequest().getContextPath()).append(winletUrl)
+						.append("\"");
 
 				if (params != null)
-					sb.append(" data-winlet-params=\"")
-							.append(params.replaceAll("\"", "&quot;"))
-							.append("\"");
+					sb.append(" data-winlet-params=\"").append(params.replaceAll("\"", "&quot;")).append("\"");
 
 				// TODO: settings处理
 
 				sb.append(">").append(str).append("</div>");
-				content = m
-						.replaceFirst(Matcher.quoteReplacement(sb.toString()));
+				content = mx.replaceFirst(Matcher.quoteReplacement(sb.toString()));
 			}
 		}
 
@@ -334,38 +319,28 @@ public class PreloadWinletTag extends BodyTagSupport {
 
 				if (metaByName.get("canonical") != null) { // 明确指定了canonical url
 					content = CANONICAL_LINK.matcher(content).replaceAll("");
-					sb.append("<link href=\"" + metaByName.get("canonical")
-							+ "\" rel=\"canonical\" />");
+					sb.append("<link href=\"" + metaByName.get("canonical") + "\" rel=\"canonical\" />");
 				} else if (metaByProperty.get("og:url") != null) {
 					if (!CANONICAL_LINK.matcher(content).find())// 设置了og:url，页面中原来没有canonical
 																// link，添加上
-						sb.append("<link href=\"" + metaByName.get("canonical")
-								+ "\" rel=\"canonical\" />");
+						sb.append("<link href=\"" + metaByName.get("canonical") + "\" rel=\"canonical\" />");
 				}
 
 				for (String key : metaByName.keySet()) {
-					sb.append("<meta name=\"").append(key)
-							.append("\" content=\"")
-							.append(metaByName.get(key)).append("\"/>");
-					content = content.replaceAll("<meta\\s+name\\s*=\\s*\"\\s*"
-							+ Matcher.quoteReplacement(key)
+					sb.append("<meta name=\"").append(key).append("\" content=\"").append(metaByName.get(key))
+							.append("\"/>");
+					content = content.replaceAll("<meta\\s+name\\s*=\\s*\"\\s*" + Matcher.quoteReplacement(key)
 							+ "\\s*\"\\s+content\\s*=\\s*\"[^\"]*\"[^>]*>", "");
 				}
 				for (String key : metaByProperty.keySet()) {
-					sb.append("<meta property=\"").append(key)
-							.append("\" content=\"")
-							.append(metaByProperty.get(key)).append("\"/>");
-					content = content
-							.replaceAll(
-									"<meta\\s+property\\s*=\\s*\"\\s*"
-											+ Matcher.quoteReplacement(key)
-											+ "\\s*\"\\s+content\\s*=\\s*\"[^\"]*\"[^>]*>",
-									"");
+					sb.append("<meta property=\"").append(key).append("\" content=\"").append(metaByProperty.get(key))
+							.append("\"/>");
+					content = content.replaceAll("<meta\\s+property\\s*=\\s*\"\\s*" + Matcher.quoteReplacement(key)
+							+ "\\s*\"\\s+content\\s*=\\s*\"[^\"]*\"[^>]*>", "");
 				}
 
 				int idx = content.indexOf("</head>");
-				content = content.substring(0, idx) + sb.toString()
-						+ content.substring(idx);
+				content = content.substring(0, idx) + sb.toString() + content.substring(idx);
 			}
 		}
 
@@ -379,9 +354,7 @@ public class PreloadWinletTag extends BodyTagSupport {
 	public int doAfterBody() throws JspTagException {
 		BodyContent body = getBodyContent();
 		try {
-			getPreviousOut().write(
-					preloadWinlet(ContextUtils.getReqInfo(), body.getString(),
-							true));
+			getPreviousOut().write(preloadWinlet(ContextUtils.getReqInfo(), body.getString(), true));
 		} catch (Exception e) {
 			throw new JspTagException(e.getMessage());
 		}

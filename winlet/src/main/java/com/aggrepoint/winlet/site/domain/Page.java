@@ -244,7 +244,7 @@ public class Page extends Base {
 		areas.add(area);
 	}
 
-	protected List<Page> getPages() {
+	public List<Page> getPages() {
 		return pages;
 	}
 

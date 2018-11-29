@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.aggrepoint.utils.StringUtils;
+import com.aggrepoint.winlet.AuthorizationEngine;
 import com.aggrepoint.winlet.ContextUtils;
 import com.aggrepoint.winlet.LogInfoImpl;
 import com.aggrepoint.winlet.ReqInfoImpl;
@@ -37,17 +38,19 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	static final String WINLET_FORM_RESP = "WINLET_FORM_RESP:";
 
 	@Override
-	public boolean preHandle(HttpServletRequest request,
-			HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		LogInfoImpl.getLogInfo(request, response).setHandler(handler);
 
 		// 表单处理
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
 
-			Class<? extends Exception> exp = ContextUtils
-					.getAuthorizationEngine(request).check(hm.getBeanType(),
-							hm.getMethod());
+			AuthorizationEngine ae = ContextUtils.getAuthorizationEngine(request);
+			if (ae == null)
+				return true;
+
+			Class<? extends Exception> exp = ae.check(hm.getBeanType(), hm.getMethod());
 			if (exp != null) {
 				if (exp == Unspecified.class)
 					return false;
@@ -57,8 +60,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			WinletDef def = WinletDef.getDef(hm.getBeanType());
 			if (def == null) // 不是Winlet
 				return true;
-			Action action = AnnotationUtils.findAnnotation(hm.getMethod(),
-					Action.class); // 不是Action
+			Action action = AnnotationUtils.findAnnotation(hm.getMethod(), Action.class); // 不是Action
 
 			ReqInfoImpl ri = ContextUtils.getReqInfo();
 			if (action == null) {
@@ -78,11 +80,9 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public void postHandle(HttpServletRequest request,
-			HttpServletResponse response, Object handler,
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		LogInfoImpl li = LogInfoImpl.getLogInfo(request, response)
-				.setHandler(handler).setModelAndView(modelAndView);
+		LogInfoImpl li = LogInfoImpl.getLogInfo(request, response).setHandler(handler).setModelAndView(modelAndView);
 
 		if (handler instanceof HandlerMethod) {
 			HandlerMethod hm = (HandlerMethod) handler;
@@ -101,10 +101,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 			WinletDef def = WinletDef.getDef(hm.getBeanType());
 			if (def == null) { // 不是Winlet
 				// 处理普通Spring MVC Controller方法上定义的@Return
-				ControllerMethodDef mdef = ControllerMethodDef.getDef(hm
-						.getMethod());
-				rd = PsnReturnDefFinder.getReturnDef(mdef
-						.getReturnDef(viewName));
+				ControllerMethodDef mdef = ControllerMethodDef.getDef(hm.getMethod());
+				rd = PsnReturnDefFinder.getReturnDef(mdef.getReturnDef(viewName));
 				if (rd != null) {
 					li.setReturnDef(rd);
 
@@ -122,14 +120,11 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 			win = AnnotationUtils.findAnnotation(hm.getMethod(), Window.class);
 			if (win != null)
-				rd = PsnReturnDefFinder.getReturnDef(def.getWindow(win.value())
-						.getReturnDef(viewName));
+				rd = PsnReturnDefFinder.getReturnDef(def.getWindow(win.value()).getReturnDef(viewName));
 			else {
-				action = AnnotationUtils.findAnnotation(hm.getMethod(),
-						Action.class);
+				action = AnnotationUtils.findAnnotation(hm.getMethod(), Action.class);
 				if (action != null)
-					rd = PsnReturnDefFinder.getReturnDef(def.getAction(
-							action.value()).getReturnDef(viewName));
+					rd = PsnReturnDefFinder.getReturnDef(def.getAction(action.value()).getReturnDef(viewName));
 			}
 
 			if (win == null && action == null) // 被调用的既不是Window也不是Action
@@ -146,11 +141,8 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 				if (action != null && reqInfo.isValidateField()) {
 					// 表单字段校验，返回校验结果
-					response.setHeader("Content-Type",
-							"application/json; charset=UTF-8");
-					response.getOutputStream().write(
-							StringUtils.fixJson(form.getJsonChanges())
-									.getBytes("UTF-8"));
+					response.setHeader("Content-Type", "application/json; charset=UTF-8");
+					response.getOutputStream().write(StringUtils.fixJson(form.getJsonChanges()).getBytes("UTF-8"));
 
 					if (modelAndView != null)
 						modelAndView.clear();
@@ -162,18 +154,15 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 						modelAndView.setViewName(rd.getViewName());
 
 				if (rd.getTitle() != null)
-					response.setHeader(RespHeaderConst.HEADER_TITLE,
-							URLEncoder.encode(rd.getTitle(), "UTF-8"));
+					response.setHeader(RespHeaderConst.HEADER_TITLE, URLEncoder.encode(rd.getTitle(), "UTF-8"));
 
 				if (action != null) {
 					if (rd.getUpdate() != null) {
-						response.setHeader(RespHeaderConst.HEADER_UPDATE,
-								rd.getUpdate());
+						response.setHeader(RespHeaderConst.HEADER_UPDATE, rd.getUpdate());
 					}
 
 					if (rd.getTarget() != null) {
-						response.setHeader(RespHeaderConst.HEADER_TARGET,
-								rd.getTarget());
+						response.setHeader(RespHeaderConst.HEADER_TARGET, rd.getTarget());
 					}
 
 					if (rd.cache()) {
@@ -182,18 +171,14 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 					}
 
 					if (rd.getMsg() != null && !"".equals(rd.getMsg()))
-						response.setHeader(RespHeaderConst.HEADER_MSG,
-								URLEncoder.encode(rd.getMsg(), "UTF-8"));
+						response.setHeader(RespHeaderConst.HEADER_MSG, URLEncoder.encode(rd.getMsg(), "UTF-8"));
 
 					if (rd.isDialog())
 						response.setHeader(RespHeaderConst.HEADER_DIALOG, "yes");
 					else {
-						if (!viewName.startsWith(Const.REDIRECT)
-								&& form.isValidateForm() && form.hasError(true)) { // 表单校验出错
+						if (!viewName.startsWith(Const.REDIRECT) && form.isValidateForm() && form.hasError(true)) { // 表单校验出错
 							response.getOutputStream().write(
-									(WINLET_FORM_RESP + StringUtils
-											.fixJson(form.getJsonChanges()))
-											.getBytes("UTF-8"));
+									(WINLET_FORM_RESP + StringUtils.fixJson(form.getJsonChanges())).getBytes("UTF-8"));
 
 							if (modelAndView != null)
 								modelAndView.clear();
@@ -205,31 +190,25 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 
 			if (modelAndView != null && modelAndView.getViewName() != null) {
 				if (modelAndView.getViewName().startsWith(Const.REDIRECT)) {
-					response.setHeader(RespHeaderConst.HEADER_REDIRECT,
-							modelAndView.getViewName().substring(9));
+					response.setHeader(RespHeaderConst.HEADER_REDIRECT, modelAndView.getViewName().substring(9));
 					modelAndView.clear();
 					return;
 				}
 
 				if (!"".equals(modelAndView.getViewName())) {
 					if (modelAndView.getViewName().indexOf("/") != 0) {
-						modelAndView.setViewName(def.getViewPath() + "/"
-								+ modelAndView.getViewName());
+						modelAndView.setViewName(def.getViewPath() + "/" + modelAndView.getViewName());
 						return;
 					}
 				}
 			}
 
 			if (modelAndView != null) {
-				if (!reqInfo.isFromContainer()
-						&& !cache
-						&& (modelAndView.getViewName() == null || ""
-								.equals(modelAndView.getViewName()))
+				if (!reqInfo.isFromContainer() && !cache
+						&& (modelAndView.getViewName() == null || "".equals(modelAndView.getViewName()))
 						&& action != null)
-					response.getOutputStream().write(
-							reqInfo.getWindowContent(null, null, null,
-									modelAndView.getModel(), null).getBytes(
-									"UTF-8"));
+					response.getOutputStream().write(reqInfo
+							.getWindowContent(null, null, null, modelAndView.getModel(), null).getBytes("UTF-8"));
 
 				if ("".equals(modelAndView.getViewName()))
 					modelAndView.clear();
@@ -238,8 +217,7 @@ public class WinletHandlerInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public void afterCompletion(HttpServletRequest request,
-			HttpServletResponse response, Object handler, Exception ex)
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		LogInfoImpl.getLogInfo(request, response).setException(ex).complete();
 	}

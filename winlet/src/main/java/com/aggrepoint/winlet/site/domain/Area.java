@@ -27,8 +27,7 @@ public class Area extends Base {
 		return content;
 	}
 
-	Pattern P_WINLET = Pattern
-			.compile("<div\\s+data-winlet\\s*=\\s*\"([^\\?\"\\s]+)([^\"]*)\"");
+	Pattern P_WINLET = Pattern.compile("<div\\s+data-winlet\\s*=\\s*\"([^\\?\"\\s]+)([^\"]*)\"");
 
 	public void setContent(String content, String contextRoot) {
 		this.content = content;
@@ -41,14 +40,12 @@ public class Area extends Base {
 			if (!url.startsWith("/"))
 				url = "/" + url;
 
-			if (!url.startsWith(contextRoot + "/")) // winlet路径不是以context
+			if (!url.startsWith(contextRoot + "/win/")) // winlet路径不是以context
 				// root开始，加上context root
-				url = contextRoot + url;
+				url = contextRoot + "/win" + url;
 
-			winlets.add(url.substring(contextRoot.length() + 1));
-			m.appendReplacement(sb,
-					("<div data-winlet=\"" + url + m.group(2) + "\"")
-							.replaceAll("\\$", "\\\\\\$"));
+			winlets.add(url.substring(contextRoot.length() + 5));
+			m.appendReplacement(sb, ("<div data-winlet=\"" + url + m.group(2) + "\"").replaceAll("\\$", "\\\\\\$"));
 		}
 		m.appendTail(sb);
 		this.content = sb.toString();

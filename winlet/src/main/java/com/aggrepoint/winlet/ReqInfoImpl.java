@@ -71,9 +71,6 @@ public class ReqInfoImpl implements ReqConst, ReqInfo {
 		// ，用ReqInfoImpl中保存的request对象的getRequestURI()方法只能获得当前JSP的URI而不是期望的Winlet
 		// URI。如果不封装，或者封装类不从HttpServletRequestWrapper派生，则ReqInfoImpl中request.getRequestURI()可以正常工作。为了避免这个问题，这里直接将requestURI取出保存。
 		requestPath = request.getRequestURI();
-		int idx = requestPath.indexOf("/", 1);
-		if (idx > 0)
-			requestPath = requestPath.substring(idx);
 
 		requestId = REQUEST_ID++;
 

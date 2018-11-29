@@ -179,13 +179,10 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 		Session session = null;
 		EntityManager em = null;
 
-		// entityManagerFactory to be supported
-		// if (entityManagerFactory != null) {
-		// em = entityManagerFactory.createEntityManager();
-		// session = em.unwrap(Session.class);
-		// } else
-
-		if (sessionFactory != null)
+		if (entityManagerFactory != null) {
+			em = entityManagerFactory.createEntityManager();
+			session = em.unwrap(Session.class);
+		} else if (sessionFactory != null)
 			session = sessionFactory.getCurrentSession();
 
 		try {

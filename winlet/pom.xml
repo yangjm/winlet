@@ -19,7 +19,6 @@
 		<javax.servlet.jstl-version>1.2</javax.servlet.jstl-version>
 		<org.ow2.asm-version>5.0.4</org.ow2.asm-version>
 		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
-		<jackson-version>2.9.5</jackson-version>
 		<htmlcompressor-version>1.5.2</htmlcompressor-version>
 		<yuicompressor-version>2.4.8</yuicompressor-version>
 		<freemarker-version>2.3.20</freemarker-version>
@@ -83,12 +82,6 @@
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>${freemarker-version}</version>
-		</dependency>
-
-		<dependency>
-			<artifactId>jackson-databind</artifactId>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<version>${jackson-version}</version>
 		</dependency>
 
 		<dependency>

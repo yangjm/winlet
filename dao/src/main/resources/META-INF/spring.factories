@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.aggrepoint.dao.spring.boot.DaoScanAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=\
+com.aggrepoint.dao.spring.boot.DaoContextInitializer
