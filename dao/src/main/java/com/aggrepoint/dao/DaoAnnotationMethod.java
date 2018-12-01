@@ -38,6 +38,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 import com.aggrepoint.dao.annotation.Cache;
 import com.aggrepoint.dao.annotation.Delete;
@@ -496,264 +497,257 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		Session session = null;
 		EntityManager em = null;
 
-		// entityManagerFactory to be supported
 		if (entityManagerFactory != null) {
-			em = entityManagerFactory.createEntityManager();
+			em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 			session = em.unwrap(Session.class);
 		} else if (sessionFactory != null)
 			session = sessionFactory.getCurrentSession();
 
-		try {
-			Object fromCache = null;
-			CacheMetaData<T> cacheMetaData = null;
-			Object key = null;
-			org.springframework.cache.Cache theCache = null;
+		Object fromCache = null;
+		CacheMetaData<T> cacheMetaData = null;
+		Object key = null;
+		org.springframework.cache.Cache theCache = null;
 
-			if (type == TYPE_CACHE || type == TYPE_CACHE_SQL) {
-				if (args == null)
-					key = keyGenerator.generate(clz, method);
-				else
-					key = keyGenerator.generate(clz, method, args);
+		if (type == TYPE_CACHE || type == TYPE_CACHE_SQL) {
+			if (args == null)
+				key = keyGenerator.generate(clz, method);
+			else
+				key = keyGenerator.generate(clz, method, args);
 
-				if (cacheManager != null) {
-					theCache = cacheManager.getCache(cache.name());
-					fromCache = theCache.get(key);
-				}
-
-				if (fromCache != null) {
-					fromCache = ((ValueWrapper) fromCache).get();
-
-					if (fromCache instanceof CacheList)
-						cacheMetaData = ((CacheList) fromCache).getMetaData();
-					else if (fromCache instanceof CachePageList)
-						cacheMetaData = ((CachePageList) fromCache).getMetaData();
-					else {
-						fromCache = null;
-					}
-				}
-
-				if (cacheMetaData != null && System.currentTimeMillis() - cacheMetaData.getSyncTime() < cache.ttl()) // 缓存有效
-					return fromCache;
+			if (cacheManager != null) {
+				theCache = cacheManager.getCache(cache.name());
+				fromCache = theCache.get(key);
 			}
 
-			HashMap<String, Object> values = getValues(args);
+			if (fromCache != null) {
+				fromCache = ((ValueWrapper) fromCache).get();
 
-			HashSet<String> paramsInUse = new HashSet<String>();
-
-			StringBuffer sb = new StringBuffer();
-			for (QueryPart part : parts) {
-				String p = part.get(values);
-				if (p != null) {
-					sb.append(p);
-					for (String pm : part.getParamDepends())
-						paramsInUse.add(pm);
+				if (fromCache instanceof CacheList)
+					cacheMetaData = ((CacheList) fromCache).getMetaData();
+				else if (fromCache instanceof CachePageList)
+					cacheMetaData = ((CachePageList) fromCache).getMetaData();
+				else {
+					fromCache = null;
 				}
 			}
 
-			String query = sb.toString();
-			Query queryObject;
-
-			switch (type) {
-			case TYPE_CACHE:
-			case TYPE_CACHE_SQL:
-			case TYPE_FIND:
-			case TYPE_FIND_SQL:
-				PageList<T> pageList = null;
-				boolean paging = false;
-				int pageNum = -1;
-				int pageSize = -1;
-
-				if (pageNumIdx >= 0 && pageSizeIdx >= 0) {
-					paging = true;
-					pageNum = args[pageNumIdx] == null ? 1 : (Integer) args[pageNumIdx];
-					pageSize = (Integer) args[pageSizeIdx];
-
-					if (pageNum <= 0)
-						pageNum = 1;
-					if (pageSize <= 0)
-						pageSize = 1;
-				}
-
-				CachePageList<T> cachePageList = null;
-
-				if (retType == RETURN_PAGE || type == TYPE_CACHE || type == TYPE_CACHE_SQL) {
-					if (type == TYPE_FIND || type == TYPE_FIND_SQL)
-						pageList = new PageList<T>();
-					else
-						pageList = cachePageList = new CachePageList<T>(method.getName(), args);
-
-					CountHelper ch = new CountHelper(query);
-					if (ch.getFrom() == null)
-						if (type == TYPE_CACHE || type == TYPE_FIND)
-							throw new IllegalArgumentException("Unable to conver hql to count hql '" + query);
-						else
-							throw new IllegalArgumentException("Unable to conver sql to count sql '" + query);
-
-					String q = null;
-					boolean grouping = ch.getFrom().toLowerCase().indexOf(GROUP_BY) > 0;
-
-					if (type == TYPE_FIND || type == TYPE_FIND_SQL) {
-						if (grouping)
-							q = "select count(" + count + ") from (select " + ch.getSelect() + " from " + ch.getFrom()
-									+ ")";
-						else
-							q = "select count(" + count + ") from " + ch.getFrom();
-					} else {
-						if (type == TYPE_CACHE)
-							q = "select count(" + count + "), max(" + cache.alias() + "." + updateTimeProp + ") from "
-									+ ch.getFrom();
-						else
-							q = "select count(" + count + "), max(" + cache.alias() + "." + updateTimeCol.name()
-									+ ") from " + ch.getFrom();
-					}
-
-					if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
-						// 把更改同步到数据库，使SQL语句可以访问
-						session.flush();
-						queryObject = session.createNativeQuery(q);
-					} else
-						queryObject = session.createQuery(q.replaceAll(FETCH, " "));
-
-					for (String param : paramsInUse)
-						DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
-
-					Object c = queryObject.uniqueResult();
-					if (type == TYPE_FIND || type == TYPE_FIND_SQL) {
-						if (c instanceof Long)
-							pageList.setTotalCount(((Long) c).intValue());
-						else if (c instanceof BigDecimal)
-							pageList.setTotalCount(((BigDecimal) c).intValue());
-						else if (c instanceof BigInteger)
-							pageList.setTotalCount(((BigInteger) c).intValue());
-						else
-							pageList.setTotalCount((Integer) c);
-					} else {
-						Object[] cs = (Object[]) c;
-						if (cs[0] instanceof Long)
-							pageList.setTotalCount(((Long) cs[0]).intValue());
-						else if (cs[0] instanceof BigDecimal)
-							pageList.setTotalCount(((BigDecimal) cs[0]).intValue());
-						else
-							pageList.setTotalCount((Integer) cs[0]);
-
-						cachePageList.setTimestamp(cs[1] == null ? 0 : ((Date) cs[1]).getTime());
-
-						if (cachePageList.getMetaData().equals(cacheMetaData)) { // 缓存有效
-							cacheMetaData.updateSyncTime();
-							theCache.put(key, fromCache);
-							return fromCache;
-						}
-					}
-
-					if (paging) {
-						pageList.setPageSize(pageSize);
-						pageList.setTotalPage(
-								(int) Math.ceil((double) pageList.getTotalCount() / pageList.getPageSize()));
-						if (pageNum > pageList.getTotalPage())
-							pageNum = pageList.getTotalPage();
-						pageList.setCurrentPage(pageNum);
-					}
-				}
-
-				List<?> result = null;
-
-				if (pageList == null || pageList.getTotalCount() != 0) {
-					if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
-						// 把更改同步到数据库，使SQL语句可以访问
-						try {
-							session.flush();
-						} catch (javax.persistence.TransactionRequiredException e) {
-							// 切换到Hibernate 5之后，如果事务未启动，会抛出javax.persistence.TransactionRequiredException
-							// 可以直接忽略
-						}
-						NativeQuery q = session.createNativeQuery(query);
-						queryObject = q;
-						if (entityClass != null)
-							q.addEntity(entityClass);
-					} else
-						queryObject = session.createQuery(query);
-
-					for (String param : paramsInUse)
-						DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
-					if (paging) {
-						queryObject.setFirstResult((pageNum - 1) * pageSize);
-						queryObject.setMaxResults(pageSize);
-					}
-
-					result = queryObject.list();
-				}
-
-				switch (retType) {
-				case RETURN_LIST:
-					if (type == TYPE_FIND || type == TYPE_FIND_SQL)
-						return result;
-
-					CacheList<T> list = new CacheList<T>(method.getName(), args);
-					if (result != null)
-						list.addAll((ArrayList<T>) result);
-					list.setTimestamp(cachePageList.getMetaData().getTimestamp());
-					list.setCount(cachePageList.getMetaData().getCount());
-					theCache.put(key, list);
-					return list;
-				case RETURN_PAGE:
-					if (result == null)
-						result = new ArrayList<T>();
-					pageList.setList(result);
-
-					if (type == TYPE_CACHE || type == TYPE_CACHE_SQL)
-						theCache.put(key, pageList);
-
-					return pageList;
-				case RETURN_VOID:
-					return null;
-				case RETURN_OBJECT:
-					if (result.size() <= 0)
-						return null;
-
-					Object obj = result.get(0);
-					if (obj == null)
-						return null;
-
-					if (!obj.getClass().equals(method.getReturnType())
-							&& cs.canConvert(obj.getClass(), method.getReturnType()))
-						return cs.convert(obj, method.getReturnType());
-					return obj;
-				}
-			case TYPE_UPDATE:
-			case TYPE_DELETE: {
-				queryObject = session.createQuery(query);
-				for (String param : paramsInUse)
-					DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
-
-				int ret = queryObject.executeUpdate();
-
-				if (retType == RETURN_VOID)
-					return null;
-
-				return ret;
-			}
-			case TYPE_UPDATE_SQL:
-			case TYPE_DELETE_SQL: {
-				// 把更改同步到数据库，使SQL语句可以访问
-				session.flush();
-				queryObject = session.createNativeQuery(query);
-				for (String param : paramsInUse)
-					DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
-
-				int ret = queryObject.executeUpdate();
-
-				if (retType == RETURN_VOID)
-					return null;
-
-				return ret;
-			}
-			}
-
-			return null;
-		} finally {
-			if (em != null)
-				em.close();
+			if (cacheMetaData != null && System.currentTimeMillis() - cacheMetaData.getSyncTime() < cache.ttl()) // 缓存有效
+				return fromCache;
 		}
+
+		HashMap<String, Object> values = getValues(args);
+
+		HashSet<String> paramsInUse = new HashSet<String>();
+
+		StringBuffer sb = new StringBuffer();
+		for (QueryPart part : parts) {
+			String p = part.get(values);
+			if (p != null) {
+				sb.append(p);
+				for (String pm : part.getParamDepends())
+					paramsInUse.add(pm);
+			}
+		}
+
+		String query = sb.toString();
+		Query queryObject;
+
+		switch (type) {
+		case TYPE_CACHE:
+		case TYPE_CACHE_SQL:
+		case TYPE_FIND:
+		case TYPE_FIND_SQL:
+			PageList<T> pageList = null;
+			boolean paging = false;
+			int pageNum = -1;
+			int pageSize = -1;
+
+			if (pageNumIdx >= 0 && pageSizeIdx >= 0) {
+				paging = true;
+				pageNum = args[pageNumIdx] == null ? 1 : (Integer) args[pageNumIdx];
+				pageSize = (Integer) args[pageSizeIdx];
+
+				if (pageNum <= 0)
+					pageNum = 1;
+				if (pageSize <= 0)
+					pageSize = 1;
+			}
+
+			CachePageList<T> cachePageList = null;
+
+			if (retType == RETURN_PAGE || type == TYPE_CACHE || type == TYPE_CACHE_SQL) {
+				if (type == TYPE_FIND || type == TYPE_FIND_SQL)
+					pageList = new PageList<T>();
+				else
+					pageList = cachePageList = new CachePageList<T>(method.getName(), args);
+
+				CountHelper ch = new CountHelper(query);
+				if (ch.getFrom() == null)
+					if (type == TYPE_CACHE || type == TYPE_FIND)
+						throw new IllegalArgumentException("Unable to conver hql to count hql '" + query);
+					else
+						throw new IllegalArgumentException("Unable to conver sql to count sql '" + query);
+
+				String q = null;
+				boolean grouping = ch.getFrom().toLowerCase().indexOf(GROUP_BY) > 0;
+
+				if (type == TYPE_FIND || type == TYPE_FIND_SQL) {
+					if (grouping)
+						q = "select count(" + count + ") from (select " + ch.getSelect() + " from " + ch.getFrom()
+								+ ")";
+					else
+						q = "select count(" + count + ") from " + ch.getFrom();
+				} else {
+					if (type == TYPE_CACHE)
+						q = "select count(" + count + "), max(" + cache.alias() + "." + updateTimeProp + ") from "
+								+ ch.getFrom();
+					else
+						q = "select count(" + count + "), max(" + cache.alias() + "." + updateTimeCol.name() + ") from "
+								+ ch.getFrom();
+				}
+
+				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
+					// 把更改同步到数据库，使SQL语句可以访问
+					session.flush();
+					queryObject = session.createNativeQuery(q);
+				} else
+					queryObject = session.createQuery(q.replaceAll(FETCH, " "));
+
+				for (String param : paramsInUse)
+					DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
+
+				Object c = queryObject.uniqueResult();
+				if (type == TYPE_FIND || type == TYPE_FIND_SQL) {
+					if (c instanceof Long)
+						pageList.setTotalCount(((Long) c).intValue());
+					else if (c instanceof BigDecimal)
+						pageList.setTotalCount(((BigDecimal) c).intValue());
+					else if (c instanceof BigInteger)
+						pageList.setTotalCount(((BigInteger) c).intValue());
+					else
+						pageList.setTotalCount((Integer) c);
+				} else {
+					Object[] cs = (Object[]) c;
+					if (cs[0] instanceof Long)
+						pageList.setTotalCount(((Long) cs[0]).intValue());
+					else if (cs[0] instanceof BigDecimal)
+						pageList.setTotalCount(((BigDecimal) cs[0]).intValue());
+					else
+						pageList.setTotalCount((Integer) cs[0]);
+
+					cachePageList.setTimestamp(cs[1] == null ? 0 : ((Date) cs[1]).getTime());
+
+					if (cachePageList.getMetaData().equals(cacheMetaData)) { // 缓存有效
+						cacheMetaData.updateSyncTime();
+						theCache.put(key, fromCache);
+						return fromCache;
+					}
+				}
+
+				if (paging) {
+					pageList.setPageSize(pageSize);
+					pageList.setTotalPage((int) Math.ceil((double) pageList.getTotalCount() / pageList.getPageSize()));
+					if (pageNum > pageList.getTotalPage())
+						pageNum = pageList.getTotalPage();
+					pageList.setCurrentPage(pageNum);
+				}
+			}
+
+			List<?> result = null;
+
+			if (pageList == null || pageList.getTotalCount() != 0) {
+				if (type == TYPE_FIND_SQL || type == TYPE_CACHE_SQL) {
+					// 把更改同步到数据库，使SQL语句可以访问
+					try {
+						session.flush();
+					} catch (javax.persistence.TransactionRequiredException e) {
+						// 切换到Hibernate 5之后，如果事务未启动，会抛出javax.persistence.TransactionRequiredException
+						// 可以直接忽略
+					}
+					NativeQuery q = session.createNativeQuery(query);
+					queryObject = q;
+					if (entityClass != null)
+						q.addEntity(entityClass);
+				} else
+					queryObject = session.createQuery(query);
+
+				for (String param : paramsInUse)
+					DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
+				if (paging) {
+					queryObject.setFirstResult((pageNum - 1) * pageSize);
+					queryObject.setMaxResults(pageSize);
+				}
+
+				result = queryObject.list();
+			}
+
+			switch (retType) {
+			case RETURN_LIST:
+				if (type == TYPE_FIND || type == TYPE_FIND_SQL)
+					return result;
+
+				CacheList<T> list = new CacheList<T>(method.getName(), args);
+				if (result != null)
+					list.addAll((ArrayList<T>) result);
+				list.setTimestamp(cachePageList.getMetaData().getTimestamp());
+				list.setCount(cachePageList.getMetaData().getCount());
+				theCache.put(key, list);
+				return list;
+			case RETURN_PAGE:
+				if (result == null)
+					result = new ArrayList<T>();
+				pageList.setList(result);
+
+				if (type == TYPE_CACHE || type == TYPE_CACHE_SQL)
+					theCache.put(key, pageList);
+
+				return pageList;
+			case RETURN_VOID:
+				return null;
+			case RETURN_OBJECT:
+				if (result.size() <= 0)
+					return null;
+
+				Object obj = result.get(0);
+				if (obj == null)
+					return null;
+
+				if (!obj.getClass().equals(method.getReturnType())
+						&& cs.canConvert(obj.getClass(), method.getReturnType()))
+					return cs.convert(obj, method.getReturnType());
+				return obj;
+			}
+		case TYPE_UPDATE:
+		case TYPE_DELETE: {
+			queryObject = session.createQuery(query);
+			for (String param : paramsInUse)
+				DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
+
+			int ret = queryObject.executeUpdate();
+
+			if (retType == RETURN_VOID)
+				return null;
+
+			return ret;
+		}
+		case TYPE_UPDATE_SQL:
+		case TYPE_DELETE_SQL: {
+			// 把更改同步到数据库，使SQL语句可以访问
+			session.flush();
+			queryObject = session.createNativeQuery(query);
+			for (String param : paramsInUse)
+				DaoBaseMethod.applyNamedParameterToQuery(queryObject, param, values.get(param));
+
+			int ret = queryObject.executeUpdate();
+
+			if (retType == RETURN_VOID)
+				return null;
+
+			return ret;
+		}
+		}
+
+		return null;
 	}
 
 	Hashtable<String, Expression> htExpressionCache = new Hashtable<String, Expression>();

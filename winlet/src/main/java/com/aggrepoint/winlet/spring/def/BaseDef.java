@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.aggrepoint.winlet.spring.annotation.AccessRule;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 
@@ -13,7 +14,9 @@ import com.aggrepoint.winlet.spring.annotation.AccessRule;
 public class BaseDef extends ReturnDefList {
 	private String name;
 	private String accessRule;
+	@JsonIgnore
 	private WinletDef winletDef;
+	@JsonIgnore
 	private Method method;
 
 	public BaseDef(String name, WinletDef def, Method method) {

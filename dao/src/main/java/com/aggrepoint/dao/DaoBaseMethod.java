@@ -18,6 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.query.Query;
 import org.springframework.dao.DataAccessException;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 /**
  * 
@@ -180,97 +181,92 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 		EntityManager em = null;
 
 		if (entityManagerFactory != null) {
-			em = entityManagerFactory.createEntityManager();
+			em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
 			session = em.unwrap(Session.class);
 		} else if (sessionFactory != null)
 			session = sessionFactory.getCurrentSession();
 
-		try {
-			switch (methodId) {
-			case 101:
-				return session.save(args[0]);
-			case 102:
-				session.saveOrUpdate(args[0]);
-				return null;
-			case 103:
-				return session.get(clz, (Serializable) args[0]);
-			case 104:
-				CriteriaQuery<?> criteriaQuery = session.getCriteriaBuilder().createQuery(clz);
-				criteriaQuery.from(clz);
-
-				return session.createQuery(criteriaQuery).getResultList();
-			case 105:
-				session.update(args[0]);
-				return null;
-			case 106:
-				session.delete(args[0]);
-				return null;
-			case 107:
-				for (T t : (Collection<T>) args[0])
-					session.delete(t);
-				return null;
-			case 108:
-				session.evict(args[0]);
-				return null;
-
-			case 1:
-				session.clear();
-				return null;
-			case 2:
-				return session.contains(args[0]);
-			case 3:
-				session.evict(args[0]);
-				return null;
-			case 4:
-				return find(session, (String) args[0], (Object[]) null);
-			case 5:
-				return find(session, (String) args[0], new Object[] { args[1] });
-			case 6:
-				return find(session, (String) args[0], (Object[]) args[1]);
-			case 7:
-				return findByCriteria(session, (DetachedCriteria) args[0], -1, -1);
-			case 8:
-				return findByCriteria(session, (DetachedCriteria) args[0], (Integer) args[1], (Integer) args[2]);
-			case 9:
-				return findByNamedParam(session, (String) args[0], new String[] { (String) args[1] },
-						new Object[] { args[2] });
-			case 10:
-				return findByNamedParam(session, (String) args[0], (String[]) args[1], (Object[]) args[2]);
-			case 11:
-				return findByNamedQuery(session, (String) args[0], (Object[]) null);
-			case 12:
-				return findByNamedQuery(session, (String) args[0], new Object[] { args[1] });
-			case 13:
-				return findByNamedQuery(session, (String) args[0], (Object[]) args[1]);
-			case 14:
-				return findByNamedQueryAndNamedParam(session, (String) args[0], new String[] { (String) args[1] },
-						new Object[] { args[2] });
-			case 15:
-				return findByNamedQueryAndNamedParam(session, (String) args[0], (String[]) args[1], (Object[]) args[2]);
-			case 16:
-				session.flush();
-				return null;
-			case 17:
-				session.load(args[0], (Serializable) args[1]);
-				return null;
-			case 18:
-				return session.merge(args[0]);
-			case 19:
-				session.persist(args[0]);
-				return null;
-			case 20:
-				session.refresh(args[0]);
-				return null;
-			case 21:
-				session.replicate(args[0], (ReplicationMode) args[1]);
-				return null;
-			}
-
+		switch (methodId) {
+		case 101:
+			return session.save(args[0]);
+		case 102:
+			session.saveOrUpdate(args[0]);
 			return null;
-		} finally {
-			if (em != null)
-				em.close();
+		case 103:
+			return session.get(clz, (Serializable) args[0]);
+		case 104:
+			CriteriaQuery<?> criteriaQuery = session.getCriteriaBuilder().createQuery(clz);
+			criteriaQuery.from(clz);
+
+			return session.createQuery(criteriaQuery).getResultList();
+		case 105:
+			session.update(args[0]);
+			return null;
+		case 106:
+			session.delete(args[0]);
+			return null;
+		case 107:
+			for (T t : (Collection<T>) args[0])
+				session.delete(t);
+			return null;
+		case 108:
+			session.evict(args[0]);
+			return null;
+
+		case 1:
+			session.clear();
+			return null;
+		case 2:
+			return session.contains(args[0]);
+		case 3:
+			session.evict(args[0]);
+			return null;
+		case 4:
+			return find(session, (String) args[0], (Object[]) null);
+		case 5:
+			return find(session, (String) args[0], new Object[] { args[1] });
+		case 6:
+			return find(session, (String) args[0], (Object[]) args[1]);
+		case 7:
+			return findByCriteria(session, (DetachedCriteria) args[0], -1, -1);
+		case 8:
+			return findByCriteria(session, (DetachedCriteria) args[0], (Integer) args[1], (Integer) args[2]);
+		case 9:
+			return findByNamedParam(session, (String) args[0], new String[] { (String) args[1] },
+					new Object[] { args[2] });
+		case 10:
+			return findByNamedParam(session, (String) args[0], (String[]) args[1], (Object[]) args[2]);
+		case 11:
+			return findByNamedQuery(session, (String) args[0], (Object[]) null);
+		case 12:
+			return findByNamedQuery(session, (String) args[0], new Object[] { args[1] });
+		case 13:
+			return findByNamedQuery(session, (String) args[0], (Object[]) args[1]);
+		case 14:
+			return findByNamedQueryAndNamedParam(session, (String) args[0], new String[] { (String) args[1] },
+					new Object[] { args[2] });
+		case 15:
+			return findByNamedQueryAndNamedParam(session, (String) args[0], (String[]) args[1], (Object[]) args[2]);
+		case 16:
+			session.flush();
+			return null;
+		case 17:
+			session.load(args[0], (Serializable) args[1]);
+			return null;
+		case 18:
+			return session.merge(args[0]);
+		case 19:
+			session.persist(args[0]);
+			return null;
+		case 20:
+			session.refresh(args[0]);
+			return null;
+		case 21:
+			session.replicate(args[0], (ReplicationMode) args[1]);
+			return null;
 		}
+
+		return null;
 	}
 
 	@Override

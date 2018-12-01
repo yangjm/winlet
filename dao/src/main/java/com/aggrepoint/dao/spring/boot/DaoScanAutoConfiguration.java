@@ -30,14 +30,12 @@ public class DaoScanAutoConfiguration implements ApplicationContextAware {
 			return null;
 
 		DaoScannerConfigurer cfg = new DaoScannerConfigurer();
-		cfg.setBasePackage(basePackages.stream().collect(
-				Collectors.joining(",")));
+		cfg.setBasePackage(basePackages.stream().collect(Collectors.joining(",")));
 		return cfg;
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		context = applicationContext;
 	}
 }

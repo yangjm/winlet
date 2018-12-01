@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
  * 
  */
 public interface DaoMethod<T> {
+	public static String PM_MAP = "PM_MAP";
+
 	/**
 	 * 判断Method是否适用于当前的参数
 	 * 
@@ -18,9 +20,7 @@ public interface DaoMethod<T> {
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 */
-	public boolean match(Object[] args) throws NoSuchMethodException,
-			InvocationTargetException, IllegalAccessException;
+	public boolean match(Object[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 
-	public Object invoke(Object proxy, Method method, Object[] args)
-			throws Throwable;
+	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
 }
