@@ -11,16 +11,16 @@ Latest Winlet java library has been published to Maven central repository. Add b
 <dependency>
   <groupId>com.aggrepoint.framework</groupId>
   <artifactId>winlet</artifactId>
-  <version>0.5.2-SNAPSHOT</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
-Version 1.7.0 uses Spring Framework 4:
+Version 0.1.17 uses Spring Framework 4:
 ```
 <dependency>
   <groupId>com.aggrepoint.framework</groupId>
   <artifactId>winlet</artifactId>
-  <version>1.7.0</version>
+  <version>0.1.17</version>
 </dependency>
 ```
 Winlet requires JRE 8.
