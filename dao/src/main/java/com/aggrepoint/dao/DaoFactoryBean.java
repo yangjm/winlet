@@ -6,9 +6,13 @@ import static org.springframework.util.Assert.notNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.Metamodel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -120,15 +124,29 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, 
 		return conversionService;
 	}
 
+	private static Map<Class<?>, EntityManagerFactory> factoryMap = null;
+
 	private EntityManagerFactory getEntityManagerFactory() {
 		if (entityManagerFactory == null)
 			try {
-				if (StringUtils.isEmpty(entityManagerFactoryName))
-					entityManagerFactory = ctx.getBean(EntityManagerFactory.class);
-				else
+				if (StringUtils.isEmpty(entityManagerFactoryName)) {
+					if (factoryMap == null) {
+						Map<Class<?>, EntityManagerFactory> map = new HashMap<>();
+						for (EntityManagerFactory f : ctx.getBeansOfType(EntityManagerFactory.class).values()) {
+							final Metamodel mm = f.getMetamodel();
+
+							for (final ManagedType<?> managedType : mm.getManagedTypes()) {
+								map.put(managedType.getJavaType(), f);
+							}
+						}
+						factoryMap = map;
+					}
+					entityManagerFactory = factoryMap.get(domainClz);
+				} else
 					entityManagerFactory = ctx.getBean(entityManagerFactoryName, EntityManagerFactory.class);
 			} catch (NoSuchBeanDefinitionException e) {
 			}
+
 		return entityManagerFactory;
 	}
 
@@ -164,8 +182,8 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, 
 				}
 
 				proxy = (T) Proxy.newProxyInstance(daoInterface.getClassLoader(), new Class[] { daoInterface },
-						new DaoInvocationHandler<K>(getEntityManagerFactory(), getSessionFactory(), cm, getConversionService(),
-								daoInterface, domainClz, funcs));
+						new DaoInvocationHandler<K>(getEntityManagerFactory(), getSessionFactory(), cm,
+								getConversionService(), daoInterface, domainClz, funcs));
 			} catch (Throwable t) {
 				logger.error("Error while creating proxy for dao interface '" + this.daoInterface + "'.", t);
 				throw new IllegalArgumentException(t);
