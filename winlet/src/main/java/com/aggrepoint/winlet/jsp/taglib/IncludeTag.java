@@ -95,20 +95,14 @@ public class IncludeTag extends BodyTagSupport {
 				ReqInfo ri = ContextUtils.getReqInfo();
 				String windowUrl = ri.getWindowUrl(winletDef, win);
 				long wid = WinletManager.getSeqId();
-				String response = ri.getWindowContent(wid, windowUrl, m_params,
-						null, null);
+				String response = ri.getWindowContent(wid, "/win" + windowUrl, m_params, null, null);
 
 				StringBuffer sb = new StringBuffer();
-				sb.append(
-						"<div data-winlet-id=\""
-								+ wid
-								+ "\" class=\"winlet_child\" data-winlet-url=\"")
-						.append(ri.getRequest().getContextPath())
-						.append(windowUrl).append("\"");
+				sb.append("<div data-winlet-id=\"" + wid + "\" class=\"winlet_child\" data-winlet-url=\"")
+						.append(ri.getRequest().getContextPath()).append("/win").append(windowUrl).append("\"");
 				if (m_params.size() > 0)
 					sb.append(" data-winlet-params=\"")
-							.append(new ObjectMapper().writeValueAsString(
-									m_params).replaceAll("\"", "&quot;"))
+							.append(new ObjectMapper().writeValueAsString(m_params).replaceAll("\"", "&quot;"))
 							.append("\"");
 				if (root)
 					sb.append(" data-winlet-settings=\"{&quot;root&quot;:&quot;yes&quot;}\"");
