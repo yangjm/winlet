@@ -26,15 +26,18 @@ public class ClassPathCfgLoader implements CfgLoader {
 				continue;
 			if ("/".equals(rn.getDir()))
 				resourceNodes.add(rn);
-			else
+			else {
+				boolean added = false;
 				for (ResourceNode r : resourceNodes)
-					if (!r.add(rn)) {
-						logger.error("Unable to add resource " + res);
+					if (r.add(rn)) {
+						added = true;
+						break;
 					}
-		}
 
-		for (ResourceNode rn : resourceNodes)
-			System.out.println(rn.toString());
+				if (!added)
+					logger.error("Unable to add resource " + res);
+			}
+		}
 	}
 
 	@Override
