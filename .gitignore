@@ -6,6 +6,7 @@ classes/
 .springBeans
 .settings
 .DS_Store
+.vscode
 
 ## Intellij IDEA ##
 .idea/
