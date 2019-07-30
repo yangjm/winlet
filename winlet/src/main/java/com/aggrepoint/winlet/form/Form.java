@@ -1,6 +1,7 @@
 package com.aggrepoint.winlet.form;
 
 import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -29,21 +30,16 @@ public interface Form {
 	 * 对字段field进行校验
 	 * 
 	 * @param field
-	 * @param when
-	 *            true表示校验未通过
-	 * @param error
-	 *            如果校验失败，使用的错误信息
+	 * @param when  true表示校验未通过
+	 * @param error 如果校验失败，使用的错误信息
 	 */
-	public Form addError(String field, Function<String, Boolean> when,
-			String error);
+	public Form addError(String field, Function<String, Boolean> when, String error);
 
 	public Form addError(String field, boolean when, String error);
 
-	public Form addError(String field, Function<String, Boolean> when,
-			String error, boolean validateEvenErrorExist);
+	public Form addError(String field, Function<String, Boolean> when, String error, boolean validateEvenErrorExist);
 
-	public Form addError(String field, boolean when, String error,
-			boolean validateEvenErrorExist);
+	public Form addError(String field, boolean when, String error, boolean validateEvenErrorExist);
 
 	/**
 	 * 获取字段field的值。
@@ -114,6 +110,8 @@ public interface Form {
 
 	public void clearErrors();
 
+	public void clearErrors(Function<String, Boolean> test);
+
 	/**
 	 * 将指定字段的状态改为禁用。
 	 * 
@@ -161,8 +159,7 @@ public interface Form {
 
 	public String mapStatus(String vf, String vfError, String error);
 
-	public String mapStatus(String vf, String vfError, String error,
-			String passed);
+	public String mapStatus(String vf, String vfError, String error, String passed);
 
 	public Form noError(Process process) throws Exception;
 }
