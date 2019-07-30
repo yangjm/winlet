@@ -58,10 +58,8 @@ public class FormImpl implements Form, ReqConst {
 			fields.add(ri.getValidateFieldName());
 			disabledFields = new HashSet<String>();
 		} else {
-			toCollection(fields,
-					ri.getRequest().getParameterValues(PARAM_WIN_FORM_FIELDS));
-			disabledFields = toSet(ri.getRequest().getParameterValues(
-					PARAM_WIN_FORM_DISABLED_FIELD));
+			toCollection(fields, ri.getRequest().getParameterValues(PARAM_WIN_FORM_FIELDS));
+			disabledFields = toSet(ri.getRequest().getParameterValues(PARAM_WIN_FORM_DISABLED_FIELD));
 		}
 
 		for (String field : fields) {
@@ -89,8 +87,7 @@ public class FormImpl implements Form, ReqConst {
 
 	public boolean isValidateForm() {
 		String val = ri.getParameter(PARAM_WIN_FORM_VALIDATE, "no");
-		return "yes".equalsIgnoreCase(val) || "form".equals(val)
-				|| "field".equals(val);
+		return "yes".equalsIgnoreCase(val) || "form".equals(val) || "field".equals(val);
 	}
 
 	public boolean validate(String field) {
@@ -106,8 +103,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	public void removeChange(Change change) {
-		vecChanges
-				.removeAll(Change.find(vecChanges, change.type, change.input));
+		vecChanges.removeAll(Change.find(vecChanges, change.type, change.input));
 	}
 
 	private static HashSet<String> toSet(String[] vals) {
@@ -234,8 +230,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public void setSelectOptions(String field,
-			Collection<? extends SelectOption> list) {
+	public void setSelectOptions(String field, Collection<? extends SelectOption> list) {
 		processBinders();
 
 		recordChange(new ChangeUpdateList(field, list));
@@ -322,6 +317,20 @@ public class FormImpl implements Form, ReqConst {
 		removeChange(new ChangeUpdateValidateResult(field, ""));
 	}
 
+	public void clearErrors(Function<String, Boolean> test) {
+		processBinders();
+
+		HashSet<String> remove = new HashSet<>();
+		fieldErrors.keySet().forEach(field -> {
+			if (test.apply(field))
+				remove.add(field);
+		});
+		remove.forEach(field -> {
+			fieldErrors.remove(field);
+			removeChange(new ChangeUpdateValidateResult(field, ""));
+		});
+	}
+
 	@Override
 	public void setDisabled(String field) {
 		processBinders();
@@ -381,9 +390,8 @@ public class FormImpl implements Form, ReqConst {
 						vs.add(vl);
 
 				for (Validate vl : vs)
-					validators.add(new FormValidator(controller, vl.name(), vl
-							.pattern(), vl.id(), vl.method(), vl.passskip()
-							.name(), vl.failskip().name(), vl.error(),
+					validators.add(new FormValidator(controller, vl.name(), vl.pattern(), vl.id(), vl.method(),
+							vl.passskip().name(), vl.failskip().name(), vl.error(),
 							new Vector<String>(Arrays.asList(vl.args()))));
 			}
 		}
@@ -401,15 +409,13 @@ public class FormImpl implements Form, ReqConst {
 				continue;
 
 			String[] values = this.getValues(field);
-			String value = values == null || values.length < 1 ? null
-					: values[0];
+			String value = values == null || values.length < 1 ? null : values[0];
 
 			for (Iterator<FormValidator> itv = vs.iterator(); itv.hasNext();) {
 				FormValidator dv = itv.next();
 
 				if (dv.matches(field)) {
-					ValidateResult vr = dv.validate(ri.getRequest(), this,
-							value);
+					ValidateResult vr = dv.validate(ri.getRequest(), this, value);
 					switch (vr.getType()) {
 					case PASS_CONTINUE:
 						continue;
@@ -432,15 +438,13 @@ public class FormImpl implements Form, ReqConst {
 		}
 	}
 
-	public String getJsonChanges() throws JsonGenerationException,
-			JsonMappingException, IOException {
+	public String getJsonChanges() throws JsonGenerationException, JsonMappingException, IOException {
 		processBinders();
 
 		if (vecChanges == null)
 			return "{}";
 
-		return new ObjectMapper().writeValueAsString(vecChanges
-				.toArray(new Change[vecChanges.size()]));
+		return new ObjectMapper().writeValueAsString(vecChanges.toArray(new Change[vecChanges.size()]));
 	}
 
 	/**
@@ -453,14 +457,12 @@ public class FormImpl implements Form, ReqConst {
 		binders.add(binder);
 	}
 
-	protected void mergeBindingResult(String field,
-			Collection<BindingResult> values) {
+	protected void mergeBindingResult(String field, Collection<BindingResult> values) {
 		if (disabledFields.contains(field))
 			return;
 
 		HttpServletRequest request = ContextUtils.getRequest();
-		WebApplicationContext context = RequestContextUtils
-				.findWebApplicationContext(request);
+		WebApplicationContext context = RequestContextUtils.findWebApplicationContext(request);
 		Locale locale = RequestContextUtils.getLocale(request);
 
 		for (BindingResult val : values) {
@@ -469,8 +471,7 @@ public class FormImpl implements Form, ReqConst {
 
 			BeanPropertyBindingResult br = (BeanPropertyBindingResult) val;
 
-			if (br.getTarget() != null && br.getFieldType(field) != null
-					|| br.getObjectName().equals(field)) {
+			if (br.getTarget() != null && br.getFieldType(field) != null || br.getObjectName().equals(field)) {
 				// merge Spring conversion & validation errors
 				List<FieldError> errors = br.getFieldErrors(field);
 				if (errors != null && errors.size() > 0) {
@@ -479,9 +480,8 @@ public class FormImpl implements Form, ReqConst {
 					});
 				} else if (getErrors(field) == null && br.getTarget() != null) {
 					// no error, apply Spring formatter
-					String value = WinletDefaultFormattingConversionService
-							.format(br.getPropertyAccessor(), br.getTarget(),
-									field);
+					String value = WinletDefaultFormattingConversionService.format(br.getPropertyAccessor(),
+							br.getTarget(), field);
 					if (value != null)
 						setValue(field, value.toString());
 				}
@@ -507,8 +507,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	protected void processBinders() {
-		Collection<BindingResult> col = binders.stream()
-				.map(p -> p.getBindingResult()).collect(Collectors.toList());
+		Collection<BindingResult> col = binders.stream().map(p -> p.getBindingResult()).collect(Collectors.toList());
 		binders.clear();
 		mergeBindingResult(col);
 	}
@@ -519,8 +518,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public Form addError(String field, Function<String, Boolean> when,
-			String error, boolean validateEvenErrorExist) {
+	public Form addError(String field, Function<String, Boolean> when, String error, boolean validateEvenErrorExist) {
 		if (!validate(field))
 			return this;
 		if (hasError(field) && !validateEvenErrorExist)
@@ -533,8 +531,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public Form addError(String field, boolean when, String error,
-			boolean validateEvenErrorExist) {
+	public Form addError(String field, boolean when, String error, boolean validateEvenErrorExist) {
 		if (!validate(field))
 			return this;
 		if (hasError(field) && !validateEvenErrorExist)
@@ -547,8 +544,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public Form addError(String field, Function<String, Boolean> when,
-			String error) {
+	public Form addError(String field, Function<String, Boolean> when, String error) {
 		return addError(field, when, error, false);
 	}
 
@@ -558,8 +554,7 @@ public class FormImpl implements Form, ReqConst {
 	}
 
 	@Override
-	public String mapStatus(String vf, String vfError, String error,
-			String passed) {
+	public String mapStatus(String vf, String vfError, String error, String passed) {
 		if (isValidateField())
 			if (hasError())
 				return vfError;
