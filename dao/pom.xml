@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.aggrepoint.framework</groupId>
 		<artifactId>pom-parent</artifactId>
-		<version>1.0.4</version>
+		<version>1.0.5-SNAPSHOT</version>
 		<relativePath>../pom_parent.xml</relativePath>
 	</parent>
 
@@ -19,7 +19,7 @@
 		<commons-beanutils-version>1.9.3</commons-beanutils-version>
 		<validation-api-version>2.0.1.Final</validation-api-version>
 
-		<utils-version>1.0.4</utils-version>
+		<utils-version>1.0.5-SNAPSHOT</utils-version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
