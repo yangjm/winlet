@@ -3,6 +3,7 @@ package com.aggrepoint.winlet.site;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -99,12 +100,15 @@ public class SiteController implements ApplicationContextAware {
 					} else {
 						logger.error("Unable to locate /branch/ directory: " + rootDir);
 					}
+				} catch (FileNotFoundException e) {
+					// 允许不使用
 				} catch (Exception e) {
 					logger.error("Error", e);
 				}
 			}
 
-		branches = loader.load(branches, contextRoot);
+		if (loader != null)
+			branches = loader.load(branches, contextRoot);
 	}
 
 	private String contextRoot = null;
@@ -117,6 +121,9 @@ public class SiteController implements ApplicationContextAware {
 
 	public HashSet<String> getBranchFirstLevelDirs(HttpServletRequest req) {
 		HashSet<String> list = new HashSet<>();
+		if (branches == null)
+			return list;
+
 		updateBranches(getContextRoot(req));
 		for (Branch b : branches) {
 			for (Page page : b.getRootPage().getPages()) {

@@ -4,7 +4,7 @@
 
 	<groupId>com.aggrepoint.framework</groupId>
 	<artifactId>pom-parent</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>pom</packaging>
 
 	<name>AggrePoint Framework Parent</name>
@@ -113,6 +113,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<configuration>
+							<doclint>none</doclint>
 							<additionalparam>-Xdoclint:none</additionalparam>
 							<finalName>${project.artifactId}-${project.version}</finalName>
 						</configuration>
