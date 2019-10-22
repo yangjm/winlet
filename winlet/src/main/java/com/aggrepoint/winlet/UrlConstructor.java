@@ -6,11 +6,13 @@ public class UrlConstructor {
 	private String pageRoot;
 	private String resRoot;
 	private String urlPrefix;
+	private String urlPrepend;
 
-	public UrlConstructor(HttpServletRequest req, String urlPrefix) {
+	public UrlConstructor(HttpServletRequest req, String urlPrefix, String urlPrepend) {
 		pageRoot = req.getContextPath() + "/site";
 		resRoot = req.getContextPath();
 		this.urlPrefix = urlPrefix;
+		this.urlPrepend = urlPrepend;
 	}
 
 	public String getPageUrl(String path) {
@@ -21,7 +23,13 @@ public class UrlConstructor {
 			url = pageRoot + "/" + path;
 
 		if (urlPrefix != null && url.startsWith(urlPrefix))
-			return url.substring(urlPrefix.length());
+			url = url.substring(urlPrefix.length());
+
+		if (urlPrepend != null)
+			if (url.startsWith("/"))
+				url = urlPrepend + url;
+			else
+				url = urlPrepend + "/" + url;
 
 		return url;
 	}

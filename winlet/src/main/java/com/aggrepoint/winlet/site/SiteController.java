@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.ConfigurableMimeFileTypeMap;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -203,11 +204,20 @@ public class SiteController implements ApplicationContextAware {
 	}
 
 	/**
+	 * <pre>
 	 * urlPrefix - 前段HTTP服务器或者反向代理添加的URL前段，例如/portal/site/home
+	 * urlPrepend - 在每个生成的URL前面加上
+	 * </pre>
 	 */
 	@RequestMapping(value = "/site/**")
 	public Object site(HttpServletRequest req, HttpServletResponse resp, AuthorizationEngine ap,
-			PsnRuleEngine psnEngine, @RequestHeader(value = "X-Url-Prefix", required = false) String urlPrefix) {
+			PsnRuleEngine psnEngine, @RequestHeader(value = "X-Url-Prefix", required = false) String urlPrefix,
+			@RequestHeader(value = "X-Url-Prepend", required = false) String urlPrepend) {
+		if (StringUtils.isEmpty(urlPrefix))
+			urlPrefix = null;
+		if (StringUtils.isEmpty(urlPrepend))
+			urlPrepend = null;
+
 		String path = req.getServletPath().substring(5);
 
 		try {
@@ -235,7 +245,7 @@ public class SiteController implements ApplicationContextAware {
 
 					return returnFile(branch, path.replace(page.getFullPath(), page.getFullDir()));
 				} else {
-					SiteContext sc = new SiteContext(req, page, urlPrefix);
+					SiteContext sc = new SiteContext(req, page, urlPrefix, urlPrepend);
 					req.setAttribute(SiteContext.SITE_CONTEXT_KEY, sc);
 					req.setAttribute(PAGE_PATH, sc.getPageUrl(page.getFullPath()));
 					req.setAttribute(PAGE_DATA, page.getDataMap());
