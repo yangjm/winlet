@@ -12,7 +12,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.aggrepoint.winlet.spring.WinletDispatcherServlet;
-import com.aggrepoint.winlet.spring.WinletFormattingConversionServiceFactoryBean;
 import com.aggrepoint.winlet.spring.WinletHandlerMethodArgumentResolver;
 import com.aggrepoint.winlet.spring.WinletRequestMappingHandlerMapping;
 
@@ -55,10 +54,5 @@ public class WinletAutoConfiguration implements WebMvcConfigurer {
 	@Bean
 	public DispatcherServlet dispatcherServlet() {
 		return new WinletDispatcherServlet();
-	}
-
-	@Bean
-	public WinletFormattingConversionServiceFactoryBean formattingConversionService() {
-		return new WinletFormattingConversionServiceFactoryBean();
 	}
 }
