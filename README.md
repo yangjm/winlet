@@ -11,7 +11,7 @@ Latest Winlet java library has been published to Maven central repository. Add b
 <dependency>
   <groupId>com.aggrepoint.framework</groupId>
   <artifactId>winlet</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
 </dependency>
 ```
 
