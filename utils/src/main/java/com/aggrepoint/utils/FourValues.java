@@ -1,6 +1,8 @@
 package com.aggrepoint.utils;
 
 public class FourValues<U, V, K, M> extends ThreeValues<U, V, K> {
+	private static final long serialVersionUID = 1L;
+
 	private M four;
 
 	public FourValues(U u, V v, K k, M m) {

@@ -1,6 +1,10 @@
 package com.aggrepoint.utils;
 
-public class TwoValues<U, V> {
+import java.io.Serializable;
+
+public class TwoValues<U, V> implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private U one;
 	private V two;
 
