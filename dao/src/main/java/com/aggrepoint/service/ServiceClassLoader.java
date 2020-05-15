@@ -3,11 +3,19 @@ package com.aggrepoint.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.aggrepoint.dao.DaoService;
+import com.aggrepoint.dao.annotation.DefaultDao;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -21,12 +29,6 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.aggrepoint.dao.DaoService;
-import com.aggrepoint.dao.annotation.DefaultDao;
-
 /**
  * Add implementation for methods declared in DaoService interface but not in
  * service implementation class<br>
@@ -37,14 +39,12 @@ import com.aggrepoint.dao.annotation.DefaultDao;
  * @author Jiangming Yang (yangjm@gmail.com)
  */
 public class ServiceClassLoader extends ClassLoader {
-	private static final Log logger = LogFactory
-			.getLog(ServiceClassLoader.class);
+	private static final Log logger = LogFactory.getLog(ServiceClassLoader.class);
 
 	private ClassLoader innerLoader;
 	private HashMap<String, String> tmMap = new HashMap<String, String>();
 
-	Map<Class<?>, Class<?>> classMap = Collections
-			.synchronizedMap(new HashMap<Class<?>, Class<?>>());
+	Map<Class<?>, Class<?>> classMap = Collections.synchronizedMap(new HashMap<Class<?>, Class<?>>());
 	/** Dao fields of service class */
 	static HashMap<Class<?>, Field> daoFields = new HashMap<Class<?>, Field>();
 
@@ -53,16 +53,13 @@ public class ServiceClassLoader extends ClassLoader {
 		innerLoader = inner;
 	}
 
-	public ServiceClassLoader(ClassLoader inner,
-			TransactionManagerConfig... tmcfgs) {
+	public ServiceClassLoader(ClassLoader inner, TransactionManagerConfig... tmcfgs) {
 		super(inner);
 		innerLoader = inner;
 
 		if (tmcfgs != null && tmcfgs.length > 0) {
 			for (TransactionManagerConfig tmc : tmcfgs) {
-				if (tmc != null && tmc.getName() != null
-						&& tmc.getClasses() != null
-						&& tmc.getClasses().length > 0) {
+				if (tmc != null && tmc.getName() != null && tmc.getClasses() != null && tmc.getClasses().length > 0) {
 					for (Class<?> c : tmc.getClasses()) {
 						if (c != null)
 							tmMap.put(c.getName(), tmc.getName());
@@ -78,13 +75,11 @@ public class ServiceClassLoader extends ClassLoader {
 
 			Field daoField = null;
 			for (Field field : clz.getDeclaredFields()) {
-				DefaultDao[] anns = field
-						.getAnnotationsByType(DefaultDao.class);
+				DefaultDao[] anns = field.getAnnotationsByType(DefaultDao.class);
 				if (anns != null && anns.length > 0) {
 					if (daoField != null)
 						throw new IllegalArgumentException(
-								"Mutiple @DefaultDao fields found in service class: "
-										+ clz.getName());
+								"Mutiple @DefaultDao fields found in service class: " + clz.getName());
 
 					daoField = field;
 				}
@@ -141,8 +136,7 @@ public class ServiceClassLoader extends ClassLoader {
 			return false;
 
 		for (int i = a.getParameterCount() - 1; i >= 0; i--)
-			if (!a.getParameters()[i].getType().equals(
-					b.getParameters()[i].getType()))
+			if (!a.getParameters()[i].getType().equals(b.getParameters()[i].getType()))
 				return false;
 
 		return true;
@@ -158,8 +152,7 @@ public class ServiceClassLoader extends ClassLoader {
 		return a.getName().equals(b.getName());
 	}
 
-	public static boolean sameSignature(CtMethod a, Method b)
-			throws NotFoundException {
+	public static boolean sameSignature(CtMethod a, Method b) throws NotFoundException {
 		if (!a.getName().equals(b.getName()))
 			return false;
 
@@ -196,15 +189,27 @@ public class ServiceClassLoader extends ClassLoader {
 		if (implementsInterface(clz, DaoService.class)) {
 			Field daoField = findDaoField(clz);
 			if (daoField != null) {
+				// { find the domain class name
+				String domainTypeName = null;
+
+				for (Type genericInterface : daoField.getType().getGenericInterfaces()) {
+					if (genericInterface instanceof ParameterizedType
+							&& genericInterface.getTypeName().startsWith("com.aggrepoint.dao.DaoService")) {
+						domainTypeName = (((ParameterizedType) genericInterface).getActualTypeArguments()[0])
+								.getTypeName();
+					}
+				}
+
+				if (domainTypeName != null)
+					domainTypeName = domainTypeName.replaceAll("\\.", "/");
+				// }
+
 				// Modify DaoService implementation
 				HashSet<Method> methods = findMethods(clz, DaoService.class);
-				HashSet<Method> find = findMethods(daoField.getType(),
-						DaoService.class);
+				HashSet<Method> find = findMethods(daoField.getType(), DaoService.class);
 				methods.retainAll(find);
-				Method[] toadd = (Method[]) methods.stream()
-						.filter(p -> !declares(clz, p))
-						.filter(p -> !Modifier.isStatic(p.getModifiers()))
-						.toArray(size -> new Method[size]);
+				Method[] toadd = (Method[]) methods.stream().filter(p -> !declares(clz, p))
+						.filter(p -> !Modifier.isStatic(p.getModifiers())).toArray(size -> new Method[size]);
 
 				if (toadd != null && toadd.length > 0) {
 					try {
@@ -219,43 +224,57 @@ public class ServiceClassLoader extends ClassLoader {
 						classPool.appendClassPath(new LoaderClassPath(this));
 
 						CtClass ctclass = classPool.get(clz.getName());
+						ConstPool cp = ctclass.getClassFile().getConstPool();
 
 						String tm = tmMap.get(daoField.getType().getName());
 						if (tm != null) {
 							// Change @Transactional annotation to use specified
 							// transaction manager
-							ConstPool cp = ctclass.getClassFile()
-									.getConstPool();
-							Iterator<?> it = ctclass.getClassFile()
-									.getAttributes().iterator();
+							Iterator<?> it = ctclass.getClassFile().getAttributes().iterator();
 							while (it.hasNext()) {
 								AttributeInfo ai = (AttributeInfo) it.next();
 								if (ai instanceof AnnotationsAttribute) {
 									AnnotationsAttribute aa = (AnnotationsAttribute) ai;
-									if (aa.removeAnnotation("org.springframework.transaction.annotation.Transactional")) {
+									if (aa.removeAnnotation(
+											"org.springframework.transaction.annotation.Transactional")) {
 										Annotation anno = new Annotation(
-												"org.springframework.transaction.annotation.Transactional",
-												cp);
-										anno.addMemberValue("value",
-												new StringMemberValue(tm, cp));
+												"org.springframework.transaction.annotation.Transactional", cp);
+										anno.addMemberValue("value", new StringMemberValue(tm, cp));
 										aa.addAnnotation(anno);
 									}
 								}
 							}
 						}
 
+						// { is the service class a RestController?
+						boolean isRestController = false;
+						boolean enableDaoRest = false;
+						Iterator<?> it = ctclass.getClassFile().getAttributes().iterator();
+						while (it.hasNext()) {
+							AttributeInfo ai = (AttributeInfo) it.next();
+							if (ai instanceof AnnotationsAttribute) {
+								if (((AnnotationsAttribute) ai).getAnnotation(
+										"org.springframework.web.bind.annotation.RestController") != null) {
+									isRestController = true;
+								}
+								if (((AnnotationsAttribute) ai)
+										.getAnnotation("com.aggrepoint.dao.annotation.EnableDaoRest") != null) {
+									enableDaoRest = true;
+								}
+							}
+						}
+						// }
+
 						// add interface method implementation
 						for (Method method : toadd) {
-							CtClass ds = classPool.get(method
-									.getDeclaringClass().getName());
+							CtClass ds = classPool.get(method.getDeclaringClass().getName());
 
 							boolean found = false;
-							for (CtMethod m : ds.getDeclaredMethods())
-								if (sameSignature(m, method)) {
-									CtMethod newmethod = null;
+							for (CtMethod daoMethod : ds.getDeclaredMethods()) {
+								if (sameSignature(daoMethod, method)) {
+									CtMethod newMethod = null;
 									try {
-										newmethod = CtNewMethod.copy(m,
-												ctclass, null);
+										newMethod = CtNewMethod.copy(daoMethod, ctclass, null);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
@@ -263,23 +282,30 @@ public class ServiceClassLoader extends ClassLoader {
 									// { Change method implementation to call
 									// dao method
 									StringBuffer code = new StringBuffer();
-									if (!newmethod.getReturnType().getName()
-											.equals("void"))
+									if (!newMethod.getReturnType().getName().equals("void"))
 										code.append("return ");
-									code.append(daoField.getName() + "."
-											+ method.getName() + "($$);");
+									code.append(daoField.getName() + "." + method.getName() + "($$);");
 
-									newmethod.setBody(code.toString());
+									newMethod.setBody(code.toString());
 									// }
 
-									ctclass.addMethod(newmethod);
+									if (isRestController) {
+										RestHelper.copyRestAnnotations(daoMethod, newMethod);
+
+										if (enableDaoRest)
+											RestHelper.enableRest(newMethod, domainTypeName);
+
+										RestHelper.copyParamAttrs(daoMethod, newMethod);
+									}
+
+									ctclass.addMethod(newMethod);
 									found = true;
 									break;
 								}
+							}
 
 							if (!found) {
-								logger.error("Unable to find CtMethod for method "
-										+ method
+								logger.error("Unable to find CtMethod for method " + method
 										+ ", this DaoService can't be implemented automatically on class "
 										+ clz.getName());
 							}

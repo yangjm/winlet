@@ -260,16 +260,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 		pans = method.getParameterAnnotations();
 		for (int i = 0; i < pans.length; i++) {
-			if (pans[i].length == 0) {
-				String name = "p_" + Integer.toString(i + 1);
-
-				if (positions.containsKey(name))
-					throw new IllegalArgumentException("Duplicated param/like/replace name: '" + name + "' on "
-							+ method.getDeclaringClass().getName() + "." + method.getName());
-
-				params.add(name);
-				positions.put(name, i);
-			} else {
+			boolean processed = false;
+			if (pans[i].length > 0) {
 				for (int j = 0; j < pans[i].length; j++)
 					if (pans[i][j].annotationType() == Param.class) {
 						Param p = (Param) pans[i][j];
@@ -284,6 +276,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 						params.add(name);
 						positions.put(name, i);
+						processed = true;
 						break;
 					} else if (pans[i][j].annotationType() == Like.class) {
 						Like p = (Like) pans[i][j];
@@ -298,6 +291,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 						likes.put(name, p);
 						positions.put(name, i);
+						processed = true;
 						break;
 					} else if (pans[i][j].annotationType() == Replace.class) {
 						Replace r = (Replace) pans[i][j];
@@ -312,20 +306,34 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 
 						replaces.put(name, r);
 						positions.put(name, i);
+						processed = true;
 						break;
 					} else if (pans[i][j].annotationType() == PageNum.class) {
 						if (type != TYPE_FIND && type != TYPE_CACHE && type != TYPE_FIND_SQL)
 							throw new IllegalArgumentException("@PageNum shouldn't be used on "
 									+ method.getDeclaringClass().getName() + "." + method.getName());
 						pageNumIdx = i;
+						processed = true;
 						break;
 					} else if (pans[i][j].annotationType() == PageSize.class) {
 						if (type != TYPE_FIND && type != TYPE_CACHE && type != TYPE_FIND_SQL)
 							throw new IllegalArgumentException("@PageSize shouldn't be used on "
 									+ method.getDeclaringClass().getName() + "." + method.getName());
 						pageSizeIdx = i;
+						processed = true;
 						break;
 					}
+			}
+
+			if (!processed) {
+				String name = "p_" + Integer.toString(i + 1);
+
+				if (positions.containsKey(name))
+					throw new IllegalArgumentException("Duplicated param/like/replace name: '" + name + "' on "
+							+ method.getDeclaringClass().getName() + "." + method.getName());
+
+				params.add(name);
+				positions.put(name, i);
 			}
 		}
 
