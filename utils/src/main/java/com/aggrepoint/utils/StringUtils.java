@@ -544,7 +544,7 @@ public class StringUtils {
 	}
 
 	/**
-	 * Jackson生成的JSON字符串中，如果值里面有<>，直接将JSON写入页面中会造成错误，需要进行转码
+	 * Jackson生成的JSON字符串中，如果值里面有&lt;&gt;，直接将JSON写入页面中会造成错误，需要进行转码
 	 * 应该用于所有会被直接写入页面中供页面里JS代码使用的JSON字符串
 	 * 
 	 * @return
