@@ -392,7 +392,7 @@ public class FileUtils {
 	/**
 	 * 解压Zip文件
 	 * 
-	 * @param rootPath
+	 * @param vecDirs
 	 *            String 要存放解出文件的目录
 	 * @param fis
 	 *            InputStream Zip文件输入流

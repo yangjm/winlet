@@ -134,11 +134,6 @@ public class ImageUtils {
 
 	/**
 	 * 将源图片缩放为指定的尺寸大小
-	 * 
-	 * @param src
-	 * @param dest
-	 * @param width
-	 * @param height
 	 * @throws IOException
 	 */
 	public static int resizeImage(BufferedImage inputImage, String dest, int width, int height, float quality)
