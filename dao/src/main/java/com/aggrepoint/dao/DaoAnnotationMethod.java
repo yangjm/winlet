@@ -22,15 +22,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.Column;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.springframework.cache.Cache.ValueWrapper;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
@@ -38,7 +34,6 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 import com.aggrepoint.dao.annotation.Cache;
 import com.aggrepoint.dao.annotation.Delete;
@@ -80,9 +75,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	static private KeyGenerator keyGenerator = new DaoCacheKeyGenerator();
 
 	Class<T> clz;
-	EntityManagerFactory entityManagerFactory;
-	SessionFactory sessionFactory;
-	CacheManager cacheManager;
+	DaoResourceProvider resProvider;
 	ConversionService cs;
 	Method method;
 	Annotation[][] pans;
@@ -112,12 +105,9 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	};
 
 	public DaoAnnotationMethod(Class<T> clz, Method method, Annotation ann, List<IFunc> funcs,
-			EntityManagerFactory managerFactory, SessionFactory factory, CacheManager cacheManager,
-			ConversionService cs) {
+			DaoResourceProvider resProvider, ConversionService cs) {
 		this.clz = clz;
-		this.entityManagerFactory = managerFactory;
-		this.sessionFactory = factory;
-		this.cacheManager = cacheManager;
+		this.resProvider = resProvider;
 		this.cs = cs;
 		this.method = method;
 
@@ -147,7 +137,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 				hql = ((Load) ann).value();
 			}
 		} else if (ann.annotationType() == Cache.class) {
-			if (cacheManager == null)
+			if (resProvider.getCacheManager() == null)
 				throw new IllegalArgumentException("CacheManager must be configured for using Cache on "
 						+ method.getDeclaringClass().getName() + "." + method.getName());
 
@@ -502,14 +492,7 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	Object invokeImpl(Object proxy, Method method, Object[] args)
 			throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		Session session = null;
-		EntityManager em = null;
-
-		if (entityManagerFactory != null) {
-			em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
-			session = em.unwrap(Session.class);
-		} else if (sessionFactory != null)
-			session = sessionFactory.getCurrentSession();
+		Session session = resProvider.getSession();
 
 		Object fromCache = null;
 		CacheMetaData<T> cacheMetaData = null;
@@ -522,8 +505,8 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 			else
 				key = keyGenerator.generate(clz, method, args);
 
-			if (cacheManager != null) {
-				theCache = cacheManager.getCache(cache.name());
+			if (resProvider.getCacheManager() != null) {
+				theCache = resProvider.getCacheManager().getCache(cache.name());
 				fromCache = theCache.get(key);
 			}
 

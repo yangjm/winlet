@@ -6,27 +6,17 @@ import static org.springframework.util.Assert.notNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.Metamodel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.support.DaoSupport;
-import org.springframework.util.StringUtils;
 
 /**
  * 不能注入SessionFactory，不能在checkDaoConfig时获取SessionFactory，
@@ -42,9 +32,7 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, 
 	private static ConversionService conversionService;
 	private ApplicationContext ctx;
 	private String entityManagerFactoryName;
-	private EntityManagerFactory entityManagerFactory;
 	private String sessionFactoryName;
-	private SessionFactory sessionFactory;
 	private Class<T> daoInterface;
 	private T proxy;
 	private Class<K> domainClz;
@@ -124,44 +112,6 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, 
 		return conversionService;
 	}
 
-	private static Map<Class<?>, EntityManagerFactory> factoryMap = null;
-
-	private EntityManagerFactory getEntityManagerFactory() {
-		if (entityManagerFactory == null)
-			try {
-				if (StringUtils.isEmpty(entityManagerFactoryName)) {
-					if (factoryMap == null) {
-						Map<Class<?>, EntityManagerFactory> map = new HashMap<>();
-						for (EntityManagerFactory f : ctx.getBeansOfType(EntityManagerFactory.class).values()) {
-							final Metamodel mm = f.getMetamodel();
-
-							for (final ManagedType<?> managedType : mm.getManagedTypes()) {
-								map.put(managedType.getJavaType(), f);
-							}
-						}
-						factoryMap = map;
-					}
-					entityManagerFactory = factoryMap.get(domainClz);
-				} else
-					entityManagerFactory = ctx.getBean(entityManagerFactoryName, EntityManagerFactory.class);
-			} catch (NoSuchBeanDefinitionException e) {
-			}
-
-		return entityManagerFactory;
-	}
-
-	private SessionFactory getSessionFactory() {
-		if (sessionFactory == null)
-			try {
-				if (StringUtils.isEmpty(sessionFactoryName))
-					sessionFactory = ctx.getBean(SessionFactory.class);
-				else
-					sessionFactory = ctx.getBean(sessionFactoryName, SessionFactory.class);
-			} catch (NoSuchBeanDefinitionException e) {
-			}
-		return sessionFactory;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -169,20 +119,9 @@ public class DaoFactoryBean<T, K> extends DaoSupport implements FactoryBean<T>, 
 	public T getObject() throws Exception {
 		if (proxy == null) {
 			try {
-				CacheManager cm = null;
-				try {
-					cm = ctx.getBean("daoCache", CacheManager.class);
-				} catch (Exception e) {
-				}
-				if (cm == null) {
-					try {
-						cm = ctx.getBean(CacheManager.class);
-					} catch (Exception e) {
-					}
-				}
-
 				proxy = (T) Proxy.newProxyInstance(daoInterface.getClassLoader(), new Class[] { daoInterface },
-						new DaoInvocationHandler<K>(getEntityManagerFactory(), getSessionFactory(), cm,
+						new DaoInvocationHandler<K>(
+								new DaoResourceProvider(ctx, entityManagerFactoryName, sessionFactoryName, domainClz),
 								getConversionService(), daoInterface, domainClz, funcs));
 			} catch (Throwable t) {
 				logger.error("Error while creating proxy for dao interface '" + this.daoInterface + "'.", t);

@@ -6,19 +6,15 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.query.Query;
 import org.springframework.dao.DataAccessException;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 /**
  * 
@@ -62,14 +58,12 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 			{ 20, "refresh", new Class[] { Object.class }, HibernateDao.class },
 			{ 21, "replicate", new Class[] { Object.class, ReplicationMode.class }, HibernateDao.class } };
 
-	EntityManagerFactory entityManagerFactory;
-	SessionFactory sessionFactory;
+	DaoResourceProvider resProvider;
 	int methodId;
 
-	public DaoBaseMethod(Class<T> clz, Method method, EntityManagerFactory managerFactory, SessionFactory factory) {
+	public DaoBaseMethod(Class<T> clz, Method method, DaoResourceProvider resProvider) {
 		this.clz = clz;
-		this.entityManagerFactory = managerFactory;
-		this.sessionFactory = factory;
+		this.resProvider = resProvider;
 
 		for (Object[] m : methods) {
 			if (!method.getName().equals(m[1]))
@@ -177,14 +171,7 @@ public class DaoBaseMethod<T> implements DaoMethod<T> {
 
 	@SuppressWarnings("unchecked")
 	public Object invoke(Object proxy, Method method, Object[] args) {
-		Session session = null;
-		EntityManager em = null;
-
-		if (entityManagerFactory != null) {
-			em = EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory);
-			session = em.unwrap(Session.class);
-		} else if (sessionFactory != null)
-			session = sessionFactory.getCurrentSession();
+		Session session = resProvider.getSession();
 
 		switch (methodId) {
 		case 101:
