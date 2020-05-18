@@ -264,6 +264,12 @@ public class ServiceClassLoader extends ClassLoader {
 							}
 						}
 						// }
+						
+						for (CtMethod method : ctclass.getDeclaredMethods()) {
+							if (method.getName().equals("findTest") || method.getName().equals("findTest1")) {
+								System.out.println();
+							}
+						}
 
 						// add interface method implementation
 						for (Method method : toadd) {
@@ -279,16 +285,6 @@ public class ServiceClassLoader extends ClassLoader {
 										e.printStackTrace();
 									}
 
-									// { Change method implementation to call
-									// dao method
-									StringBuffer code = new StringBuffer();
-									if (!newMethod.getReturnType().getName().equals("void"))
-										code.append("return ");
-									code.append(daoField.getName() + "." + method.getName() + "($$);");
-
-									newMethod.setBody(code.toString());
-									// }
-
 									if (isRestController) {
 										RestHelper.copyRestAnnotations(daoMethod, newMethod);
 
@@ -297,6 +293,16 @@ public class ServiceClassLoader extends ClassLoader {
 
 										RestHelper.copyParamAttrs(daoMethod, newMethod);
 									}
+
+									// { Change method implementation to call
+									// dao method
+									StringBuffer code = new StringBuffer();
+									if (!newMethod.getReturnType().getName().equals("void"))
+										code.append("return ($r)");
+									code.append(daoField.getName() + "." + method.getName() + "($$);");
+
+									newMethod.setBody(code.toString());
+									// }
 
 									ctclass.addMethod(newMethod);
 									found = true;

@@ -74,6 +74,8 @@ public class RestHelper {
 		String url = null;
 		boolean requestBody = false;
 		boolean pathVar = false;
+		boolean replaceObject = false;
+		boolean replaceSerializable = false;
 		String param = null;
 
 		switch (method.getName() + mi.getDescriptor()) {
@@ -82,18 +84,22 @@ public class RestHelper {
 			url = "create";
 			requestBody = true;
 			param = "entity";
+			replaceObject = true;
 			break;
 		case "createOrUpdate(Ljava/lang/Object;)V":
 			restMethod = "org.springframework.web.bind.annotation.PostMapping";
 			url = "createOrUpdate";
 			param = "entity";
 			requestBody = true;
+			replaceObject = true;
 			break;
 		case "find(Ljava/io/Serializable;)Ljava/lang/Object;":
 			restMethod = "org.springframework.web.bind.annotation.GetMapping";
 			url = "find/{id}";
 			param = "id";
 			pathVar = true;
+			replaceObject = true;
+			replaceSerializable = true;
 			break;
 		case "find()Ljava/util/List;":
 			restMethod = "org.springframework.web.bind.annotation.GetMapping";
@@ -104,21 +110,25 @@ public class RestHelper {
 			url = "update";
 			param = "entity";
 			requestBody = true;
+			replaceObject = true;
 			break;
 		case "delete(Ljava/lang/Object;)V":
 			restMethod = "org.springframework.web.bind.annotation.PostMapping";
 			url = "delete";
 			param = "entity";
 			requestBody = true;
+			replaceObject = true;
 			break;
 		}
 
 		if (restMethod == null)
 			return false;
 
-		mi.setDescriptor(mi.getDescriptor().replace("java/lang/Object", domainTypeName));
+		if (replaceObject)
+			mi.setDescriptor(mi.getDescriptor().replace("java/lang/Object", domainTypeName));
 		// 暂时只支持Long
-		mi.setDescriptor(mi.getDescriptor().replace("java/io/Serializable", "java/lang/Long"));
+		if (replaceSerializable)
+			mi.setDescriptor(mi.getDescriptor().replace("java/io/Serializable", "java/lang/Long"));
 		ConstPool cp = mi.getConstPool();
 
 		AnnotationsAttribute ar = new AnnotationsAttribute(cp, AnnotationsAttribute.visibleTag);
