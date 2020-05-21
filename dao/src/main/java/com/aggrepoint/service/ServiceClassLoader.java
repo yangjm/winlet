@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.aggrepoint.dao.DaoService;
+import com.aggrepoint.dao.annotation.DaoRestMethod;
 import com.aggrepoint.dao.annotation.DefaultDao;
 
 import javassist.ClassPool;
@@ -27,6 +28,8 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 /**
@@ -248,7 +251,7 @@ public class ServiceClassLoader extends ClassLoader {
 
 						// { is the service class a RestController?
 						boolean isRestController = false;
-						boolean enableDaoRest = false;
+						HashSet<DaoRestMethod> daoRestMethods = null;
 						Iterator<?> it = ctclass.getClassFile().getAttributes().iterator();
 						while (it.hasNext()) {
 							AttributeInfo ai = (AttributeInfo) it.next();
@@ -257,19 +260,30 @@ public class ServiceClassLoader extends ClassLoader {
 										"org.springframework.web.bind.annotation.RestController") != null) {
 									isRestController = true;
 								}
-								if (((AnnotationsAttribute) ai)
-										.getAnnotation("com.aggrepoint.dao.annotation.EnableDaoRest") != null) {
-									enableDaoRest = true;
+								if (daoRestMethods == null) {
+									Annotation anno = ((AnnotationsAttribute) ai)
+											.getAnnotation("com.aggrepoint.dao.annotation.EnableDaoRest");
+
+									if (anno != null) {
+										daoRestMethods = new HashSet<>();
+
+										ArrayMemberValue val = (ArrayMemberValue) anno.getMemberValue("value");
+										if (val != null && val.getValue() != null && val.getValue().length > 0) {
+											for (MemberValue mv : val.getValue()) {
+												DaoRestMethod dm = DaoRestMethod.fromClassName(mv.toString());
+												if (dm != null)
+													daoRestMethods.add(dm);
+											}
+										}
+
+										if (daoRestMethods.size() == 0)
+											for (DaoRestMethod dm : DaoRestMethod.values())
+												daoRestMethods.add(dm);
+									}
 								}
 							}
 						}
 						// }
-						
-						for (CtMethod method : ctclass.getDeclaredMethods()) {
-							if (method.getName().equals("findTest") || method.getName().equals("findTest1")) {
-								System.out.println();
-							}
-						}
 
 						// add interface method implementation
 						for (Method method : toadd) {
@@ -288,8 +302,8 @@ public class ServiceClassLoader extends ClassLoader {
 									if (isRestController) {
 										RestHelper.copyRestAnnotations(daoMethod, newMethod);
 
-										if (enableDaoRest)
-											RestHelper.enableRest(newMethod, domainTypeName);
+										if (daoRestMethods != null)
+											RestHelper.enableRest(newMethod, domainTypeName, daoRestMethods);
 
 										RestHelper.copyParamAttrs(daoMethod, newMethod);
 									}

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.aggrepoint.dao.annotation.DaoRestMethod;
+
 import javassist.CtMethod;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ConstPool;
@@ -68,7 +70,7 @@ public class RestHelper {
 	/**
 	 * 对ServiceImpl依照ServiceDao加入的方法启用REST访问
 	 */
-	static boolean enableRest(CtMethod method, String domainTypeName) {
+	static boolean enableRest(CtMethod method, String domainTypeName, Set<DaoRestMethod> daoRestMethods) {
 		MethodInfo mi = method.getMethodInfo();
 		String restMethod = null;
 		String url = null;
@@ -80,44 +82,56 @@ public class RestHelper {
 
 		switch (method.getName() + mi.getDescriptor()) {
 		case "create(Ljava/lang/Object;)Ljava/io/Serializable;":
-			restMethod = "org.springframework.web.bind.annotation.PostMapping";
-			url = "create";
-			requestBody = true;
-			param = "entity";
-			replaceObject = true;
+			if (daoRestMethods.contains(DaoRestMethod.create)) {
+				restMethod = "org.springframework.web.bind.annotation.PostMapping";
+				url = "create";
+				requestBody = true;
+				param = "entity";
+				replaceObject = true;
+			}
 			break;
 		case "createOrUpdate(Ljava/lang/Object;)V":
-			restMethod = "org.springframework.web.bind.annotation.PostMapping";
-			url = "createOrUpdate";
-			param = "entity";
-			requestBody = true;
-			replaceObject = true;
+			if (daoRestMethods.contains(DaoRestMethod.createOrUpdate)) {
+				restMethod = "org.springframework.web.bind.annotation.PostMapping";
+				url = "createOrUpdate";
+				param = "entity";
+				requestBody = true;
+				replaceObject = true;
+			}
 			break;
 		case "find(Ljava/io/Serializable;)Ljava/lang/Object;":
-			restMethod = "org.springframework.web.bind.annotation.GetMapping";
-			url = "find/{id}";
-			param = "id";
-			pathVar = true;
-			replaceObject = true;
-			replaceSerializable = true;
+			if (daoRestMethods.contains(DaoRestMethod.find)) {
+				restMethod = "org.springframework.web.bind.annotation.GetMapping";
+				url = "find/{id}";
+				param = "id";
+				pathVar = true;
+				replaceObject = true;
+				replaceSerializable = true;
+			}
 			break;
 		case "find()Ljava/util/List;":
-			restMethod = "org.springframework.web.bind.annotation.GetMapping";
-			url = "findAll";
+			if (daoRestMethods.contains(DaoRestMethod.findAll)) {
+				restMethod = "org.springframework.web.bind.annotation.GetMapping";
+				url = "findAll";
+			}
 			break;
 		case "update(Ljava/lang/Object;)V":
-			restMethod = "org.springframework.web.bind.annotation.PostMapping";
-			url = "update";
-			param = "entity";
-			requestBody = true;
-			replaceObject = true;
+			if (daoRestMethods.contains(DaoRestMethod.update)) {
+				restMethod = "org.springframework.web.bind.annotation.PostMapping";
+				url = "update";
+				param = "entity";
+				requestBody = true;
+				replaceObject = true;
+			}
 			break;
 		case "delete(Ljava/lang/Object;)V":
-			restMethod = "org.springframework.web.bind.annotation.PostMapping";
-			url = "delete";
-			param = "entity";
-			requestBody = true;
-			replaceObject = true;
+			if (daoRestMethods.contains(DaoRestMethod.delete)) {
+				restMethod = "org.springframework.web.bind.annotation.PostMapping";
+				url = "delete";
+				param = "entity";
+				requestBody = true;
+				replaceObject = true;
+			}
 			break;
 		}
 
