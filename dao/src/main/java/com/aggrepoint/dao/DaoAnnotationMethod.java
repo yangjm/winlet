@@ -3,6 +3,7 @@ package com.aggrepoint.dao;
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -470,15 +471,34 @@ public class DaoAnnotationMethod<T> implements DaoMethod<T> {
 		if (findForLoad) {
 			Function<Collection<?>, Object> func = (ids) -> {
 				try {
-					return invokeImpl(proxy, method, new Object[] { ids });
+					Object[] newArgs = null;
+
+					if (args.length <= 1)
+						newArgs = new Object[] { ids };
+					else {
+						newArgs = new Object[args.length];
+						newArgs[0] = ids;
+						for (int i = 1; i < args.length; i++)
+							newArgs[i] = args[i];
+					}
+
+					return invokeImpl(proxy, method, newArgs);
 				} catch (Exception e) {
 					e.printStackTrace();
 					return null;
 				}
 			};
 			ThreadContext.setAttribute(Loader.THREAD_ATTR_LOADER, func);
+			final Class<?> declaringClass = method.getDeclaringClass();
+
+			// https://dzone.com/articles/correct-reflective-access-to-interface-default-methods
 			try {
-				final Class<?> declaringClass = method.getDeclaringClass();
+				// 先尝试用Java 9+的方法
+				return MethodHandles.lookup().findSpecial(declaringClass, method.getName(),
+						MethodType.methodType(method.getReturnType(), method.getParameterTypes()), declaringClass)
+						.bindTo(proxy).invokeWithArguments(args);
+			} catch (Exception e) {
+				// 再尝试Java 8的方法
 				return CONSTRUCTOR.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
 						.unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
 			} finally {
