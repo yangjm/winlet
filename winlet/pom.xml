@@ -18,7 +18,7 @@
 		<javax.servlet.jsp-version>2.1</javax.servlet.jsp-version>
 		<javax.servlet.jstl-version>1.2</javax.servlet.jstl-version>
 		<org.ow2.asm-version>5.0.4</org.ow2.asm-version>
-		<org.owasp.esapi-version>2.1.0</org.owasp.esapi-version>
+		<org.owasp.esapi-version>2.3.0.0</org.owasp.esapi-version>
 		<htmlcompressor-version>1.5.2</htmlcompressor-version>
 		<yuicompressor-version>2.4.8</yuicompressor-version>
 		<freemarker-version>2.3.28</freemarker-version>
