@@ -15,7 +15,7 @@
 	<description>Common utilities used by both Dao and Winlet project</description>
 
 	<properties>
-		<jackson-version>2.9.10</jackson-version>
+		<jackson-version>2.12.7.1</jackson-version>
 		<imgscalr-version>4.2</imgscalr-version>
 	</properties>
 
